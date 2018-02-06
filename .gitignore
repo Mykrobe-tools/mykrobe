@@ -1,3 +1,7 @@
+# Custom
+.pytest_cache/
+mccortex/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

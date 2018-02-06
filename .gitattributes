@@ -1,0 +1,2 @@
+*.fasta filter=lfs diff=lfs merge=lfs -text
+*.gb filter=lfs diff=lfs merge=lfs -text

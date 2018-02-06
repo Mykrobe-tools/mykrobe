@@ -1,0 +1,771 @@
+{
+    "Non_tuberculosis_mycobacterium_complex": {
+        "phylo_group": "complex", 
+        "children": {
+            "Mycobacterium_chelonae_abscessus_complex": {
+                "phylo_group": "sub-complex", 
+                "children": {
+                    "Mycobacterium_chelonae": {
+                        "phylo_group": "species", 
+                        "children": {
+                            "Mycobacterium_chelonae_subsp_chelonae": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }, 
+                            "Mycobacterium_chelonae_subsp_abscessum": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            },
+			    "Mycobacterium_chelonae_chemovar_niacinogenes": {
+                                "phylo_group": "sub-species",
+                                "children": {}
+			    }			       
+                        }
+                    }, 
+                    "Mycobacterium_abscessus": {
+                        "phylo_group": "species", 
+                        "children": {
+                            "Mycobacterium_abscessus_subsp_bolletii": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }, 
+                            "Mycobacterium_abscessus_subsp_massiliense": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }
+                        }
+                    }
+                }
+            }, 
+            "Mycobacterium_avium_complex": {
+                "phylo_group": "sub-complex", 
+                "children": {
+                    "Mycobacterium_intracellulare": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_avium": {
+                        "phylo_group": "species", 
+                        "children": {
+                            "Mycobacterium_avium_subsp_avium": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }, 
+                            "Mycobacterium_avium_subsp_paratuberculosis": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }, 
+                            "Mycobacterium_avium_subsp_silvaticum": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }
+                        }
+                    }, 
+                    "Mycobacterium_chimaera": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }
+                }
+            }, 
+            "subNon_tuberculosis_mycobacterium_complex": {
+                "phylo_group": "sub-complex", 
+                "children": {
+                    "Mycobacterium_aichiense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_novum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_nonchromogenicum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_arupense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_neolactis": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_setense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_hackensackense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_aubagnense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_phlei": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_canariasense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_senegalense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_pulveris": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_bohemicum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_runyonii": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_europaeum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_doricum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_pallens": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_chitae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_minnesotense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_agri": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_suricattae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_neworleansense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_leprae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_obuense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_duvalii": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_selandiae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_florentinum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_cosmeticum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_vaccae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_monacense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_chimaera": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_gilvum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_peregrinum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_mantenii": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_lentiflavum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_terrae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_yunnanensis": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_pyrenivorans": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_flavescens": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_angelicum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_ratisbonense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_triplex": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_boenickei": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_poriferae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_asiaticum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_farcinogenes": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_mucogenicum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_xenopi": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_vanbaalenii": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_heidelbergense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_smegmatis": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_wolinskyi": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_austroafricanum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_rhodesiae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_aurum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_paraffinicum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_septicum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_parascrofulaceum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_arosiense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_confluentis": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_phage": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_bouchedurhonense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_frederiksbergense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_vulneris": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_gallinarum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_hafniae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_seoulense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_malmoense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_holsaticum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_llatzerense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_yongonense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_novocastrense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_riyadhense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_acapulcensis": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_brunense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_bacteremicum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_palustre": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_sphagni": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_koreense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_intermedium": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_scrofulaceum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_ulcerans": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_fluoranthenivorans": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_shinjukuense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_neglectum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_psychrotolerans": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_paraseoulense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_algericum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_simiae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_gordonae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_interjectum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_tomidae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_paraterrae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_szulgae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_marinum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_parafortuitum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_saskatchewanense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_szulgai": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_litorale": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_murale": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_celatum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_colombiense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_timonense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_aromaticivorans": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_kansasii": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_senuense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_mageritense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_hiberniae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_madagascariense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_gadium": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_immunogenum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_aemonae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_kyorinense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_thermoresistibile": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_kumamotonense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_rutilum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_brumae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_pinnipedii": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_conceptionense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_shimoidei": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_alvei": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_insubricum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_heraklionense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_heckeshornense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_chlorophenolicum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_goodii": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_kubicae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_diernhoferi": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_chubuense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_petroleophilum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_fortuitum": {
+                        "phylo_group": "species", 
+                        "children": {
+                            "Mycobacterium_fortuitum_subsp_acetamidolyticum": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }
+                        }
+                    }, 
+                    "Mycobacterium_hassiacum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_phocaicum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_hodleri": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_crocinum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_lacus": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_rufum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_moriokaense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_genavense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_neoaurum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_sherrisii": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_elephantis": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_porcinum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_manitobense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_genevense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_houstonense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_fallax": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_haemophilum": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_branderi": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_marseillense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_brisbanense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_hippocampi": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_montefiorense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_tusciae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_nebraskense": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }
+                }
+            }
+        }
+    }, 
+    "Mycobacterium_tuberculosis_complex": {
+        "phylo_group": "complex", 
+        "children": {
+            "subMycobacterium_tuberculosis_complex": {
+                "phylo_group": "sub-complex", 
+                "children": {
+                    "Mycobacterium_tuberculosis": {
+                        "phylo_group": "species", 
+                        "children": {
+                            "Mycobacterium_tuberculosis_subsp_canettii": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }, 
+                            "European_American": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }, 
+                            "Delhi_Central_Asia": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }, 
+                            "East_Africa_Indian_ocean": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }, 
+                            "Beijing_East_Asia": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }
+                        }
+                    }, 
+                    "Mycobacterium_africanum": {
+                        "phylo_group": "species", 
+                        "children": {
+                            "West_Africa": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }, 
+                            "Ethiopian": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }
+                        }
+                    }, 
+                    "Mycobacterium_microti": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }, 
+                    "Mycobacterium_bovis": {
+                        "phylo_group": "species", 
+                        "children": {
+                            "Mycobacterium_bovis_subsp_bcg": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }, 
+                            "Mycobacterium_bovis_subsp_caprae": {
+                                "phylo_group": "sub-species", 
+                                "children": {}
+                            }
+                        }
+                    }, 
+                    "Mycobacterium_caprae": {
+                        "phylo_group": "species", 
+                        "children": {}
+                    }
+                }
+            }
+        }
+    }
+}
