@@ -1,6 +1,6 @@
 language: python
 python: 3.6
-service: mongodb
+services: mongodb
 env:
  # - TOX_ENV=py37
  - TOX_ENV=py36
