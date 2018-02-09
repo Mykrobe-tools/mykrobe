@@ -7,7 +7,6 @@ import argparse
 
 
 from mykrobe.version import __version__
-# from mykrobe.base import ArgumentParserWithDefaults
 from mykrobe.base import DEFAULT_DB_NAME
 from mykrobe.base import sequence_parser_mixin
 from mykrobe.base import sequence_or_binary_parser_mixin
@@ -67,7 +66,9 @@ def main():
                         version="%(prog)s " + str(__version__))
     subparsers = parser.add_subparsers(
         title='[sub-commands]',
-        dest='command')
+        dest='command',
+        parser_class=ArgumentParserWithDefaults
+    )
 
     db_parser_mixin = argparse.ArgumentParser(add_help=False)
     db_parser_mixin.add_argument(
@@ -223,11 +224,9 @@ def main():
     parser_geno.set_defaults(func=run_subtool)
 
     args = parser.parse_args()
-    try:
-        args.func(parser, args)
-    except AttributeError:
+    if not args.command:
         args = parser.parse_args(["--help"])
-        args.func(parser, args)
+    args.func(parser, args)
 
 
 if __name__ == "__main__":
