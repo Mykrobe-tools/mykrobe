@@ -1,6 +1,6 @@
-from mykatlas.stats import percent_coverage_from_expected_coverage
-from mykatlas.stats import log_factorial
-from mykatlas.stats import log_lik_depth
+from mykrobe.stats import percent_coverage_from_expected_coverage
+from mykrobe.stats import log_factorial
+from mykrobe.stats import log_lik_depth
 
 from math import log
 from math import exp

@@ -1,6 +1,8 @@
 # Custom
 .pytest_cache/
 mccortex/
+atlas/
+tmp/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

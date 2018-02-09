@@ -43,7 +43,7 @@ def read(*names, **kwargs):
 
 
 setup(
-    name='mykatlas',
+    name='mykrobe',
     version='0.1.0',
     license='MIT',
     description='Mykrobe atlas',
@@ -90,7 +90,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'mykatlas = mykatlas.cli:main',
+            'mykrobe = mykrobe.cli:main',
         ]
     },
     cmdclass={'install': MyInstall, 'develop': MyInstall}

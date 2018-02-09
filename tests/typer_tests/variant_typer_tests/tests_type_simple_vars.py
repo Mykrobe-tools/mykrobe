@@ -1,10 +1,10 @@
 from unittest import TestCase
 from ga4ghmongo.schema import Variant
 from ga4ghmongo.schema import VariantCall
-from mykatlas.typing import VariantTyper
-from mykatlas.typing import ProbeCoverage
-from mykatlas.typing import SequenceProbeCoverage
-from mykatlas.typing import VariantProbeCoverage
+from mykrobe.typing import VariantTyper
+from mykrobe.typing import ProbeCoverage
+from mykrobe.typing import SequenceProbeCoverage
+from mykrobe.typing import VariantProbeCoverage
 
 
 class VariantTyperTest(TestCase):
