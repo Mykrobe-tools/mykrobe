@@ -11,12 +11,12 @@ class MTBCSpeciesTests(TestCase):
         pass
 
     def test_mixed_chimera(self):
-        species_predictor = AMRSpeciesPredictor(base_json={},
-                                                phylo_group_covgs={},
-                                                sub_complex_covgs={},
-                                                species_covgs={},
-                                                lineage_covgs={}
-                                                )
+        species_predictor = AMRSpeciesPredictor(
+            phylo_group_covgs={},
+            sub_complex_covgs={},
+            species_covgs={},
+            lineage_covgs={}
+        )
         species_predictor.out_json["phylogenetics"] = {
             "sub_complex": {
                 "Mycobacterium_avium_complex": {
