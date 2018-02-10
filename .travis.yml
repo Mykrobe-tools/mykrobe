@@ -23,4 +23,4 @@ matrix:
     env: TOXENV=py37           
 install:
   - travis_retry pip install tox
-script: tox -e $TOX_ENV
+script: tox -e $TOXENV
