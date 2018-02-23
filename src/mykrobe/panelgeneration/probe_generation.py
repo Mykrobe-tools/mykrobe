@@ -6,10 +6,10 @@ from mongoengine.connection import MongoEngineConnectionError
 from pymongo.errors import ServerSelectionTimeoutError
 import logging
 from ga4ghmongo.schema import Variant
-from mykatlas.utils import split_var_name
-from mykatlas.utils import flatten
-from mykatlas.utils import unique
-from mykatlas.panelgeneration import AlleleGenerator
+from mykrobe.utils import split_var_name
+from mykrobe.utils import flatten
+from mykrobe.utils import unique
+from mykrobe.panelgeneration.models import AlleleGenerator
 from ga4ghmongo.schema import VariantSet
 
 logging.basicConfig(level=logging.DEBUG)

@@ -52,7 +52,7 @@ You can deactivate at anytime by typing `deactivate` in your terminal.
 ### Make probes
 
 ```
-(venv)-bash-4.1$ ./mykatlas/atlas_main.py make-probes --help
+(venv)-bash-4.1$ ./mykrobe/atlas_main.py make-probes --help
 usage: atlas make-probes [-h] [--db_name db_name] [-q] [-v VARIANT] [-f FILE]
                          [-g GENBANK] [-k KMER]
                          reference_filepath

@@ -15,17 +15,19 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from mongoengine import connect
 DB = connect('atlas-test')
+import pytest
 
 
 class TestRegions():
 
-    def setUp(self):
+    def setup(self):
         DB.drop_database('atlas-test')
-        with open("mykrobe/data/NC_000962.3.fasta", 'r') as infile:
+        with open("src/mykrobe/data/NC_000962.3.fasta", 'r') as infile:
             self.reference_seq = list(SeqIO.parse(infile, "fasta"))[0].seq
+
         self.gm = GeneAminoAcidChangeToDNAVariants(
-            reference="mykrobe/data/NC_000962.3.fasta",
-            genbank="mykrobe/data/NC_000962.3.gb")
+            reference="src/mykrobe/data/NC_000962.3.fasta",
+            genbank="src/mykrobe/data/NC_000962.3.gb")
         self.reference_set = ReferenceSet().create_and_save(name="ref_set")
         self.variant_set = VariantSet.create_and_save(
             name="this_vcf_file",
@@ -81,7 +83,7 @@ class TestRegions():
             reference=self.reference_seq,
             start=759807,
             end=763325)
-        with assert_raises(ValueError):
+        with pytest.raises(ValueError):
             g.get_codon(1173)
         assert g.get_codon(2) == "GCA"
         assert g.get_codon(3) == "GAT"
@@ -96,7 +98,7 @@ class TestRegions():
             start=4407528,
             end=4408202,
             forward=False)
-        with assert_raises(ValueError):
+        with pytest.raises(ValueError):
             g.get_codon(225)
         assert g.get_codon(2) == "TCT"
         assert g.get_codon(3) == "CCG"
@@ -107,8 +109,8 @@ class TestRegions():
 
     def test_gene_muts(self):
         self.gm = GeneAminoAcidChangeToDNAVariants(
-            reference="mykrobe/data/NC_000962.3.fasta",
-            genbank="mykrobe/data/NC_000962.3.gb")
+            reference="src/mykrobe/data/NC_000962.3.fasta",
+            genbank="src/mykrobe/data/NC_000962.3.gb")
         assert self.gm.get_alts("K") == ['AAA', 'AAG']
         # GAT -> ['GCA', 'GCT', 'GCC', 'GCG'], positions 759813,14,15
         assert sorted(self.gm.get_variant_names("rpoB", "D3A")) == sorted(
@@ -177,8 +179,8 @@ class TestRegions():
 
     def test_gene_muts2(self):
         self.gm = GeneAminoAcidChangeToDNAVariants(
-            reference="mykrobe/data/NC_000962.3.fasta",
-            genbank="mykrobe/data/NC_000962.3.gb")
+            reference="src/mykrobe/data/NC_000962.3.fasta",
+            genbank="src/mykrobe/data/NC_000962.3.gb")
         assert self.gm.get_alts("K") == ['AAA', 'AAG']
         # AGC -> ['CTT', 'CTC', 'CTA', 'CTG']
     #   # GAG -> ['GCA', 'GCT', 'GCC', 'GCG']
@@ -187,7 +189,7 @@ class TestRegions():
             ['CTC2156103TGC', 'CTC2156103AGC', 'CTC2156103GGC', 'CTC2156103CGC'])
 
     def test_make_variant_panel(self):
-        ag = AlleleGenerator("mykrobe/data/NC_000962.3.fasta")
+        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
         gene = self.gm.get_gene("rpoB")
         for var in self.gm.get_variant_names("rpoB", "D3A"):
             ref, start, alt = split_var_name(var)
@@ -205,7 +207,7 @@ class TestRegions():
                 assert Seq(seq).translate()[2] == "A"
 
     def test_make_variant_panel2(self):
-        ag = AlleleGenerator("mykrobe/data/NC_000962.3.fasta")
+        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
         gene = self.gm.get_gene("katG")
         for var in self.gm.get_variant_names("katG", "E3A"):
             ref, start, alt = split_var_name(var)
@@ -223,7 +225,7 @@ class TestRegions():
                 assert Seq(seq).reverse_complement().translate()[2] == "A"
 
     def test_make_variant_panel3(self):
-        ag = AlleleGenerator("mykrobe/data/NC_000962.3.fasta")
+        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
         gene = self.gm.get_gene("katG")
         for var in self.gm.get_variant_names("katG", "S315L"):
             ref, start, alt = split_var_name(var)
@@ -241,7 +243,7 @@ class TestRegions():
                 assert Seq(seq).reverse_complement().translate()[314] == "L"
 
     def test_make_variant_panel4(self):
-        ag = AlleleGenerator("mykrobe/data/NC_000962.3.fasta")
+        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
         gene = self.gm.get_gene("katG")
         for var in self.gm.get_variant_names("katG", "W90R"):
             ref, start, alt = split_var_name(var)
@@ -259,7 +261,7 @@ class TestRegions():
                 assert Seq(seq).reverse_complement().translate()[89] == "R"
 
     def test_make_variant_panel5(self):
-        ag = AlleleGenerator("mykrobe/data/NC_000962.3.fasta")
+        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
         gene = self.gm.get_gene("gyrA")
         for var in self.gm.get_variant_names("gyrA", "D94X"):
             ref, start, alt = split_var_name(var)
@@ -276,11 +278,11 @@ class TestRegions():
                 assert Seq(seq).translate()[93] != "D"
 
     def test_make_variant_panel6(self):
-        ag = AlleleGenerator("mykatlas/data/NC_000962.3.fasta")
+        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
         gene = self.gm.get_gene("pncA")
         variants = list(self.gm.get_variant_names(
             "pncA", "CAG28TAA", protein_coding_var=False))
-        assert len(variants) == 2
+        assert len(variants) == 1
         var = variants[0]
         ref, start, alt = split_var_name(var)
         assert ref == 'CTG'
@@ -317,7 +319,7 @@ class TestRegions():
         # CACAGAATCCGACTGTGGCATATGCCGC
         #   |
         #   | <- C = last nucleotide of gene, at 2715332
-        ag = AlleleGenerator("mykatlas/data/NC_000962.3.fasta")
+        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
         gene = self.gm.get_gene("eis")
         variants = list(self.gm.get_variant_names(
             "eis", "G-10A", protein_coding_var=False))
@@ -347,7 +349,7 @@ class TestRegions():
         assert alt == seq[:30] + 'T' + seq[31:]
 
     def test_make_variant_panel8(self):
-        ag = AlleleGenerator("mykatlas/data/NC_000962.3.fasta")
+        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
         gene = self.gm.get_gene("eis")
         variants = list(self.gm.get_variant_names(
             "eis", "TG-1T", protein_coding_var=False))

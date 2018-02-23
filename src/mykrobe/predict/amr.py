@@ -91,7 +91,7 @@ class BasePredictor(object):
             if isinstance(gene, list):
                 if len(gene) > 1:
                     logger.warning(
-                        "Ambigious gene call from mykatlas. Continuing regardless. ")
+                        "Ambigious gene call. Continuing regardless. ")
                 gene = gene[0]
             self._update_resistance_prediction(name, gene)
 

@@ -11,8 +11,8 @@ from collections import Counter
 import logging
 import datetime
 import math
-from mykatlas.utils import make_hash
-from mykatlas.utils import split_var_name
+from mykrobe.utils import make_hash
+from mykrobe.utils import split_var_name
 from ga4ghmongo.schema.models.base import CreateAndSaveMixin
 from ga4ghmongo.schema import Variant
 
