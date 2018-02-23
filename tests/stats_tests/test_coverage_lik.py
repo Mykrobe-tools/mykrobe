@@ -4,6 +4,7 @@ from mykrobe.stats import log_lik_depth
 
 from math import log
 from math import exp
+import pytest
 
 
 def test_percentage_coverage():
