@@ -78,10 +78,19 @@ optional arguments:
 
 	mykrobe make-probes -t example-data/tb-walker-2015-panel.txt -g data/NC_000962.3.gb data/NC_000962.3.fasta
 
+### Tests
+To run tests:
+    
+    pip install tox
+    tox
+
+To run tests for a particular python version run, e.g. python 3.6:
+
+    tox -e py36
 
 ### Citation
 
-Please cite us if you use atlas in a publication
+Please cite us if you use mykrobe in a publication:
 
 <U>Bradley P</U>, ... , Iqbal Z.
 Rapid antibiotic-resistance predictions from genome sequence data for _Staphylococcus aureus_ and _Mycobacterium tuberculosis_.

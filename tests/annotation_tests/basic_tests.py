@@ -274,3 +274,33 @@ class TestRegions():
                 seq = copy.copy(str(gene.seq))
                 seq = seq.replace(panel.ref, alt)
                 assert Seq(seq).translate()[93] != "D"
+
+    def test_make_variant_panel6(self):
+        ag = AlleleGenerator("mykatlas/data/NC_000962.3.fasta")
+        gene = self.gm.get_gene("pncA")
+        variants = list(self.gm.get_variant_names(
+            "pncA", "CAG28TAA", protein_coding_var=False))
+        assert len(variants) == 2
+        var = variants[0]
+        ref, start, alt = split_var_name(var)
+        assert ref == 'CTG'
+        assert start == 2289212
+        assert alt == 'TTA'
+        v = Variant.create(
+            variant_sets=self.variant_sets,
+            reference=self.reference_id,
+            reference_bases=ref,
+            start=start,
+            alternate_bases=[alt])
+        panel = ag.create(v)
+        assert len(panel.alts) == 1
+        alt = panel.alts[0]
+        # the panel ref/alt seqs go past the end of the gene,
+        # so can't comparie against gene sequence. Need to get
+        # subseq from the reference seq
+        panel_ref_start = self.reference_seq.find(panel.ref)
+        assert panel_ref_start < start < panel_ref_start + len(panel.ref)
+        seq = str(
+            self.reference_seq[panel_ref_start:panel_ref_start + len(panel.ref)])
+        assert seq == panel.ref
+        assert alt == seq[:30] + 'TTA' + seq[33:]
