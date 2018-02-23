@@ -187,6 +187,11 @@ class GeneAminoAcidChangeToDNAVariants():
     def _process_DNA_mutation(self, gene, ref, start, alt):
         names = []
         pos = gene.get_reference_position(start)
+        if not gene.forward:
+            pos -= len(ref) - 1
+            ref = str(Seq(ref).reverse_complement())
+            if alt != 'X':
+                alt = str(Seq(alt).reverse_complement())
         if alt == "X":
             for a in ["A", "T", "C", "G"]:
                 if a != ref:

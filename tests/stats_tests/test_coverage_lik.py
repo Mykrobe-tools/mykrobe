@@ -5,8 +5,6 @@ from mykrobe.stats import log_lik_depth
 from math import log
 from math import exp
 
-from nose.tools import assert_raises
-
 
 def test_percentage_coverage():
     assert percent_coverage_from_expected_coverage(
@@ -55,13 +53,13 @@ def test_log_lik_depth():
         depth=50) < log_lik_depth(
         expected_depth=10,
         depth=9)
-    with assert_raises(ValueError) as cm:
+    with pytest.raises(ValueError) as cm:
         log_lik_depth(expected_depth=0, depth=0)
-    with assert_raises(ValueError) as cm:
+    with pytest.raises(ValueError) as cm:
         log_lik_depth(expected_depth=-1, depth=9)
-    with assert_raises(ValueError) as cm:
+    with pytest.raises(ValueError) as cm:
         log_lik_depth(expected_depth=12, depth=-1)
-    with assert_raises(ValueError) as cm:
+    with pytest.raises(ValueError) as cm:
         log_lik_depth(expected_depth=0, depth=1)
     assert log_lik_depth(expected_depth=1, depth=0) == -1
 

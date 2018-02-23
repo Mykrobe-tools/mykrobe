@@ -304,3 +304,74 @@ class TestRegions():
             self.reference_seq[panel_ref_start:panel_ref_start + len(panel.ref)])
         assert seq == panel.ref
         assert alt == seq[:30] + 'TTA' + seq[33:]
+
+    def test_make_variant_panel7(self):
+        # Test DNA change upstream of a gene on the reverse
+        # strand. The variant G-10A is in "gene space", ie
+        # 10 bases upstream of eis is the nucleotide G on the
+        # reverse strand. That position is 2715342 in the genome,
+        # and is C on the forwards strand.
+        # Here's a diagram:
+        #             | <- This C is at -10 in "gene space", so variant G-10A has ref=G
+        #             |    ref coord is 2715342, and variant in "ref space" is C2715342T
+        # CACAGAATCCGACTGTGGCATATGCCGC
+        #   |
+        #   | <- C = last nucleotide of gene, at 2715332
+        ag = AlleleGenerator("mykatlas/data/NC_000962.3.fasta")
+        gene = self.gm.get_gene("eis")
+        variants = list(self.gm.get_variant_names(
+            "eis", "G-10A", protein_coding_var=False))
+        assert len(variants) == 1
+        var = variants[0]
+        ref, start, alt = split_var_name(var)
+        assert ref == 'C'
+        assert start == 2715342
+        assert alt == 'T'
+        v = Variant.create(
+            variant_sets=self.variant_sets,
+            reference=self.reference_id,
+            reference_bases=ref,
+            start=start,
+            alternate_bases=[alt])
+        panel = ag.create(v)
+        assert len(panel.alts) == 1
+        alt = panel.alts[0]
+        # the panel ref/alt seqs go past the end of the gene,
+        # so can't comparie against gene sequence. Need to get
+        # subseq from the reference seq
+        panel_ref_start = self.reference_seq.find(panel.ref)
+        assert panel_ref_start < start < panel_ref_start + len(panel.ref)
+        seq = str(
+            self.reference_seq[panel_ref_start:panel_ref_start + len(panel.ref)])
+        assert seq == panel.ref
+        assert alt == seq[:30] + 'T' + seq[31:]
+
+    def test_make_variant_panel8(self):
+        ag = AlleleGenerator("mykatlas/data/NC_000962.3.fasta")
+        gene = self.gm.get_gene("eis")
+        variants = list(self.gm.get_variant_names(
+            "eis", "TG-1T", protein_coding_var=False))
+        assert len(variants) == 1
+        var = variants[0]
+        ref, start, alt = split_var_name(var)
+        assert ref == 'CA'
+        assert start == 2715332
+        assert alt == 'A'
+        v = Variant.create(
+            variant_sets=self.variant_sets,
+            reference=self.reference_id,
+            reference_bases=ref,
+            start=start,
+            alternate_bases=[alt])
+        panel = ag.create(v)
+        assert len(panel.alts) == 1
+        alt = panel.alts[0]
+        # the panel ref/alt seqs go past the end of the gene,
+        # so can't comparie against gene sequence. Need to get
+        # subseq from the reference seq
+        panel_ref_start = self.reference_seq.find(panel.ref)
+        assert panel_ref_start < start < panel_ref_start + len(panel.ref)
+        seq = str(
+            self.reference_seq[panel_ref_start:panel_ref_start + len(panel.ref)])
+        assert seq == panel.ref
+        assert alt[:-1] == seq[:30] + seq[31:]
