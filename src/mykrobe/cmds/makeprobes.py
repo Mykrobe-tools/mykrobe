@@ -20,9 +20,9 @@ from mykrobe.utils import split_var_name
 from mykrobe.annotation.genes import GeneAminoAcidChangeToDNAVariants
 from mykrobe._vcf import VCF
 
-from mykrobe.panelgeneration.models import Mutation
-from mykrobe.panelgeneration import AlleleGenerator
-from mykrobe.panelgeneration import make_variant_probe
+from mykrobe.probes.models import Mutation
+from mykrobe.probes import AlleleGenerator
+from mykrobe.probes import make_variant_probe
 
 
 logging.basicConfig(level=logging.DEBUG)

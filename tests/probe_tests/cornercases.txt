@@ -1,0 +1,23 @@
+## cornercases
+
+v = Variant("A", 4021408, "ACGCTGGCGGGCG")
+v1  = Variant("AGA", 4021406, "CGG")
+context = [v1]
+
+v1 removes A at reference V and v becomes
+v = Variant("G", 4021408, "GCGCTGGCGGGCG")? 
+
+---
+    v = Variant("TCGCGTGGC", 4021459, "GCGAGCAGA" )
+    v1 =  Variant("A", 4021455, "ATCTAGCCGCAAG")
+    v2 =  Variant("T", 4021489, "G")
+
+    v2 is pushed out of context by v1
+
+
+---
+
+        v = Variant("G", 2338961, "A")
+        v1 = Variant("GGATG", 2338990, "CGATA")  
+
+Indel slides off the end i.e. G is not in the context

@@ -9,7 +9,7 @@ from ga4ghmongo.schema import Variant
 from mykrobe.utils import split_var_name
 from mykrobe.utils import flatten
 from mykrobe.utils import unique
-from mykrobe.panelgeneration.models import AlleleGenerator
+from mykrobe.probes.models import AlleleGenerator
 from ga4ghmongo.schema import VariantSet
 
 logging.basicConfig(level=logging.DEBUG)
