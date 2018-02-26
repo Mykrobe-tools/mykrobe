@@ -119,9 +119,11 @@ class VariantTyperWithContamination(TestCase):
 class TestVariantTyperWithMultipleAlternateCoverages(TestCase):
 
     def setUp(self):
+        # to do, test should pass on kc model also
         self.vt_no_contaim = VariantTyper(
             expected_depths=[100],
-            contamination_depths=[])
+            contamination_depths=[],
+            model="median_depth")
 
     def teardown(self):
         pass
