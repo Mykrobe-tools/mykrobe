@@ -1,9 +1,9 @@
-from atlasvar.probes import AlleleGenerator
-from ga4ghmongo.schema import Variant
-from ga4ghmongo.schema import VariantSet
-from ga4ghmongo.schema import Reference
-from ga4ghmongo.schema import ReferenceSet
-from nose.tools import assert_raises
+from mykrobe.probes import AlleleGenerator
+from mykrobe.variants.schema.models import Variant
+from mykrobe.variants.schema.models import VariantSet
+from mykrobe.variants.schema.models import Reference
+from mykrobe.variants.schema.models import ReferenceSet
+import pytest
 from mongoengine import connect
 DB = connect('atlas-test')
 
@@ -13,9 +13,9 @@ class TestINDELandSNPSAlleleGenerator():
     def setup(self):
         DB.drop_database('atlas-test')
         self.pg = AlleleGenerator(
-            reference_filepath="atlasvar/data/BX571856.1.fasta")
+            reference_filepath="src/mykrobe/data/BX571856.1.fasta")
         self.pg2 = AlleleGenerator(
-            reference_filepath="atlasvar/data/NC_000962.2.fasta")
+            reference_filepath="src/mykrobe/data/NC_000962.2.fasta")
         self.reference_set = ReferenceSet().create_and_save(name="ref_set")
         self.variant_set = VariantSet.create_and_save(
             name="this_vcf_file",

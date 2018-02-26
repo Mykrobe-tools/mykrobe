@@ -1,10 +1,10 @@
 from mykrobe.probes import AlleleGenerator
-from mykrobe.variants.schema import Variant
-from mykrobe.variants.schema import VariantSet
-from mykrobe.variants.schema import Reference
-from mykrobe.variants.schema import ReferenceSet
-from nose.tools import assert_raises
+from mykrobe.variants.schema.models import Variant
+from mykrobe.variants.schema.models import VariantSet
+from mykrobe.variants.schema.models import Reference
+from mykrobe.variants.schema.models import ReferenceSet
 from mongoengine import connect
+import pytest
 DB = connect('atlas-test')
 
 
@@ -13,7 +13,7 @@ class TestSNPAlleleGenerator():
     def setup(self):
         DB.drop_database('atlas-test')
         self.pg = AlleleGenerator(
-            reference_filepath="atlasvar/data/BX571856.1.fasta")
+            reference_filepath="src/mykrobe/data/BX571856.1.fasta")
         self.reference_set = ReferenceSet().create_and_save(name="ref_set")
         self.variant_set = VariantSet.create_and_save(
             name="this_vcf_file",
@@ -27,7 +27,7 @@ class TestSNPAlleleGenerator():
 
     def test_panel_generator(self):
         pg = AlleleGenerator(
-            reference_filepath="atlasvar/data/BX571856.1.fasta")
+            reference_filepath="src/mykrobe/data/BX571856.1.fasta")
         assert pg.ref is not None
 
     def test_simple_variant(self):
@@ -57,7 +57,7 @@ class TestSNPAlleleGenerator():
             "GATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTGATC"]
 
     def test_simple_variant_invalid(self):
-        with assert_raises(ValueError) as cm:
+        with pytest.raises(ValueError) as cm:
             v = Variant.create(
                 variant_sets=self.variant_sets,
                 reference=self.reference,

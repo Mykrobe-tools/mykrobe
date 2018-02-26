@@ -1,10 +1,10 @@
 from mykrobe.probes import AlleleGenerator
-from mykrobe.variant.schema import Variant
-from mykrobe.variant.schema import VariantSet
-from mykrobe.variant.schema import Reference
-from mykrobe.variant.schema import ReferenceSet
-from nose.tools import assert_raises
+from mykrobe.variants.schema.models import Variant
+from mykrobe.variants.schema.models import VariantSet
+from mykrobe.variants.schema.models import Reference
+from mykrobe.variants.schema.models import ReferenceSet
 from mongoengine import connect
+import pytest
 DB = connect('atlas-test')
 
 
@@ -14,9 +14,9 @@ class TestINDELAlleleGenerator():
         DB.drop_database('atlas-test')
 
         self.pg = AlleleGenerator(
-            reference_filepath="atlasvar/data/BX571856.1.fasta")
+            reference_filepath="src/mykrobe/data/BX571856.1.fasta")
         self.pg2 = AlleleGenerator(
-            reference_filepath="atlasvar/data/NC_000962.2.fasta")
+            reference_filepath="src/mykrobe/data/NC_000962.2.fasta")
         self.reference_set = ReferenceSet().create_and_save(name="ref_set")
         self.variant_set = VariantSet.create_and_save(
             name="this_vcf_file",
