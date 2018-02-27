@@ -15,25 +15,27 @@ from mykrobe.base import force_mixin
 from mykrobe.base import genotyping_mixin
 
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 DEFAULT_KMER_SIZE = os.environ.get("KMER_SIZE", 31)
 
 
 def run_subtool(parser, args):
-    if args.command == 'add':
-        from mykrobe.cmds.variants.add import run
+    if args.command == "variants":
+        if args.sub_command == 'add':
+            from mykrobe.cmds.variants.add import run
     # elif args.command == "add-gt":
     #     from mykrobe.cmds.atlasadd import run
-    elif args.command == "dump-probes":
-        from mykrobe.cmds.dump import run
+        elif args.sub_command == "dump-probes":
+            from mykrobe.cmds.dump import run
+        elif args.sub_command == "make-probes":
+            from mykrobe.cmds.makeprobes import run
     elif args.command == "predict":
         from mykrobe.cmds.amr import run
     elif args.command == "genotype":
         from mykrobe.cmds.genotype import run
-    elif args.command == "make-probes":
-        from mykrobe.cmds.makeprobes import run
+
     elif args.command == "place":
         from mykrobe.cmds.place import run
     elif args.command == "diff":
@@ -113,11 +115,13 @@ def main():
     # ##################
 
     parser_variants = subparsers.add_parser(
-        'variants')
+        'variants',
+        help="build variant probes", aliases=['vars'])
 
     variant_subparsers = parser_variants.add_subparsers(
         title='[sub-commands]',
-        dest='command'
+        dest='sub_command',
+        help="help"
     )
 
     ##########
@@ -238,9 +242,10 @@ def main():
     parser_geno.set_defaults(func=run_subtool)
 
     args = parser.parse_args()
-    if not args.command:
-        args = parser.parse_args(["--help"])
-    args.func(parser, args)
+    if hasattr(args, 'func'):
+        args.func(parser, args)
+    else:
+        parser.print_help()
 
 
 if __name__ == "__main__":

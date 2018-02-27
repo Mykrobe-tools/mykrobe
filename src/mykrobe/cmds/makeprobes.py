@@ -4,7 +4,7 @@ import os
 import sys
 import logging
 from mongoengine import connect
-from mongoengine.errors import ConnectionError
+
 from mongoengine import DoesNotExist
 from mongoengine import NotUniqueError
 
@@ -25,18 +25,19 @@ from mykrobe.probes import AlleleGenerator
 from mykrobe.probes import make_variant_probe
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
+
 logger = logging.getLogger(__name__)
 
 
 def run(parser, args):
-    DB = connect('atlas-%s' % (args.db_name))
+    DB = connect('mykrobe-%s' % (args.db_name))
     if DB is not None:
         try:
             Variant.objects()
             logging.info(
-                "Connected to atlas-%s" % (args.db_name))
-        except (ServerSelectionTimeoutError, ConnectionError):
+                "Connected to mykrobe-%s" % (args.db_name))
+        except (ServerSelectionTimeoutError):
             DB = None
             logging.warning(
                 "Could not connect to database. Continuing without using genetic backgrounds")
@@ -65,7 +66,8 @@ def run(parser, args):
                                      gene=aa2dna.get_gene(gene),
                                      mut=mutation))
         else:
-            for variant in args.variant:
+            for variant in args.variants:
+
                 gene, mutation = variant.split("_")
                 for var_name in aa2dna.get_variant_names(gene, mutation):
                     mutations.append(
@@ -92,27 +94,32 @@ def run(parser, args):
         else:
             mutations.extend(Mutation(reference=reference, var_name=v)
                              for v in args.variants)
-
     al = AlleleGenerator(
         reference_filepath=args.reference_filepath,
         kmer=args.kmer)
-    for mut in mutations:
+    for enum, mut in enumerate(mutations):
+        if enum % 100 == 0:
+            logger.info(
+                "%i of %i - %f%%" % (enum, len(mutations), round(100*enum/len(mutations), 2)))
         variant_panel = make_variant_probe(
             al, mut.variant, args.kmer, DB=DB, no_backgrounds=args.no_backgrounds)
         if variant_panel is not None:
-            if mut.gene:
+            for i, ref in enumerate(variant_panel.refs):
+                try:
+                    gene_name = mut.gene.name
+                except AttributeError:
+                    gene_name = "NA"
+
                 sys.stdout.write(
-                    ">ref-%s?num_alts=%i&gene=%s&mut=%s&ref=%s\n" %
-                    (mut.variant.var_name, len(
-                        variant_panel.alts), mut.gene.name, mut.mut, mut.reference))
-            else:
-                sys.stdout.write(
-                    ">ref-%s?num_alts=%i\n" %
-                    (mut.variant.var_name, len(
-                        variant_panel.alts)))
-            sys.stdout.write("%s\n" % variant_panel.ref)
-            for a in variant_panel.alts:
-                sys.stdout.write(">alt-%s\n" % mut.mut)
+                    ">ref-%s?var_name=%s&num_alts=%i&ref=%s&enum=%i&gene=%s&mut=%s\n" %
+                    (mut.mut, mut.variant.var_name, len(
+                        variant_panel.alts), mut.reference, i, gene_name, mut.mut))
+                sys.stdout.write("%s\n" % ref)
+
+            for i, a in enumerate(variant_panel.alts):
+                sys.stdout.write(">alt-%s?var_name=%s&enum=%i&gene=%s&mut=%s\n" %
+                                 (mut.mut, mut.variant.var_name, i, gene_name, mut.mut))
+
                 sys.stdout.write("%s\n" % a)
         else:
             logging.warning(

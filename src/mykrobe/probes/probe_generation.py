@@ -12,7 +12,7 @@ from mykrobe.variants.schema.models import VariantSet
 
 import logging
 logging.basicConfig(level=logging.INFO)
-# logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def get_context(pos, kmer):
@@ -73,26 +73,29 @@ def make_variant_probe(al, variant, kmer, DB=None, no_backgrounds=False):
             except:
                 DB = None
                 context = []
-                # logger.warning(
-                # "Could not connect to database. Continuing without using backgrounds")
+                logger.warning(
+                    "Could not connect to database. Continuing without using backgrounds")
         else:
             context = []
-    # if context:
-        # logger.debug(
-            # "Found %i variants in context of %s" %
-            # (len(context), variant))
+    if context:
+        logger.debug(
+            "Found %i variants in context of %s" %
+            (len(context), variant))
     variant_probe = None
     contexts_seen_together = seen_together(context)
     alts = []
     for context in contexts_seen_together:
-        # logger.debug("Processing variant:%s context:%s" % (
-            # variant, ",".join([str(c) for c in context])))
+        if context:
+            logger.debug("Processing variant:%s with context:%s" % (
+                variant, ",".join([str(c) for c in context])))
+        else:
+            logger.debug("Processing variant:%s " % (variant))
         try:
             panel = al.create(variant, context)
         except ValueError as e:
             pass
-            # logger.warning("Failed to process variant:%s context:%s. %s" % (
-            # variant, ",".join([str(c) for c in context]), str(e)))
+            logger.warning("Failed to process variant:%s context:%s. %s" % (
+                variant, ",".join([str(c) for c in context]), str(e)))
         else:
             if variant_probe is not None:
                 variant_probe.alts.extend(panel.alts)

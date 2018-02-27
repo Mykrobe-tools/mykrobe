@@ -215,7 +215,10 @@ class VCF(object):
             if sample["GT"] is None:
                 valid = False
             else:
-                if sum([int(i) for i in split_GT(sample['GT'])]) < 2:
+                try:
+                    if sum([int(i) for i in split_GT(sample['GT'])]) < 2:
+                        valid = False
+                except ValueError:
                     valid = False
             try:
                 if sample["GT_CONF"] <= 1:
