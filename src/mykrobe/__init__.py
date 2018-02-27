@@ -1,0 +1,1 @@
+from mykrobe import version

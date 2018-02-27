@@ -1,0 +1,50 @@
+##fileformat=VCFv4.0
+##fileDate=02/12/15
+##phasing=none,though some calls involve phasing clustered variants
+##variants_justified=left
+##ALT=<ID=COMPLEX,Description="Complex variant, collection of SNPs and indels">
+##ALT=<ID=DEL,Description="Deletion">
+##ALT=<ID=DEL_INV,Description="Deletion + Inversion">
+##ALT=<ID=INDEL,Description="Insertion-deletion">
+##ALT=<ID=INS,Description="Insertion of novel sequence">
+##ALT=<ID=INS_INV,Description="Insertion + Inversion">
+##ALT=<ID=INV,Description="Inversion">
+##ALT=<ID=INV_INDEL,Description="Inversion+indel - this script overcalls these, so worth checking">
+##ALT=<ID=PH_SNPS,Description="Phased SNPs">
+##ALT=<ID=SNP,Description="SNP">
+##ALT=<ID=SNP_FROM_COMPLEX,Description="SNP called from a cluster of phased SNPs or complex SNP/indel , split out for easier comparison with other SNP call sets">
+##FILTER=<ID=MAPQ,Description="5prime flank maps to reference with mapping quality below 40">
+##FILTER=<ID=MISMAPPED_UNPLACEABLE,Description="Stampy mapped the variant (using the 5p-flank) confidently (mapqual> 40) to a place where the ref-allele does not match">
+##FILTER=<ID=MULTIALLELIC,Description="Cortex does not call multiallelic sites, but combining run_calls VCFs can produce them. Filtered as current genotyper assumes biallelic.">
+##FILTER=<ID=OVERLAPPING_SITE,Description="If Stampy (or combining VCFs) has placed two biallelic variants overlapping, they are filtered">
+##FORMAT=<ID=COV,Number=2,Type=Integer,Description="Number of reads on ref and alt alleles">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=GT_CONF,Number=1,Type=Float,Description="Genotype confidence. Difference in log likelihood of most likely and next most likely genotype">
+##FORMAT=<ID=SITE_CONF,Number=1,Type=Float,Description="Probabilitic site classification confidence. Difference in log likelihood of most likely and next most likely model (models are variant, repeat and error)">
+##INFO=<ID=KMER,Number=1,Type=Integer,Description="Kmer size at which variant was discovered">
+##INFO=<ID=PV,Number=1,Type=Integer,Description="Possible variation in clean indel position">
+##INFO=<ID=SVLEN,Number=1,Type=Integer,Description="Difference in length between REF and ALT alleles">
+##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of variant">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	C00008769
+NC_000962.3	1849	UNION_BC_k31_var_147	C	A	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,63:43.67
+NC_000962.3	3446	UNION_BC_k31_var_548	C	T	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,58:40.20
+NC_000962.3	4013	UNION_BC_k31_var_17	T	C	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,62:42.97
+NC_000962.3	7362	UNION_BC_k31_var_290	G	C	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,55:38.12
+NC_000962.3	7585	UNION_BC_k31_var_867	G	C	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,65:45.05
+NC_000962.3	9304	UNION_BC_k31_var_1222	G	A	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,71:49.22
+NC_000962.3	10369	UNION_BC_k31_var_539	A	G	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,43:29.80
+NC_000962.3	10615	UNION_BC_k31_var_956	C	T	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,55:38.12
+NC_000962.3	11637	UNION_BC_k31_var_1357	C	T	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,47:32.57
+NC_000962.3	11879	UNION_BC_k31_var_35	A	G	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,65:45.05
+NC_000962.3	12204	UNION_BC_k31_var_523	G	A	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,50:34.65
+NC_000962.3	14785	UNION_BC_k31_var_267	T	C	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,57:39.51
+NC_000962.3	15117	UNION_BC_k31_var_396	C	G	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,46:31.89
+NC_000962.3	20368	UNION_BC_k31_var_138	A	C	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	0/0:47,5:1.37
+NC_000962.3	21795	UNION_BC_k31_var_227	G	A	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,55:38.12
+NC_000962.3	24007	UNION_BC_k31_var_1399	G	T	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,64:44.36
+NC_000962.3	24698	UNION_BC_k31_var_1468	GCCGCGTTGCTCGGGGTAA	G	.	PASS	KMER=31;PV=22;SVLEN=-18;SVTYPE=DEL	GT:COV:GT_CONF	1/1:0,44:38.03
+NC_000962.3	26747	UNION_BC_k31_var_866	GC	G	.	PASS	KMER=31;PV=4;SVLEN=-1;SVTYPE=DEL	GT:COV:GT_CONF	1/1:0,65:45.47
+NC_000962.3	27487	UNION_BC_k31_var_1195	G	A	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,50:34.65
+NC_000962.3	32738	UNION_BC_k31_var_1595	GC	G	.	PASS	KMER=31;PV=4;SVLEN=-1;SVTYPE=DEL	GT:COV:GT_CONF	1/1:0,41:28.84
+NC_000962.3	33372	UNION_BC_k31_var_562	T	C	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,58:40.20
+NC_000962.3	34045	UNION_BC_k31_var_829	T	C	.	PASS	KMER=31;SVLEN=0;SVTYPE=SNP	GT:COV:GT_CONF	1/1:0,63:43.67

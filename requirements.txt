@@ -1,0 +1,9 @@
+Biopython
+pyvcf
+mongoengine
+
+## Testing
+detox
+tox
+pytest
+pytest-cov
