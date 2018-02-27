@@ -94,5 +94,5 @@ setup(
             'mykrobe = mykrobe.cli:main',
         ]
     },
-    # cmdclass={'install': MyInstall}
+    cmdclass={'install': MyInstall}
 )
