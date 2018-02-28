@@ -4,6 +4,12 @@ Dev: [![Build Status](https://travis-ci.org/Phelimb/mykrobe-atlas-cli.svg?branch
 
 Tested on python 2.7, 3.4, 3.5, and 3.6.
 
+## Requirements
+
+* python 2.7, python > 3.4
+* [mongodb](https://www.mongodb.com/) > 3.0 (optional)
+
+
 ## Installation
 
 	git clone https://github.com/Mykrobe-tools/mykrobe-atlas-cli.git mykrobe
@@ -20,7 +26,7 @@ This will install two executables: mykrobe and mccortex31 (a fork of [mccortex](
 ## Usage
 
 	mykrobe --help
-	usage: mykrobe-atlas [-h] [--version] {predict,variants,vars,genotype} ...
+	usage: mykrobe [-h] [--version] {predict,variants,vars,genotype} ...
 
 	optional arguments:
 	  -h, --help            show this help message and exit
@@ -314,7 +320,7 @@ If you use one of the following panels please cite the relevant publications:
 
 ### Add variants to the database (for background/context)
 
-This is optional but will make any probe sets built more robust to variation in within k-1 bases of the key variants. 
+This is optional but will make any probe sets built more robust to variation in within k-1 bases of the key variants. This will require [mongoDB](https://www.mongodb.com/) > 3.0 running in the background.
 
 	usage: mykrobe-atlas variants add [-h] [--db_name db_name] [-f] [-q]
 	                                  [-m METHOD]
