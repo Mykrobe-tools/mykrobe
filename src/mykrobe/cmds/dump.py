@@ -31,7 +31,7 @@ def get_non_singelton_variants(db_name):
 
 
 def run(parser, args):
-    db_name = 'atlas-%s' % (args.db_name)
+    db_name = 'mykrobe-%s' % (args.db_name)
     DB = connect(db_name)
     if args.verbose:
         logger.setLevel(level=logging.DEBUG)
