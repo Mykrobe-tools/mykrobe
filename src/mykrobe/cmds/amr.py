@@ -80,24 +80,24 @@ def run(parser, args):
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
                 "data/panels/tb-walker-probe-set-feb-09-2017.fasta.gz"]
-
+    Predictor = None
     if not args.species:
         panels = TB_PANELS + GN_PANELS + STAPH_PANELS
         panel_name = "tb-gn-staph-amr"
     elif args.species == "staph":
         panels = STAPH_PANELS
         panel_name = "staph-amr"
-        # Predictor = StaphPredictor
+        Predictor = StaphPredictor
         args.kmer = 15  # Forced
     elif args.species == "tb":
         panels = TB_PANELS
         panel_name = "tb-amr"
         hierarchy_json_file = "data/phylo/mtbc_hierarchy.json"
-        # Predictor = TBPredictor
+        Predictor = TBPredictor
     elif args.species == "gn":
         panels = GN_PANELS
         panel_name = "gn-amr"
-        # Predictor = GramNegPredictor
+        Predictor = GramNegPredictor
     logger.info("Running AMR prediction with panels %s" % ", ".join(panels))
     version = {}
     version["mykrobe-predictor"] = predictor_version
@@ -156,15 +156,12 @@ def run(parser, args):
     # ## AMR prediction
 
     depths = []
-    Predictor = None
     if species_predictor.is_saureus_present():
         depths = [species_predictor.out_json["phylogenetics"]
                   ["phylo_group"]["Staphaureus"]["median_depth"]]
-        Predictor = StaphPredictor
     elif species_predictor.is_mtbc_present():
         depths = [species_predictor.out_json["phylogenetics"]["phylo_group"][
             "Mycobacterium_tuberculosis_complex"]["median_depth"]]
-        Predictor = TBPredictor
     elif species_predictor.is_gram_neg_present():
         Predictor = GramNegPredictor
         try:
@@ -179,7 +176,10 @@ def run(parser, args):
     args.quiet = True
     variant_calls_dict = {}
     sequence_calls_dict = {}
-    if depths:
+    if args.force and not depths:
+        depths = [1]
+    gt = None
+    if depths or args.force:
         gt = Genotyper(sample=args.sample,
                        expected_depths=depths,
                        expected_error_rate=args.expected_error_rate,
@@ -198,10 +198,10 @@ def run(parser, args):
         variant_calls_dict = gt.variant_calls_dict
         sequence_calls_dict = gt.sequence_calls_dict
     else:
-        depths = cp.estimate_depth()
+        depths = [cp.estimate_depth()]
     args.quiet = q
     mykrobe_predictor_susceptibility_result = MykrobePredictorSusceptibilityResult()
-    if Predictor is not None and max(depths) > args.min_depth:
+    if gt is not None and (max(depths) > args.min_depth or args.force):
         predictor = Predictor(variant_calls=gt.variant_calls,
                               called_genes=gt.sequence_calls_dict,
                               base_json=base_json[args.sample],
