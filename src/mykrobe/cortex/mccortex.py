@@ -5,7 +5,6 @@ import subprocess
 import logging
 import tempfile
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -23,27 +22,27 @@ class McCortexRunner(object):
 
     @mccortex31_path.setter
     def mccortex31_path(self, suggested_fpath):
-        logger.debug('Setting path to mccortex exacutable')
+        logger.debug('Setting path to mccortex executable')
         if os.path.isfile(suggested_fpath):
             logger.debug(
-                'Suggested path to mccortex exacutable is valid: %s', suggested_fpath)
+                'Suggested path to mccortex executable is valid: %s', suggested_fpath)
             self._mccortex31_path = suggested_fpath
             return
 
         logger.debug(
-            'Suggested path to mccortex exacutable is invalid: %s', suggested_fpath)
+            'Suggested path to mccortex executable is invalid: %s', suggested_fpath)
         fallback_path = os.path.join(
             os.path.dirname(sys.argv[0]), 'mccortex31')
         logger.debug(
-            'Checking fallback mccortex exacutable file path: %s', fallback_path)
+            'Checking fallback mccortex executable file path: %s', fallback_path)
 
         if not os.path.isfile(fallback_path):
             logger.debug(
-                'Fallback mccortex exacutable file path invalid: %s', fallback_path)
+                'Fallback mccortex executable file path invalid: %s', fallback_path)
             exit(-1)
 
         logger.debug(
-            'Valid path to mccortex exacutable found: %s', fallback_path)
+            'Valid path to mccortex executable found: %s', fallback_path)
         self._mccortex31_path = fallback_path
 
 
@@ -185,7 +184,7 @@ class McCortexGenoRunner(McCortexRunner):
             self._run_cortex()
         else:
             logger.warning('Not running mccortex. '
-                           'Force flag is false or coverage tempoary file exists')
+                           'Force flag is false or coverage temp file exists')
 
     def _check_panels(self):
         # If panel does not exists then build it
@@ -230,13 +229,11 @@ class McCortexGenoRunner(McCortexRunner):
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT)
 
-        # Poll for new stdout
         while True:
             nextline = process.stdout.readline()
-            if nextline == '' and process.poll() is not None:
+            if not nextline and process.poll() is not None:
                 break
             sys.stdout.write(nextline.decode("utf-8"))
-            sys.stdout.flush()
 
         output = process.communicate()[0]
         exit_code = process.returncode
@@ -260,10 +257,9 @@ class McCortexGenoRunner(McCortexRunner):
                 self._execute_command(self.coverages_cmd)
             except subprocess.CalledProcessError:
                 command = subprocess.list2cmdline(self.coverages_cmd)
-                exception_message = \
-                    'mccortex31 raised an error. ' \
-                    'Is it on PATH? check by running `mccortex31 geno`. ' \
-                    'The command that through the error was `%s` ' % command
+                exception_message = '''mccortex31 raised an error. 
+                    Is it on PATH? check by running `mccortex31 geno`. 
+                    'The command that through the error was `%s` ''' % command
                 raise ValueError(exception_message)
         else:
             logger.warning('Using pre-built binaries. Run with --force if '

@@ -22,16 +22,15 @@ class MyInstall(DistutilsInstall):
     def run(self):
 
         mccortex_dir = os.path.dirname(os.path.realpath(__file__))+"/mccortex"
-        if os.path.exists(mccortex_dir):
-            os.rmdir(mccortex_dir)
-        subprocess.call(
-            ["git", "clone", "--recursive", "-b", "genotype", "https://github.com/phelimb/mccortex", mccortex_dir], cwd=os.path.dirname(os.path.realpath(__file__)))
-        subprocess.call(
-            ["make", "clean"], cwd=mccortex_dir)
-        subprocess.call(
-            ["make"], cwd=mccortex_dir)
-        subprocess.call(
-            ["cp", "bin/mccortex31", "%s/bin/" % os.environ.get('VIRTUAL_ENV', '/usr/local/')], cwd=mccortex_dir)
+        if not os.path.exists(mccortex_dir):
+            subprocess.call(
+                ["git", "clone", "--recursive", "-b", "genotype", "https://github.com/phelimb/mccortex", mccortex_dir], cwd=os.path.dirname(os.path.realpath(__file__)))
+            subprocess.call(
+                ["make", "clean"], cwd=mccortex_dir)
+            subprocess.call(
+                ["make"], cwd=mccortex_dir)
+            subprocess.call(
+                ["cp", "bin/mccortex31", "%s/bin/" % os.environ.get('VIRTUAL_ENV', '/usr/local/')], cwd=mccortex_dir)
         DistutilsInstall.run(self)
 
 
