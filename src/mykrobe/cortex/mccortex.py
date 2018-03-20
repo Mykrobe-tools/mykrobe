@@ -227,7 +227,7 @@ class McCortexGenoRunner(McCortexRunner):
     def _execute_command(command):
         process = subprocess.Popen(command,
                                    stdout=subprocess.PIPE,
-                                   stderr=subprocess.STDOUT)
+                                   stderr=subprocess.STDERR)
 
         while True:
             nextline = process.stdout.readline()
