@@ -5,6 +5,9 @@ from Bio.Seq import Seq
 from Bio.Data import CodonTable
 import itertools
 from mykrobe.utils import split_var_name
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel("INFO")
 
 
 def flatten(l):
@@ -201,6 +204,8 @@ class GeneAminoAcidChangeToDNAVariants():
         return names
 
     def _process_coding_mutation(self, gene, ref, start, alt):
+        logger.debug("Processing gene:{} ref:{} start:{} alt:{}".format(
+            gene, ref, start, alt))
         if not gene.prot or start > len(gene.prot):
             raise ValueError("Error translating %s_%s " %
                              (gene, "".join([ref, str(start), alt])))
@@ -213,6 +218,10 @@ class GeneAminoAcidChangeToDNAVariants():
                     start - 1]))
         ref_codons = gene.get_reference_codons(start)
         alt_codons = self.get_reference_alts(gene, alt)
+        logger.debug("Reference codons (forward strand equivalent) {}".format(
+            "".join(ref_codons)))
+        logger.debug("Alternate codons (forward strand equivalent) {}".format(
+            "".join(alt_codons)))
         for ref_codon in ref_codons:
             if ref_codon in alt_codons:
                 alt_codons.remove(ref_codon)
