@@ -226,6 +226,6 @@ def run(parser, args):
     # write to file is specified by user, otherwise send to stdout
     if args.output:
         with open(args.output, 'w') as outfile:
-            json.dump(obj=base_json, fp=outfile, indent=4)
+            json.dump(base_json, outfile, indent=4)
     else:
         print(json.dumps(base_json, indent=4))
