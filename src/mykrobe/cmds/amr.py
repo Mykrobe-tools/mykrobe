@@ -222,4 +222,10 @@ def run(parser, args):
         model=args.model).to_dict()
     if not args.keep_tmp:
         cp.remove_temporary_files()
-    print(json.dumps(base_json, indent=4))
+
+    # write to file is specified by user, otherwise send to stdout
+    if args.output:
+        with open(args.output, 'w') as outfile:
+            json.dump(obj=base_json, fp=outfile, indent=4)
+    else:
+        print(json.dumps(base_json, indent=4))

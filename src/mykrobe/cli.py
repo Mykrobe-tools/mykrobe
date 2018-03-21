@@ -108,6 +108,11 @@ def main():
         type=int,
         help='min_depth',
         default=1)
+    parser_amr.add_argument(
+        '--output',
+        type=str,
+        help='File path to save output json file as. Default is to stdout.',
+        default='')
     parser_amr.set_defaults(func=run_subtool)
 
     # ##################
