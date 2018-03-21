@@ -53,18 +53,18 @@ def run(parser, args):
             with open(args.text_file, 'r') as infile:
                 reader = csv.reader(infile, delimiter="\t")
                 for row in reader:
-                    gene, mutation, alphabet = row
+                    gene, mutation_string, alphabet = row
                     if alphabet == "DNA":
                         protein_coding_var = False
                     else:
                         protein_coding_var = True
                     for var_name in aa2dna.get_variant_names(
-                            gene, mutation, protein_coding_var):
-                        mutations.append(
-                            Mutation(reference=reference,
-                                     var_name=var_name,
-                                     gene=aa2dna.get_gene(gene),
-                                     mut=mutation))
+                            gene, mutation_string, protein_coding_var):
+                        mutation = Mutation(reference=reference,
+                                            var_name=var_name,
+                                            gene=aa2dna.get_gene(gene),
+                                            mut=mutation_string)
+                        mutations.append(mutation)
         else:
             for variant in args.variants:
 
