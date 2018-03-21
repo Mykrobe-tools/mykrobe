@@ -99,9 +99,21 @@ def main():
         '--panel',
         metavar='panel',
         type=str,
-        help='variant panel (default:walker-2015)',
-        choices=['bradley-2015', 'walker-2015'],
+        help='variant panel (default:walker-2015). custom requires custom_probe_set_path and custom_variant_to_resistance_json to be set',
+        choices=['bradley-2015', 'walker-2015', 'custom'],
         default='walker-2015')
+    parser_amr.add_argument(
+        '--custom_probe_set_path',
+        metavar='custom_probe_set_path',
+        type=str,
+        help='For use with `--panel custom`. File path to fasta file from `mykrobe make-probes`.',
+        default=None)
+    parser_amr.add_argument(
+        '--custom_variant_to_resistance_json',
+        metavar='custom_variant_to_resistance_json',
+        type=str,
+        help='For use with `--panel custom`. File path to JSON with key,value pairs of variant names and induced drug resistance.',
+        default=None)
     parser_amr.add_argument(
         '--min_depth',
         metavar='min_depth',

@@ -10,7 +10,6 @@ from mykrobe.typing import CoverageParser
 from mykrobe.typing import Genotyper
 from mykrobe.predict import TBPredictor
 from mykrobe.predict import StaphPredictor
-from mykrobe.predict import GramNegPredictor
 from mykrobe.predict import MykrobePredictorSusceptibilityResult
 from mykrobe.metagenomics import AMRSpeciesPredictor
 from mykrobe.metagenomics import MykrobePredictorPhylogeneticsResult
@@ -80,24 +79,24 @@ def run(parser, args):
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
                 "data/panels/tb-walker-probe-set-feb-09-2017.fasta.gz"]
+        elif args.panel == "custom":
+            if not args.custom_probe_set_path:
+                raise ValueError("Custom panel requires custom_probe_set_path")
+            TB_PANELS = [
+                args.custom_probe_set_path,
+                "data/panels/tb-species-170421.fasta.gz"
+            ]
     Predictor = None
     if not args.species:
         panels = TB_PANELS + GN_PANELS + STAPH_PANELS
-        panel_name = "tb-gn-staph-amr"
     elif args.species == "staph":
         panels = STAPH_PANELS
-        panel_name = "staph-amr"
         Predictor = StaphPredictor
         args.kmer = 15  # Forced
     elif args.species == "tb":
         panels = TB_PANELS
-        panel_name = "tb-amr"
         hierarchy_json_file = "data/phylo/mtbc_hierarchy.json"
         Predictor = TBPredictor
-    elif args.species == "gn":
-        panels = GN_PANELS
-        panel_name = "gn-amr"
-        Predictor = GramNegPredictor
     logger.info("Running AMR prediction with panels %s" % ", ".join(panels))
     version = {}
     version["mykrobe-predictor"] = predictor_version
@@ -162,14 +161,6 @@ def run(parser, args):
     elif species_predictor.is_mtbc_present():
         depths = [species_predictor.out_json["phylogenetics"]["phylo_group"][
             "Mycobacterium_tuberculosis_complex"]["median_depth"]]
-    elif species_predictor.is_gram_neg_present():
-        Predictor = GramNegPredictor
-        try:
-            depths = [species_predictor.out_json["phylogenetics"][
-                "species"]["Klebsiella_pneumoniae"]["median_depth"]]
-        except KeyError:
-            depths = [species_predictor.out_json["phylogenetics"]
-                      ["species"]["Escherichia_coli"]["median_depth"]]
     # pprint (species_predictor.out_json["phylogenetics"]["species"])
     # Genotype
     q = args.quiet
@@ -207,7 +198,8 @@ def run(parser, args):
                               base_json=base_json[args.sample],
                               depth_threshold=args.min_depth,
                               ignore_filtered=True,
-                              ignore_minor_calls=args.ont)
+                              ignore_minor_calls=args.ont,
+                              variant_to_resistance_json_fp=args.custom_variant_to_resistance_json)
         mykrobe_predictor_susceptibility_result = predictor.run()
     base_json[
         args.sample] = MykrobePredictorResult(

@@ -52,7 +52,16 @@ def is_filtered(call):
 
 class BasePredictor(object):
 
-    def __init__(self, variant_calls, called_genes, base_json={}, depth_threshold=3, ignore_filtered=True, ignore_minor_calls=False):
+    def __init__(self, variant_calls, called_genes,
+                 base_json={}, depth_threshold=3, ignore_filtered=True,
+                 ignore_minor_calls=False,
+                 variant_to_resistance_json_fp=None):
+        if variant_to_resistance_json_fp:
+            self.variant_or_gene_name_to_resistance_drug = load_json(
+                variant_to_resistance_json_fp)
+        else:
+            self.variant_or_gene_name_to_resistance_drug = load_json(
+                self.default_variant_to_resistance_drug)
         self.variant_calls = variant_calls
         self.called_genes = called_genes
         self.drugs = self._get_drug_list_from_variant_to_resistance_drug()
@@ -208,16 +217,19 @@ def load_json(f):
 
 class TBPredictor(BasePredictor):
 
-    def __init__(self, variant_calls, called_genes, base_json={}, depth_threshold=3, ignore_filtered=True, ignore_minor_calls=False):
-
+    @property
+    def default_variant_to_resistance_drug(self):
         self.data_dir = os.path.abspath(
             os.path.join(
                 os.path.dirname(__file__),
                 '../data/predict/tb/'))
-        self.variant_or_gene_name_to_resistance_drug = load_json(
-            os.path.join(
-                self.data_dir,
-                "variant_to_resistance_drug.json"))
+        return os.path.join(
+            self.data_dir,
+            "variant_to_resistance_drug.json")
+
+    def __init__(self, variant_calls, called_genes, base_json={},
+                 depth_threshold=3, ignore_filtered=True, ignore_minor_calls=False,
+                 variant_to_resistance_json_fp=None):
         super(
             TBPredictor,
             self).__init__(
@@ -231,40 +243,22 @@ class TBPredictor(BasePredictor):
 
 class StaphPredictor(BasePredictor):
 
-    def __init__(self, variant_calls, called_genes, base_json={}, depth_threshold=3, ignore_filtered=True, ignore_minor_calls=False):
-
+    @property
+    def default_variant_to_resistance_drug(self):
         self.data_dir = os.path.abspath(
             os.path.join(
                 os.path.dirname(__file__),
                 '../data/predict/staph/'))
-        self.variant_or_gene_name_to_resistance_drug = load_json(
-            os.path.join(
-                self.data_dir,
-                "variant_to_resistance_drug.json"))
+        return os.path.join(
+            self.data_dir,
+            "variant_to_resistance_drug.json")
+
+    def __init__(self, variant_calls, called_genes, base_json={},
+                 depth_threshold=3, ignore_filtered=True, ignore_minor_calls=False,
+                 variant_to_resistance_json_fp=None):
+
         super(
             StaphPredictor,
-            self).__init__(
-            variant_calls,
-            called_genes,
-            base_json,
-            depth_threshold=depth_threshold,
-            ignore_filtered=ignore_filtered,
-            ignore_minor_calls=ignore_minor_calls)
-
-
-class GramNegPredictor(BasePredictor):
-
-    def __init__(self, variant_calls, called_genes, base_json={}, depth_threshold=3, ignore_filtered=True, ignore_minor_calls=False):
-        self.data_dir = os.path.abspath(
-            os.path.join(
-                os.path.dirname(__file__),
-                '../data/predict/gn/'))
-        self.variant_or_gene_name_to_resistance_drug = load_json(
-            os.path.join(
-                self.data_dir,
-                "variant_to_resistance_drug.json"))
-        super(
-            GramNegPredictor,
             self).__init__(
             variant_calls,
             called_genes,
