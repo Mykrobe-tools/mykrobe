@@ -1,0 +1,27 @@
+Bootstrap: debootstrap
+OSVersion: xenial
+MirrorURL:  http://us.archive.ubuntu.com/ubuntu/
+
+%environment
+  PATH=/usr/local/bin:$PATH
+
+%post
+    apt-get update
+    apt-get install -y software-properties-common wget build-essential zlib1g-dev git
+    apt-add-repository universe
+    apt-get update
+    export LC_ALL=C.UTF-8
+    export LANG=C.UTF-8
+    echo 'export LC_ALL=C.UTF-8' >> $SINGULARITY_ENVIRONMENT
+    echo 'export LANG=C.UTF-8' >> $SINGULARITY_ENVIRONMENT
+
+    # ========================
+    # INSTALL Mykrobe
+    # ========================
+    apt-get install -y python3-pip
+    git clone https://github.com/Mykrobe-tools/mykrobe-atlas-cli.git mykrobe
+    cd mykrobe
+    wget https://goo.gl/DXb9hN -O - | tar -vxzf  -
+    rm -fr src/mykrobe/data
+    mv mykrobe-data src/mykrobe/data
+    pip3 install .
