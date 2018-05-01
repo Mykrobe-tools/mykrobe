@@ -30,7 +30,7 @@ class TestMutation():
                             var_name="TCG761154TTA",
                             gene=self.aa2dna.get_gene("rpoB"),
                             mut="S450L")
-        assert mutation.mut == "S450L"
+        assert mutation.mutation_output_name == "S450L"
 
     def test_mutation_name_reverse_strand(self):
         gene = "gid"
@@ -42,4 +42,17 @@ class TestMutation():
                             var_name="GAT4408170ATT",
                             gene=self.aa2dna.get_gene("gid"),
                             mut="I11N")
-        assert mutation.mut == "I11N"
+        assert mutation.mutation_output_name == "I11N"
+
+    def test_mutation_name_dna_space(self):
+        gene = "pncA"
+        mutation_string = "C18CCA"
+        is_protein_coding_var = False
+        assert set(self.aa2dna.get_variant_names(
+            gene, mutation_string, is_protein_coding_var)) == set(["G2289224TGG"])
+        mutation = Mutation(reference=self.reference,
+                            var_name=self.aa2dna.get_variant_names(
+                                gene, mutation_string, is_protein_coding_var)[0],
+                            gene=self.aa2dna.get_gene(gene),
+                            mut=mutation_string)
+        assert mutation.mutation_output_name == "C18CCA"
