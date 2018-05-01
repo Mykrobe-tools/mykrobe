@@ -63,7 +63,8 @@ def run(parser, args):
                         mutation = Mutation(reference=reference,
                                             var_name=var_name,
                                             gene=aa2dna.get_gene(gene),
-                                            mut=mutation_string)
+                                            mut=mutation_string,
+                                            protein_coding_var=protein_coding_var)
                         mutations.append(mutation)
         else:
             for variant in args.variants:
@@ -112,19 +113,19 @@ def run(parser, args):
 
                 sys.stdout.write(
                     ">ref-%s?var_name=%s&num_alts=%i&ref=%s&enum=%i&gene=%s&mut=%s\n" %
-                    (mut.mut, mut.variant.var_name, len(
-                        variant_panel.alts), mut.reference, i, gene_name, mut.mut))
+                    (mut.mutation_output_name, mut.variant.var_name, len(
+                        variant_panel.alts), mut.reference, i, gene_name, mut.mutation_output_name))
                 sys.stdout.write("%s\n" % ref)
 
             for i, a in enumerate(variant_panel.alts):
                 sys.stdout.write(">alt-%s?var_name=%s&enum=%i&gene=%s&mut=%s\n" %
-                                 (mut.mut, mut.variant.var_name, i, gene_name, mut.mut))
+                                 (mut.mutation_output_name, mut.variant.var_name, i, gene_name, mut.mutation_output_name))
 
                 sys.stdout.write("%s\n" % a)
         else:
             logging.warning(
                 "All variants failed for %s_%s - %s" %
-                (mut.gene, mut.mut, mut.variant))
+                (mut.gene, mut.mutation_output_name, mut.variant))
 
 
 def run_make_probes_from_vcf_file(args):
