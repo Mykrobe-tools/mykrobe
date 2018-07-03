@@ -1,0 +1,4 @@
+flask
+celery
+requests
+redis
