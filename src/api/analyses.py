@@ -31,7 +31,7 @@ app.config.update(
 celery = make_celery(app)
 
 DEFAULT_OUTDIR=os.environ.get("DEFAULT_OUTDIR", "./") 
-ATLAS_API=os.environ.get("ATLAS_API", "http://localhost:8080") 
+ATLAS_API=os.environ.get("ATLAS_API", "https://api.atlas-prod.makeandship.com/") 
 
 from mykrobe.version import __version__
 import json
@@ -50,7 +50,7 @@ def predictor(file, sample_id):
     ## Load the output
     results=load_json(outfile)
     ## POST /samples/:id/result { type: "…", result: { … } }
-    url=os.path.join(ATLAS_API, "samples", sample_id, "result")
+    url=os.path.join(ATLAS_API, "experiments", sample_id, "results")
     r = requests.post(url, json={'type': "predictor", 'result' : results})
 
 @app.route('/analyses', methods=["POST"])
@@ -61,8 +61,8 @@ def main():
     res=predictor.delay(file, sample_id)
     return json.dumps({"result":"success", "task_id":str(res)}), 200
 
-## testing samples requests
-@app.route('/samples/<sample_id>/result', methods=["POST"])
+## testing experiments requests /experiments/:sample_id/results
+@app.route('/experiments/<sample_id>/results', methods=["POST"])
 def results(sample_id):
     return request.data,200
 
