@@ -1,6 +1,10 @@
 Biopython
 pyvcf
 mongoengine
+cython
+git+git://github.com/Phelimb/BIGSI.git@7843d5aef092363b5ba2d77773b3c285dabf0e4d
+git+git://github.com/Phelimb/atlas-var.git@9aee355b25d0f94b4603eb4bf7e8c47af793f5d4
+
 
 ## Testing
 detox
