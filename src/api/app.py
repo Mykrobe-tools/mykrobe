@@ -83,7 +83,7 @@ def bigsi(query_type, query):
     out["query"]=query
     query_id=_hash(json.dumps(query))
     url=os.path.join(ATLAS_API, "queries", query_id, "results")    
-    send_results("bigsi", out, url)
+    send_results(query_type, out, url)
 
 @app.route('/analyses', methods=["POST"])
 def main():
