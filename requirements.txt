@@ -2,7 +2,7 @@ Biopython
 pyvcf
 mongoengine
 cython
-git+git://github.com/Phelimb/BIGSI.git@d3e9a310e6c91c887d7917ced5609b6002a67623
+git+git://github.com/Phelimb/BIGSI.git@8704946e223663bdaf0a2ea8b23c8b2ceaa0a8a8
 git+git://github.com/Phelimb/atlas-var.git@9aee355b25d0f94b4603eb4bf7e8c47af793f5d4
 
 
