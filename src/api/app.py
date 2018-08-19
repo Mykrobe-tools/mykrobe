@@ -73,15 +73,17 @@ def _hash(w):
 
 @celery.task()
 def bigsi(query_type, query):
+    out={}
     results= {
         "sequence":BIGSI_TM.seq_query,
         "dna-variant":BIGSI_TM.dna_variant_query,
         "protein-variant":BIGSI_TM.protein_variant_query
     }[query_type](query)
-    results["query"]=query
+    out["results"]=results
+    out["query"]=query
     query_id=_hash(json.dumps(query))
     url=os.path.join(ATLAS_API, "queries", query_id, "results")    
-    send_results("bigsi", results, url)
+    send_results("bigsi", out, url)
 
 @app.route('/analyses', methods=["POST"])
 def main():
