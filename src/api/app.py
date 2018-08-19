@@ -8,7 +8,7 @@ from celery import Celery
 CELERY_BROKER_URL=os.environ.get("CELERY_BROKER_URL", 'redis://localhost:6379') 
 DEFAULT_OUTDIR=os.environ.get("DEFAULT_OUTDIR", "./") 
 ATLAS_API=os.environ.get("ATLAS_API", "https://api.atlas-prod.makeandship.com/") 
-
+print(ATLAS_API)
 
 def make_celery(app):
     celery = Celery(app.import_name, backend=app.config['CELERY_RESULT_BACKEND'],
@@ -67,8 +67,9 @@ BIGSI_TM=BigsiTaskManager(BIGSI_DB_PATH,TB_REFERENCE_PATH,TB_GENBANK_PATH)
 
 import hashlib
 def _hash(w):
+    w=w.encode('utf-8')
     h = hashlib.md5(w)
-    return h.digest().encode('base64')[:24]
+    return h.hexdigest()[:24]
 
 @celery.task()
 def bigsi(query_type, query):
@@ -78,7 +79,7 @@ def bigsi(query_type, query):
         "protein-variant":BIGSI_TM.protein_variant_query
     }[query_type](query)
     results["query"]=query
-    query_id=_hash(json.dump(query))
+    query_id=_hash(json.dumps(query))
     url=os.path.join(ATLAS_API, "queries", query_id, "results")    
     send_results("bigsi", results, url)
 
@@ -104,7 +105,8 @@ def results(sample_id):
     return request.data,200
 
 @app.route('/queries/<query_id>/results', methods=["POST"])
-def results(query_id):
+def query_results(query_id):
+    print(request.data,200)
     return request.data,200
 
 
