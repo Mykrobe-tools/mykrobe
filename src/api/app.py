@@ -65,6 +65,11 @@ TB_REFERENCE_PATH=os.environ.get("TB_REFERENCE_PATH", "ref.fa")
 TB_GENBANK_PATH=os.environ.get("TB_GENBANK_PATH", "ref.gb") 
 BIGSI_TM=BigsiTaskManager(BIGSI_DB_PATH,TB_REFERENCE_PATH,TB_GENBANK_PATH)
 
+import hashlib
+def _hash(w):
+    h = hashlib.md5(w)
+    return h.digest().encode('base64')[:24]
+
 @celery.task()
 def bigsi(query_type, query):
     results= {
@@ -73,7 +78,8 @@ def bigsi(query_type, query):
         "protein-variant":BIGSI_TM.protein_variant_query
     }[query_type](query)
     results["query"]=query
-    url=os.path.join(ATLAS_API, "search")    
+    query_id=_hash(json.dump(query))
+    url=os.path.join(ATLAS_API, "queries", query_id, "results")    
     send_results("bigsi", results, url)
 
 @app.route('/analyses', methods=["POST"])
@@ -89,7 +95,6 @@ def search():
     data=request.get_json()
     t = data.get('type', '')
     query = data.get('query', '')
-    print(data,t,query)
     res=bigsi.delay(t, query)
     return json.dumps({"result":"success", "task_id":str(res)}), 200    
 
@@ -97,4 +102,9 @@ def search():
 @app.route('/experiments/<sample_id>/results', methods=["POST"])
 def results(sample_id):
     return request.data,200
+
+@app.route('/queries/<query_id>/results', methods=["POST"])
+def results(query_id):
+    return request.data,200
+
 
