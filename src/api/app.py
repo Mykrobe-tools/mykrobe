@@ -3,8 +3,11 @@ from flask import Flask
 from flask import request
 
 ## Celery setup
-from celery import Celery
+from analyses import PredictorTaskManager
+from analyses import BigsiTaskManager
+from analyses import DistanceTaskManager
 
+from celery import Celery
 CELERY_BROKER_URL=os.environ.get("CELERY_BROKER_URL", 'redis://localhost:6379') 
 DEFAULT_OUTDIR=os.environ.get("DEFAULT_OUTDIR", "./") 
 ATLAS_API=os.environ.get("ATLAS_API", "https://api.atlas-prod.makeandship.com/") 
@@ -49,21 +52,26 @@ def send_results(type, results, url):
     r = requests.post(url, json={'type': type, 'result' : results})
 
 ## Predictor
-from api.analyses import run_predictor
 
 @celery.task()
-def predictor(file, sample_id):
-    results=run_predictor(file, sample_id)
+def predictor_task(file, sample_id):
+    results=PredictorTaskManager(DEFAULT_OUTDIR).run_predictor(file, sample_id)
     url=os.path.join(ATLAS_API, "experiments", sample_id, "results")
     send_results("predictor", results, url)
 
+@app.route('/analyses', methods=["POST"])
+def predictor():
+    data=request.get_json()
+    file = data.get('file', '')
+    sample_id = data.get('sample_id', '')
+    res=predictor_task.delay(file, sample_id)
+    return json.dumps({"result":"success", "task_id":str(res)}), 200    
+
 ## BIGSI
-from api.analyses import BigsiTaskManager
 
 BIGSI_DB_PATH=os.environ.get("BIGSI_DB_PATH", "dbpath") 
 TB_REFERENCE_PATH=os.environ.get("TB_REFERENCE_PATH", "ref.fa") 
 TB_GENBANK_PATH=os.environ.get("TB_GENBANK_PATH", "ref.gb") 
-BIGSI_TM=BigsiTaskManager(BIGSI_DB_PATH,TB_REFERENCE_PATH,TB_GENBANK_PATH)
 
 import hashlib
 def _hash(w):
@@ -73,25 +81,18 @@ def _hash(w):
 
 @celery.task()
 def bigsi(query_type, query):
+    bigsi_tm=BigsiTaskManager(BIGSI_DB_PATH,TB_REFERENCE_PATH,TB_GENBANK_PATH)
     out={}
     results= {
-        "sequence":BIGSI_TM.seq_query,
-        "dna-variant":BIGSI_TM.dna_variant_query,
-        "protein-variant":BIGSI_TM.protein_variant_query
+        "sequence":bigsi_tm.seq_query,
+        "dna-variant":bigsi_tm.dna_variant_query,
+        "protein-variant":bigsi_tm.protein_variant_query
     }[query_type](query)
     out["results"]=results
     out["query"]=query
     query_id=_hash(json.dumps(query))
     url=os.path.join(ATLAS_API, "queries", query_id, "results")    
     send_results(query_type, out, url)
-
-@app.route('/analyses', methods=["POST"])
-def main():
-    data=request.get_json()
-    file = data.get('file', '')
-    sample_id = data.get('sample_id', '')
-    res=predictor.delay(file, sample_id)
-    return json.dumps({"result":"success", "task_id":str(res)}), 200
 
 @app.route('/search', methods=["POST"])
 def search():
@@ -100,6 +101,23 @@ def search():
     query = data.get('query', '')
     res=bigsi.delay(t, query)
     return json.dumps({"result":"success", "task_id":str(res)}), 200    
+
+## nearest neighbour distance
+
+
+@celery.task()
+def distance_task(sample_id):
+    results=DistanceTaskManager().distance(sample_id)
+    url=os.path.join(ATLAS_API, "experiments", sample_id, "results")
+    print(results,url)
+    send_results("distance", results, url)
+
+@app.route('/distance', methods=["POST"])
+def distance():
+    data=request.get_json()
+    sample_id = data.get('sample_id', '')
+    res=distance_task.delay(sample_id)
+    return json.dumps({"result":"success", "task_id":str(res)}), 200     
 
 ## testing experiments requests /experiments/:sample_id/results
 @app.route('/experiments/<sample_id>/results', methods=["POST"])
