@@ -17,9 +17,9 @@ class BigsiTaskManager():
 		return self.bigsi.search(**query)
 
 	def dna_variant_query(self, query):
-		return self.bigsi_variant_search.search_for_variant(**query)
+		return self.bigsi_variant_search.search(**query)
 
 	def protein_variant_query(self, query):
-		return self.bigsi_protien_search.search_for_amino_acid_variant(**query)
+		return self.bigsi_protien_search.search(**query)
 
 
