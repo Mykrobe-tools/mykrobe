@@ -109,7 +109,6 @@ def search():
 def distance_task(sample_id):
     results=DistanceTaskManager().distance(sample_id)
     url=os.path.join(ATLAS_API, "experiments", sample_id, "results")
-    print(results,url)
     send_results("distance", results, url)
 
 @app.route('/distance', methods=["POST"])

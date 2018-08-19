@@ -37,3 +37,8 @@ curl -H "Content-Type: application/json" -X POST -d '{"type":"dna-variant", "que
 ```
 curl -H "Content-Type: application/json" -X POST -d '{"type":"protein-variant", "query": {"ref":"S","alt":"L","pos":450,"gene":"rpoB"} }' localhost:8080/search
 ```
+
+## Distance
+```
+curl -H "Content-Type: application/json" -X POST -d '{"sample_id": "sample_id"}' localhost:8080/distance
+```
