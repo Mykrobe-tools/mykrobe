@@ -14,3 +14,4 @@ class PredictorTaskManager():
 	    out=subprocess.check_output(['mykrobe','predict', sample_id, "tb", "-1", file, "--output", outfile ])
 	    ## Load the output
 	    results=load_json(outfile)	
+	    return results
