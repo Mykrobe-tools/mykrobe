@@ -104,19 +104,30 @@ def search():
 
 ## nearest neighbour distance
 
-
+TREE_SAMPLES=[1,2,3]
 @celery.task()
-def distance_task(sample_id):
-    results=DistanceTaskManager().distance(sample_id)
+def distance_task(sample_id, distance_type):
+    if distance_type == "all":
+        results=DistanceTaskManager().distance(sample_id, sort=True)
+    elif distance_type == "tree":
+        results=DistanceTaskManager().distance(sample_id, samples=TREE_SAMPLES, sort=True)        
+    elif distance_type == "nearest":
+        results=DistanceTaskManager().distance(sample_id, limit=10, sort=True)
+    else:
+        raise TypeError("%s is not a valid query" % distance_type)
     url=os.path.join(ATLAS_API, "experiments", sample_id, "results")
-    send_results("distance", results, url)
+    post_results={"distance_type":distance_type, "distances":results}
+    send_results("distance", post_results, url)
 
 @app.route('/distance', methods=["POST"])
 def distance():
     data=request.get_json()
     sample_id = data.get('sample_id', '')
-    res=distance_task.delay(sample_id)
-    return json.dumps({"result":"success", "task_id":str(res)}), 200     
+    distance_type = data.get('distance_type', 'all') 
+    assert distance_type in ["all", "tree", "nearest"]
+    res=distance_task.delay(sample_id, distance_type)
+    response= json.dumps({"result":"success", "task_id":str(res)}), 200     
+    return response
 
 ## testing experiments requests /experiments/:sample_id/results
 @app.route('/experiments/<sample_id>/results', methods=["POST"])
@@ -127,5 +138,3 @@ def results(sample_id):
 def query_results(query_id):
     print(request.data,200)
     return request.data,200
-
-
