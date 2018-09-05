@@ -17,7 +17,8 @@ class PresenceTyperTest(TestCase):
         pc = ProbeCoverage(min_depth=0,
                            percent_coverage=0,
                            median_depth=0,
-                           k_count=0)
+                           k_count=0,
+                           klen=31)
         s1 = SequenceProbeCoverage(name="A123T",
                                    probe_coverage=pc
                                    )
@@ -29,7 +30,8 @@ class PresenceTyperTest(TestCase):
         pc = ProbeCoverage(min_depth=100,
                            percent_coverage=100,
                            median_depth=100,
-                           k_count=100)
+                           k_count=100,
+                           klen=31)
         s = SequenceProbeCoverage(name="A123T",
                                   probe_coverage=pc,
                                   percent_coverage_threshold=80
@@ -43,7 +45,8 @@ class PresenceTyperTest(TestCase):
         pc = ProbeCoverage(min_depth=100,
                            percent_coverage=82,
                            median_depth=2,
-                           k_count=82)
+                           k_count=82,
+                           klen=31)
         s = SequenceProbeCoverage(name="A123T",
                                   probe_coverage=pc,
                                   percent_coverage_threshold=80
@@ -57,7 +60,8 @@ class PresenceTyperTest(TestCase):
         pc = ProbeCoverage(min_depth=100,
                            percent_coverage=100,
                            median_depth=1000,
-                           k_count=100)
+                           k_count=100,
+                           klen=31)
         s = SequenceProbeCoverage(name="A123T",
                                   probe_coverage=pc,
                                   percent_coverage_threshold=80
@@ -71,7 +75,8 @@ class PresenceTyperTest(TestCase):
         pc = ProbeCoverage(min_depth=100,
                            percent_coverage=16,
                            median_depth=16,
-                           k_count=16)
+                           k_count=16,
+                           klen=31)
         s = SequenceProbeCoverage(name="A123T",
                                   probe_coverage=pc,
                                   percent_coverage_threshold=80
@@ -83,7 +88,8 @@ class PresenceTyperTest(TestCase):
         pc = ProbeCoverage(min_depth=100,
                            percent_coverage=80,
                            median_depth=16,
-                           k_count=16)
+                           k_count=16,
+                           klen=31)
         s = SequenceProbeCoverage(name="A123T",
                                   probe_coverage=pc,
                                   percent_coverage_threshold=80
@@ -109,7 +115,8 @@ class PresenceTyperTestWithContaim(TestCase):
         pc = ProbeCoverage(min_depth=10,
                            percent_coverage=100,
                            median_depth=10,
-                           k_count=10)
+                           k_count=10,
+                           klen=31)
         s = SequenceProbeCoverage(name="A123T",
                                   probe_coverage=pc,
                                   percent_coverage_threshold=80
@@ -129,7 +136,8 @@ class PresenceTyperTestWithContaim(TestCase):
         pc = ProbeCoverage(min_depth=10,
                            percent_coverage=100,
                            median_depth=10,
-                           k_count=100)
+                           k_count=100,
+                           klen=31)
         s = SequenceProbeCoverage(name="A123T",
                                   probe_coverage=pc,
                                   percent_coverage_threshold=80
@@ -144,7 +152,8 @@ class PresenceTyperTestWithContaim(TestCase):
         pc = ProbeCoverage(min_depth=10,
                            percent_coverage=100,
                            median_depth=30,
-                           k_count=30)
+                           k_count=30,
+                           klen=31)
         s = SequenceProbeCoverage(name="A123T",
                                   probe_coverage=pc,
                                   percent_coverage_threshold=80
@@ -159,7 +168,8 @@ class PresenceTyperTestWithContaim(TestCase):
         pc = ProbeCoverage(min_depth=10,
                            percent_coverage=100,
                            median_depth=20,
-                           k_count=20)
+                           k_count=20,
+                           klen=31)
         s = SequenceProbeCoverage(name="A123T",
                                   probe_coverage=pc,
                                   percent_coverage_threshold=80
