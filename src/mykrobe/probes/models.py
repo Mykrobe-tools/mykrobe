@@ -354,7 +354,8 @@ class Mutation(object):
             var_name,
             reference,
             gene=None,
-            mut=None):
+            mut=None,
+            protein_coding_var=False):
         self.var_name = var_name
         self.gene = gene
         if mut:
@@ -362,21 +363,30 @@ class Mutation(object):
         self.ref, tmp, self.alt = split_var_name(var_name)
         self.standard_table = CodonTable.unambiguous_dna_by_name["Standard"]
         self.reference = reference
+        self.input_mutation_name = mut
+        self.protein_coding_var = protein_coding_var
 
     @property
-    def mut(self):
-        if self.gene is not None:
-            if self.gene.forward:
-                ref = self.ref
-                alt = self.alt
-            else:
-                ref = str(Seq(self.ref).reverse_complement())
-                alt = str(Seq(self.alt).reverse_complement())
-            r = self.standard_table.forward_table.get(ref, ref)
-            a = self.standard_table.forward_table.get(alt, alt)
-            return "".join([r, str(self.start), a])
+    def mutation_output_name(self):
+        if self.input_mutation_name:
+            return self.input_mutation_name
         else:
-            return self.var_name
+            if self.gene is not None:
+                if self.gene.forward:
+                    ref = self.ref
+                    alt = self.alt
+                else:
+                    ref = str(Seq(self.ref).reverse_complement())
+                    alt = str(Seq(self.alt).reverse_complement())
+                if self.protein_coding_var:
+                    r = self.standard_table.forward_table.get(ref, ref)
+                    a = self.standard_table.forward_table.get(alt, alt)
+                else:
+                    r = self.ref
+                    a = self.alt
+                return "".join([r, str(self.start), a])
+            else:
+                return self.var_name
 
     @property
     def variant(self):
