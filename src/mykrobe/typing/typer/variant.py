@@ -224,9 +224,9 @@ class KmerCountGenotypeModel(GenotypeModel):
 
 class DepthCoverageGenotypeModel(GenotypeModel):
 
-    def __init__(self, expected_depths, contamination_depths, error_rate, minor_freq):
+    def __init__(self, expected_depths, contamination_depths, error_rate, minor_freq, kmer_size=31):
         super(DepthCoverageGenotypeModel, self).__init__(
-            expected_depths, contamination_depths, error_rate, minor_freq)
+            expected_depths, contamination_depths, error_rate, minor_freq, kmer_size)
 
     def hom_ref_lik(self, variant_probe_coverage):
         if variant_probe_coverage.reference_percent_coverage < 100 * \
