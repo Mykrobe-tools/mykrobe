@@ -13,13 +13,17 @@ class BigsiTaskManager():
 		self.bigsi_protien_search=BIGSIAminoAcidMutationSearch(self.bigsi, reference=reference, genbank=genbank)
 
 
+	def _filter_genotypes(self, results):
+		print(results)
+		return results
+		
 	def seq_query(self, query):
 		return self.bigsi.search(**query)
 
 	def dna_variant_query(self, query):
-		return self.bigsi_variant_search.search(**query)
+		return self._filter_genotypes(self.bigsi_variant_search.search(**query))
 
 	def protein_variant_query(self, query):
-		return self.bigsi_protien_search.search(**query)
+		return self._filter_genotypes(self.bigsi_protien_search.search(**query))
 
 

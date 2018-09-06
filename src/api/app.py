@@ -47,9 +47,12 @@ requests_log = logging.getLogger("requests.packages.urllib3")
 requests_log.setLevel(logging.DEBUG)
 requests_log.propagate = True
 
-def send_results(type, results, url):
+def send_results(type, results, url, sub_type=None):
     ## POST /samples/:id/result { type: "…", result: { … } }
-    r = requests.post(url, json={'type': type, 'result' : results})
+    d={'type': type, 'result' : results}
+    if sub_type:
+        d["subType"]=sub_type
+    r = requests.post(url, json=d)
 
 ## Predictor
 
@@ -116,8 +119,7 @@ def distance_task(sample_id, distance_type):
     else:
         raise TypeError("%s is not a valid query" % distance_type)
     url=os.path.join(ATLAS_API, "experiments", sample_id, "results")
-    post_results={"distance_type":distance_type, "distances":results}
-    send_results("distance", post_results, url)
+    send_results("distance", results, url, sub_type=distance_type)
 
 @app.route('/distance', methods=["POST"])
 def distance():
