@@ -14,9 +14,12 @@ class BigsiTaskManager():
 
 
 	def _filter_genotypes(self, results):
-		print(results)
-		return results
-		
+		o={}
+		for s,v in results.items():
+			if sum([int(i) for i in v["genotype"].split("/") if i != "."])>=1:
+				o[s]=v
+		return o
+
 	def seq_query(self, query):
 		return self.bigsi.search(**query)
 
