@@ -24,7 +24,7 @@ class MyInstall(DistutilsInstall):
         mccortex_dir = os.path.dirname(os.path.realpath(__file__))+"/mccortex"
         if not os.path.exists(mccortex_dir):
             subprocess.call(
-                ["git", "clone", "--recursive", "-b", "genotype", "https://github.com/phelimb/mccortex", mccortex_dir], cwd=os.path.dirname(os.path.realpath(__file__)))
+                ["git", "clone", "--recursive", "-b", "geno_kmer_count", "https://github.com/phelimb/mccortex", mccortex_dir], cwd=os.path.dirname(os.path.realpath(__file__)))
             subprocess.call(
                 ["make", "clean"], cwd=mccortex_dir)
             subprocess.call(
@@ -43,7 +43,7 @@ def read(*names, **kwargs):
 
 setup(
     name='mykrobe',
-    version='0.6.5',
+    version='0.1.1',
     license='MIT',
     description='Mykrobe atlas',
     # long_description='%s\n%s' % (

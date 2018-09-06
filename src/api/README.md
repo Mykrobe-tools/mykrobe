@@ -1,4 +1,4 @@
-A simple API to trigger mykrobe-atlas-cli analyses
+# A simple API to trigger mykrobe-atlas-cli analyses
 
 working dir /src/api
 ```
@@ -42,8 +42,8 @@ curl -H "Content-Type: application/json" -X POST -d '{"type":"protein-variant", 
 ```
 curl -H "Content-Type: application/json" -X POST -d '{"sample_id": "sample_id"}' localhost:8080/distance
 
-curl -H "Content-Type: application/json" -X POST -d '{"sample_id": "sample_id", "distance_type":"tree"}' localhost:8080/distance
+curl -H "Content-Type: application/json" -X POST -d '{"sample_id": "sample_id", "distance_type":"tree-distance"}' localhost:8080/distance
 
-curl -H "Content-Type: application/json" -X POST -d '{"sample_id": "sample_id", "distance_type":"nearest"}' localhost:8080/distance
+curl -H "Content-Type: application/json" -X POST -d '{"sample_id": "sample_id", "distance_type":"nearest-neighbour"}' localhost:8080/distance
 
 ```

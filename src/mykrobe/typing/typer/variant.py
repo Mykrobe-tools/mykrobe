@@ -33,7 +33,8 @@ class VariantTyper(Typer):
                  ignore_filtered=False,
                  filters=[],
                  confidence_threshold=3,
-                 model="kmer_count"):
+                 model="kmer_count", 
+                 kmer_size=31):
 
         super(
             VariantTyper,
@@ -47,14 +48,15 @@ class VariantTyper(Typer):
         self.method = "MAP"
         self.error_rate = error_rate
         self.minor_freq = minor_freq
+        self.kmer_size = kmer_size
 
         if model == "median_depth":
             self.model = DepthCoverageGenotypeModel(
-                self.expected_depths, self.contamination_depths, self.error_rate, self.minor_freq)
+                self.expected_depths, self.contamination_depths, self.error_rate, self.minor_freq, self.kmer_size)
         elif model == "kmer_count":
-            logger.debug("Genotyping using kc model")
+            # logger.debug("Genotyping using kc model")
             self.model = KmerCountGenotypeModel(
-                self.expected_depths, self.contamination_depths, self.error_rate, self.minor_freq)
+                self.expected_depths, self.contamination_depths, self.error_rate, self.minor_freq, self.kmer_size)
         self.ignore_filtered = ignore_filtered
         self.filters = filters
 
@@ -130,11 +132,12 @@ class VariantTyper(Typer):
 
 class GenotypeModel(object):
 
-    def __init__(self, expected_depths, contamination_depths, error_rate, minor_freq):
+    def __init__(self, expected_depths, contamination_depths, error_rate, minor_freq, kmer_size):
         self.expected_depths = expected_depths
         self.contamination_depths = contamination_depths
         self.error_rate = error_rate
         self.minor_freq = minor_freq
+        self.kmer_size = kmer_size
 
     def hom_ref_lik(self, variant_probe_coverage):
         raise NotImplementedError
@@ -148,53 +151,59 @@ class GenotypeModel(object):
 
 class KmerCountGenotypeModel(GenotypeModel):
 
-    def __init__(self, expected_depths, contamination_depths, error_rate, minor_freq):
+    def __init__(self, expected_depths, contamination_depths, error_rate, minor_freq, kmer_size=31):
         super(KmerCountGenotypeModel, self).__init__(
-            expected_depths, contamination_depths, error_rate, minor_freq)
+            expected_depths, contamination_depths, error_rate, minor_freq,kmer_size)
+
+    def depth_to_expected_kmer_count(self, depth, allele_length):
+        # logger.debug("%f %f"% (allele_length,depth))
+        return (allele_length*depth)+0.01
 
     def hom_ref_lik(self, variant_probe_coverage):
         hom_ref_likes = []
         # Either alt+cov or alt_covg + contam_covg
         for expected_depth in self.expected_depths:
+            # logger.debug("hom ref %s" % variant_probe_coverage.var_name)
             hom_ref_likes.append(
                 log_lik_R_S_kmer_count(
                     variant_probe_coverage.reference_kmer_count,
                     variant_probe_coverage.alternate_kmer_count,
-                    expected_depth,
-                    expected_depth *
-                    self.error_rate /
-                    3))
+                    self.depth_to_expected_kmer_count(expected_depth, variant_probe_coverage.reference_klen),
+                    self.depth_to_expected_kmer_count(expected_depth * self.error_rate/3, variant_probe_coverage.alternate_klen)
+                    ))
             for contamination in self.contamination_depths:
                 hom_ref_likes.append(
                     log_lik_R_S_kmer_count(
                         variant_probe_coverage.reference_kmer_count,
                         variant_probe_coverage.alternate_kmer_count,
-                        expected_depth + contamination,
-                        (expected_depth + contamination) * self.error_rate / 3))
+                        self.depth_to_expected_kmer_count(expected_depth + contamination,variant_probe_coverage.reference_klen),
+                        self.depth_to_expected_kmer_count((expected_depth + contamination) * self.error_rate / 3),variant_probe_coverage.alternate_klen))
         return max(hom_ref_likes)
 
     def hom_alt_lik(self, variant_probe_coverage):
         hom_alt_liks = []
         # Either alt+cov or alt_covg + contam_covg
+        # logger.debug("hom alt %s" % variant_probe_coverage.var_name)
         for expected_depth in self.expected_depths:
             hom_alt_liks.append(
                 log_lik_R_S_kmer_count(
                     variant_probe_coverage.alternate_kmer_count,
                     variant_probe_coverage.reference_kmer_count,
-                    expected_depth,
-                    expected_depth *
-                    self.error_rate /
-                    3))
+                    self.depth_to_expected_kmer_count(expected_depth,variant_probe_coverage.reference_klen),
+                    self.depth_to_expected_kmer_count(expected_depth * self.error_rate / 3,variant_probe_coverage.alternate_klen))
+                )
             for contamination in self.contamination_depths:
                 hom_alt_liks.append(
                     log_lik_R_S_kmer_count(
                         variant_probe_coverage.alternate_kmer_count,
                         variant_probe_coverage.reference_kmer_count,
-                        expected_depth + contamination,
-                        (expected_depth + contamination) * self.error_rate / 3))
+                        self.depth_to_expected_kmer_count(expected_depth + contamination,variant_probe_coverage.alternate_klen),
+                        self.depth_to_expected_kmer_count((expected_depth + contamination) * self.error_rate / 3,variant_probe_coverage.reference_klen)))
         return max(hom_alt_liks)
 
     def het_lik(self, variant_probe_coverage):
+        # logger.debug("het %s" % variant_probe_coverage.var_name)
+
         if (variant_probe_coverage.alternate_kmer_count+variant_probe_coverage.reference_kmer_count) == 0:
             return MIN_LLK
         elif variant_probe_coverage.alternate_percent_coverage < 100 or variant_probe_coverage.reference_percent_coverage < 100:
@@ -206,18 +215,18 @@ class KmerCountGenotypeModel(GenotypeModel):
                     log_lik_R_S_kmer_count(
                         variant_probe_coverage.alternate_kmer_count,
                         variant_probe_coverage.reference_kmer_count,
-                        expected_depth/2 +
-                        (expected_depth/2 * self.error_rate/3),
-                        expected_depth/2 + (expected_depth/2 * self.error_rate/3))
+                        self.depth_to_expected_kmer_count(expected_depth/2 + (expected_depth/2 * self.error_rate/3),variant_probe_coverage.alternate_klen),
+                        self.depth_to_expected_kmer_count(expected_depth/2 + (expected_depth/2 * self.error_rate/3),variant_probe_coverage.reference_klen)
+                        )
                 )
             return max(het_liks)
 
 
 class DepthCoverageGenotypeModel(GenotypeModel):
 
-    def __init__(self, expected_depths, contamination_depths, error_rate, minor_freq):
+    def __init__(self, expected_depths, contamination_depths, error_rate, minor_freq, kmer_size=31):
         super(DepthCoverageGenotypeModel, self).__init__(
-            expected_depths, contamination_depths, error_rate, minor_freq)
+            expected_depths, contamination_depths, error_rate, minor_freq, kmer_size)
 
     def hom_ref_lik(self, variant_probe_coverage):
         if variant_probe_coverage.reference_percent_coverage < 100 * \
