@@ -345,7 +345,7 @@ class Panel(object):
         self.refs = unique(["".join(ref) for ref in refs])
         self.start = start
         self.alts = unique(["".join(alt) for alt in alts])
-        self.alts=list(set(self.refs)-set(self.alts))
+        self.alts=list(set(self.alts)-set(self.refs))
 
 
 class Mutation(object):

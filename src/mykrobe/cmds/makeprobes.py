@@ -23,6 +23,7 @@ from mykrobe._vcf import VCF
 from mykrobe.probes.models import Mutation
 from mykrobe.probes import AlleleGenerator
 from mykrobe.probes import make_variant_probe
+from mykrobe.constants import DB_PREFIX
 
 
 logging.basicConfig(level=logging.INFO)
@@ -31,12 +32,12 @@ logger = logging.getLogger(__name__)
 
 
 def run(parser, args):
-    DB = connect('atlas-%s' % (args.db_name))
+    DB = connect('%s-%s' % (DB_PREFIX, args.db_name))
     if DB is not None:
         try:
             Variant.objects()
             logging.info(
-                "Connected to atlas-%s" % (args.db_name))
+                "Connected to %s-%s" % (DB_PREFIX, args.db_name))
         except (ServerSelectionTimeoutError):
             DB = None
             logging.warning(
