@@ -10,6 +10,7 @@ from pymongo import MongoClient
 from mykrobe.variants.schema.models import ReferenceSet
 from mykrobe.variants.schema.models import Reference
 from mykrobe._vcf import VCF
+from mykrobe.constants import DB_PREFIX
 
 """Adds variants to the database"""
 
@@ -48,7 +49,7 @@ def run(parser, args):
         logger.setLevel(logging.ERROR)
     else:
         logger.setLevel(logging.INFO)
-    DBNAME = 'atlas-%s' % (args.db_name)
+    DBNAME = '%s-%s' % (DB_PREFIX, args.db_name)
     db = client[DBNAME]
     connect(DBNAME)
     logger.debug("Using DB %s" % DBNAME)

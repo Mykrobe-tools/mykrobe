@@ -12,8 +12,8 @@ from pymongo.errors import ServerSelectionTimeoutError
 from Bio.Seq import Seq
 
 
-from mykrobe.variants.schema.models import Variant
-from mykrobe.variants.schema.models import ReferenceSet
+from atlas.variants.schema.models import Variant
+from atlas.variants.schema.models import ReferenceSet
 from mykrobe.variants.schema.models import Reference
 
 from mykrobe.utils import split_var_name
@@ -31,12 +31,12 @@ logger = logging.getLogger(__name__)
 
 
 def run(parser, args):
-    DB = connect('mykrobe-%s' % (args.db_name))
+    DB = connect('atlas-%s' % (args.db_name))
     if DB is not None:
         try:
             Variant.objects()
             logging.info(
-                "Connected to mykrobe-%s" % (args.db_name))
+                "Connected to atlas-%s" % (args.db_name))
         except (ServerSelectionTimeoutError):
             DB = None
             logging.warning(
