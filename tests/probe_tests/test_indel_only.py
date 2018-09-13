@@ -160,6 +160,24 @@ class TestINDELAlleleGenerator():
         assert panel.alts == [
             "ATCTAGCCGCAAGGGCGCGAGCAGACGCAGACGCTGGCGGGCGATCGCATGATTTGAGCTCAAATCATGCGATTC"]
 
+    def test_double_indel_fail(self):
+        v = Variant.create(
+            variant_sets=self.variant_sets,
+            reference=self.reference,
+            reference_bases="CCA",
+            start=2288851,
+            alternate_bases=["A"])
+        v1 = Variant.create(
+            variant_sets=self.variant_sets,
+            reference=self.reference,
+            reference_bases="A",
+            start=2288850,
+            alternate_bases=["ACC"])
+        context = [v1]
+        panel = self.pg2.create(v, context=context)
+        assert "GGCGCACACAATGATCGGTGGCAATACCGACCACATCGACCTCATCGACGCCGCGTTGCCGCA" in panel.refs
+        assert "GGCGCACACAATGATCGGTGGCAATACCGACCACATCGACCTCATCGACGCCGCGTTGCCGCA" not in panel.alts 
+
     def test_large_insertion(self):
         v = Variant.create(variant_sets=self.variant_sets, reference=self.reference, reference_bases="CCGCCGGCCCCGCCGTTT", start=1636155, alternate_bases=[
                            "CTGCCGGCCCCGCCGGCGCCGCCCAATCCACCGAAGCCCCTCCCTTCGGTGGGGTCGCTGCCGCCGTCGCCGCCGTCACCGCCCTTGCCGCCGGCCCCGCCGTCGCCGCCGGCTCCGGCGGTGCCGTCGCCGCCCTGGCCGCCGGCCCCGCCGTTTCCG"])
