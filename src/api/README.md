@@ -51,3 +51,10 @@ curl -H "Content-Type: application/json" -X POST -d '{"sample_id": "sample_id", 
 curl -H "Content-Type: application/json" -X POST -d '{"sample_id": "sample_id", "distance_type":"nearest-neighbour"}' localhost:8080/distance
 
 ```
+
+## Tree
+```
+curl -H "Content-Type: application/json" -X POST -d '{}' localhost:8080/tree
+OR
+curl localhost:8080/tree
+```

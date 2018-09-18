@@ -131,6 +131,27 @@ def distance():
     response= json.dumps({"result":"success", "task_id":str(res)}), 200     
     return response
 
+TREE_PATH="data/tb_newick.txt"
+@celery.task()
+def tree_task():
+    with open(TREE_PATH, 'r') as infile:
+        data=infile.read().replace('\n', '')
+    url=os.path.join(ATLAS_API, "trees")
+    results={"tree":data}
+    send_results("tree", results, url)
+    return results
+
+@app.route('/tree', methods=["POST", "GET"])
+def tree():
+    if request.method == 'POST':
+        data=request.get_json()
+        res=tree_task.delay()
+        response= json.dumps({"result":"success", "task_id":str(res)}), 200     
+    else:
+        results=tree_task()
+        response= json.dumps({"result":results, "type": "tree"}), 200 
+    return response
+
 ## testing experiments requests /experiments/:sample_id/results
 @app.route('/experiments/<sample_id>/results', methods=["POST"])
 def results(sample_id):
@@ -138,5 +159,9 @@ def results(sample_id):
 
 @app.route('/queries/<query_id>/results', methods=["POST"])
 def query_results(query_id):
-    print(request.data,200)
     return request.data,200
+
+@app.route('/trees', methods=["POST"])
+def tree_results():
+    print(request.data)
+    return request.data,200    
