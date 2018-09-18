@@ -131,25 +131,27 @@ def distance():
     response= json.dumps({"result":"success", "task_id":str(res)}), 200     
     return response
 
-TREE_PATH="data/tb_newick.txt"
+TREE_PATH={"1.0":"data/tb_newick.txt"}
 @celery.task()
-def tree_task():
-    with open(TREE_PATH, 'r') as infile:
+def tree_task(version):
+    assert version == "latest"
+    if version == "latest":
+        float_versions=[float(x) for x in sorted(TREE_PATH.keys())]
+        version_float_max=max(float_versions)
+        float_versions_index=[i for i,x in enumerate(float_versions) if x==version_float_max]
+        version=list(sorted(TREE_PATH.keys()))[float_versions_index[0]]
+        tree_path=TREE_PATH[version]
+    with open(tree_path, 'r') as infile:
         data=infile.read().replace('\n', '')
     url=os.path.join(ATLAS_API, "trees")
-    results={"tree":data}
+    results={"tree":data, "version":version}
     send_results("tree", results, url)
     return results
 
-@app.route('/tree', methods=["POST", "GET"])
-def tree():
-    if request.method == 'POST':
-        data=request.get_json()
-        res=tree_task.delay()
-        response= json.dumps({"result":"success", "task_id":str(res)}), 200     
-    else:
-        results=tree_task()
-        response= json.dumps({"result":results, "type": "tree"}), 200 
+@app.route('/tree/<version>', methods=["GET"])
+def tree(version):
+    results=tree_task(version)
+    response= json.dumps({"result":results, "type": "tree"}), 200 
     return response
 
 ## testing experiments requests /experiments/:sample_id/results

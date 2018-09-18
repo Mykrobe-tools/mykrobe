@@ -54,7 +54,5 @@ curl -H "Content-Type: application/json" -X POST -d '{"sample_id": "sample_id", 
 
 ## Tree
 ```
-curl -H "Content-Type: application/json" -X POST -d '{}' localhost:8080/tree
-OR
-curl localhost:8080/tree
+curl localhost:8080/tree/latest
 ```
