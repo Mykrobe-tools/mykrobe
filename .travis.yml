@@ -3,6 +3,9 @@ python: 3.6
 services: mongodb
 cache: pip 
 sudo: required
+env:
+  global:
+  - COMMIT=${TRAVIS_COMMIT::8}
 matrix:
   include:
   - python: "2.7"
@@ -18,3 +21,15 @@ matrix:
 install:
   - travis_retry pip install tox
 script: tox -e $TOXENV
+after_success:
+- docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+- travis_wait 30 docker build -t phelimb/mykrobe:$COMMIT;
+- if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker tag phelimb/mykrobe:$COMMIT phelimb/mykrobe:$latest;
+    travis_wait 30 docker push phelimb/mykrobe; 
+    travis_wait 30 docker push phelimb/mykrobe:$COMMIT; 
+  else 
+    docker tag phelimb/mykrobe:$COMMIT phelimb/mykrobe:$TRAVIS_BRANCH;  
+    travis_wait 30 docker push phelimb/mykrobe:$COMMIT;
+    travis_wait 30 docker push phelimb/mykrobe:$TRAVIS_BRANCH;
+  fi  
