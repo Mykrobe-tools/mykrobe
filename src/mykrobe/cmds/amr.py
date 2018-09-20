@@ -79,6 +79,11 @@ def run(parser, args):
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
                 "data/panels/tb-walker-probe-set-feb-09-2017.fasta.gz"]
+        elif args.panel == "atlas":
+            TB_PANELS = [
+                "data/panels/tb-species-170421.fasta.gz",
+                "data/panels/tb-walker-probe-set-feb-09-2017.fasta.gz", 
+                "data/panels/tb-k21-probe-set-feb-09-2017.fasta.gz"]                
         elif args.panel == "custom":
             if not args.custom_probe_set_path:
                 raise ValueError("Custom panel requires custom_probe_set_path")
