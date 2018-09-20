@@ -24,7 +24,7 @@ install:
 script: tox -e $TOXENV
 after_success:
 - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-- travis_wait 30 docker build -t phelimb/mykrobe:$COMMIT;
+- travis_wait 30 docker build -t phelimb/mykrobe:$COMMIT .;
 - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker tag phelimb/mykrobe:$COMMIT phelimb/mykrobe:$latest;
     travis_wait 30 docker push phelimb/mykrobe; 
