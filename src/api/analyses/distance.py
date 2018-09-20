@@ -12,9 +12,12 @@ def sort_and_filter_distance_dict(d, limit):
     return OrderedDict(sorted_d)
 
 
+
+
 class DistanceTaskManager():
 
     def __init__(self, redis=REDIS, expiry=INTERMEDIATE_RESULT_EXPIRY):
+        self.inserter=BitarrayDistanceInserter(redis)
         self.redis=redis   
         self.expiry=expiry             
         self.samples=self.__get_samples()
@@ -25,12 +28,17 @@ class DistanceTaskManager():
     def __intermediate_key(self, s1, s2):
         return "_".join([str(s1),str(s2)])
 
+    def __genotype_bitarray_key(self,sample_id):
+        return "_".join([sample_id, "genotypes"])        
+
     def _build_xor(self, primary_sample, samples):
+        primary_sample_key=self.__genotype_bitarray_key(primary_sample)
         pipe=self.redis.pipeline()
         for secondary_sample in samples:
+            secondary_sample_key=self.__genotype_bitarray_key(secondary_sample)
             k=self.__intermediate_key(primary_sample,secondary_sample)                    
             if secondary_sample != primary_sample:
-                pipe.bitop("xor",k,primary_sample,secondary_sample)
+                pipe.bitop("xor",k,primary_sample_key,secondary_sample_key)
                 pipe.expire(k, self.expiry)
         pipe.execute()
 
@@ -56,5 +64,27 @@ class DistanceTaskManager():
         if sort:
             distances=sort_and_filter_distance_dict(distances, limit)
         return distances
+
+    ## Insert
+
+    
+    def insert(self, json_path, sample_id):
+        genotypes = self._create_genotype_bitarray(self.data["genotypes"])
+        filters = self._create_filtered_bitarray(self.data["filtered"])
+        filtered_genotypes=[x for i,x in enumerate(genotypes) if not filters[i]]
+        self._insert_genotype_bitarray(filtered_genotypes, sample=sample_id)
+
+    def _insert_genotype_bitarray(self, bitarray, sample_id):
+        pipe = r.pipeline()
+        for i, j in enumerate(bitarray):
+            pipe.setbit(self.__genotype_bitarray_key(sample_id), i, j)
+        pipe.execute()    
+
+    def _create_genotype_bitarray(self, sorted_calls):
+        bitarray = [int(call > 1) for call in sorted_calls]
+        return bitarray
+
+    def _create_filtered_bitarray(self, sorted_calls):
+        return sorted_calls    
 
 
