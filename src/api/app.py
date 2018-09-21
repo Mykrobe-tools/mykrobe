@@ -62,12 +62,24 @@ def predictor_task(file, sample_id):
     url=os.path.join(ATLAS_API, "experiments", sample_id, "results")
     send_results("predictor", results, url)
 
+@celery.task()
+def genotype_task(file, sample_id):
+    results=PredictorTaskManager(DEFAULT_OUTDIR).run_genotype(file, sample_id)
+    url=os.path.join(ATLAS_API, "experiments", sample_id, "results")
+    send_results("genotype", results, url)
+    ## Insert distance results 
+    DistanceTaskManager.insert(os.path.join(DEFAULT_OUTDIR, "{sample_id}_gt.json".format(sample_id=sample_id)),sample_id)
+    # ## Trigger distance tasks
+    res=distance_task.delay(sample_id, "tree-distance")
+    res=distance_task.delay(sample_id, "nearest-neighbour")
+
 @app.route('/analyses', methods=["POST"])
 def predictor():
     data=request.get_json()
     file = data.get('file', '')
     sample_id = data.get('sample_id', '')
     res=predictor_task.delay(file, sample_id)
+    res=genotype_task.delay(file, sample_id)
     return json.dumps({"result":"success", "task_id":str(res)}), 200    
 
 ## BIGSI

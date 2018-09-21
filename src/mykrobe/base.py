@@ -138,3 +138,8 @@ genotyping_mixin.add_argument(
     "--min_gene_percent_covg_threshold",
     help="all genes alleles found above this percent coverage will be reported (default 100 (only best alleles reported))",
     default=100, type=int)
+genotyping_mixin.add_argument(
+    '--output',
+    type=str,
+    help='File path to save output json file as. Default is to stdout.',
+    default='')
