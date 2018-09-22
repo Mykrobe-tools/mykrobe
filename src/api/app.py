@@ -1,7 +1,11 @@
 import os
 from flask import Flask
 from flask import request
-
+from Bio import Phylo
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 ## Celery setup
 from analyses import PredictorTaskManager
 from analyses import BigsiTaskManager
@@ -60,15 +64,15 @@ def send_results(type, results, url, sub_type=None):
 def predictor_task(file, sample_id):
     results=PredictorTaskManager(DEFAULT_OUTDIR).run_predictor(file, sample_id)
     url=os.path.join(ATLAS_API, "experiments", sample_id, "results")
-    send_results("predictor", results, url)
+    # send_results("predictor", results, url)
 
 @celery.task()
 def genotype_task(file, sample_id):
     results=PredictorTaskManager(DEFAULT_OUTDIR).run_genotype(file, sample_id)
     url=os.path.join(ATLAS_API, "experiments", sample_id, "results")
-    send_results("genotype", results, url)
+    # send_results("genotype", results, url)
     ## Insert distance results 
-    DistanceTaskManager.insert(os.path.join(DEFAULT_OUTDIR, "{sample_id}_gt.json".format(sample_id=sample_id)),sample_id)
+    DistanceTaskManager().insert(results)
     # ## Trigger distance tasks
     res=distance_task.delay(sample_id, "tree-distance")
     res=distance_task.delay(sample_id, "nearest-neighbour")
@@ -119,7 +123,42 @@ def search():
 
 ## nearest-neighbour neighbour distance
 
-TREE_SAMPLES=[1,2,3]
+## Tree
+def load_tree(version):
+    if version == "latest":
+        float_versions=[float(x) for x in sorted(TREE_PATH.keys())]
+        version_float_max=max(float_versions)
+        float_versions_index=[i for i,x in enumerate(float_versions) if x==version_float_max]
+        version=list(sorted(TREE_PATH.keys()))[float_versions_index[0]]
+        tree_path=TREE_PATH[version]
+    with open(tree_path, 'r') as infile:
+        data=infile.read().replace('\n', '')    
+    return data
+
+@celery.task()
+def tree_task(version):
+    assert version == "latest"
+    data=load_tree(version)
+    url=os.path.join(ATLAS_API, "trees")
+    results={"tree":data, "version":version}
+    send_results("tree", results, url)
+    return results
+
+@app.route('/tree/<version>', methods=["GET"])
+def tree(version):
+    results=tree_task(version)
+    response= json.dumps({"result":results, "type": "tree"}), 200 
+    return response
+
+TREE_PATH={"1.0":"data/tb_newick.txt"}
+def get_tree_samples():
+    newick=load_tree("latest")
+    tree=Phylo.read(StringIO(newick), 'newick')
+    tree_samples=[c.name for c in tree.get_terminals()]
+    return tree_samples
+
+
+TREE_SAMPLES=get_tree_samples()
 @celery.task()
 def distance_task(sample_id, distance_type):
     if distance_type == "all":
@@ -143,28 +182,6 @@ def distance():
     response= json.dumps({"result":"success", "task_id":str(res)}), 200     
     return response
 
-TREE_PATH={"1.0":"data/tb_newick.txt"}
-@celery.task()
-def tree_task(version):
-    assert version == "latest"
-    if version == "latest":
-        float_versions=[float(x) for x in sorted(TREE_PATH.keys())]
-        version_float_max=max(float_versions)
-        float_versions_index=[i for i,x in enumerate(float_versions) if x==version_float_max]
-        version=list(sorted(TREE_PATH.keys()))[float_versions_index[0]]
-        tree_path=TREE_PATH[version]
-    with open(tree_path, 'r') as infile:
-        data=infile.read().replace('\n', '')
-    url=os.path.join(ATLAS_API, "trees")
-    results={"tree":data, "version":version}
-    send_results("tree", results, url)
-    return results
-
-@app.route('/tree/<version>', methods=["GET"])
-def tree(version):
-    results=tree_task(version)
-    response= json.dumps({"result":results, "type": "tree"}), 200 
-    return response
 
 ## testing experiments requests /experiments/:sample_id/results
 @app.route('/experiments/<sample_id>/results', methods=["POST"])

@@ -74,9 +74,12 @@ class DistanceTaskManager():
     def _add_sample(self, sample_id):
         self.redis.sadd(SAMPLES_KEY, sample_id)
 
-    def insert(self, json_path):
+    def insert_from_json(json_path):
         with open(json_path, 'r') as inf:
             res=json.load(inf)
+        return self.insert(res)
+
+    def insert(self, res):
         for sample_id,data in res.items():
             self._add_sample(sample_id)
             genotypes = self._create_genotype_bitarray(data["genotypes"])
