@@ -1,3 +1,8 @@
+import sys
+import os
+sys.path.append("../src/api/")
+
+import json
 import redis
 import operator
 from collections import OrderedDict
@@ -17,7 +22,6 @@ def sort_and_filter_distance_dict(d, limit):
 class DistanceTaskManager():
 
     def __init__(self, redis=REDIS, expiry=INTERMEDIATE_RESULT_EXPIRY):
-        self.inserter=BitarrayDistanceInserter(redis)
         self.redis=redis   
         self.expiry=expiry             
         self.samples=self.__get_samples()
@@ -26,7 +30,7 @@ class DistanceTaskManager():
         return {s.decode("utf-8") for s in self.redis.smembers(SAMPLES_KEY)}
 
     def __intermediate_key(self, s1, s2):
-        return "_".join([str(s1),str(s2)])
+        return "_".join([str(s1),"xor",str(s2)])
 
     def __genotype_bitarray_key(self,sample_id):
         return "_".join([sample_id, "genotypes"])        
@@ -43,6 +47,7 @@ class DistanceTaskManager():
         pipe.execute()
 
     def _count_xor(self, primary_sample, samples):
+        samples=[s for s in samples if  s != primary_sample]
         pipe=self.redis.pipeline()
         for secondary_sample in samples:
             k=self.__intermediate_key(primary_sample,secondary_sample)        
@@ -66,16 +71,21 @@ class DistanceTaskManager():
         return distances
 
     ## Insert
+    def _add_sample(self, sample_id):
+        self.redis.sadd(SAMPLES_KEY, sample_id)
 
-    
-    def insert(self, json_path, sample_id):
-        genotypes = self._create_genotype_bitarray(self.data["genotypes"])
-        filters = self._create_filtered_bitarray(self.data["filtered"])
-        filtered_genotypes=[x for i,x in enumerate(genotypes) if not filters[i]]
-        self._insert_genotype_bitarray(filtered_genotypes, sample=sample_id)
+    def insert(self, json_path):
+        with open(json_path, 'r') as inf:
+            res=json.load(inf)
+        for sample_id,data in res.items():
+            self._add_sample(sample_id)
+            genotypes = self._create_genotype_bitarray(data["genotypes"])
+            passed_filter = self._create_filtered_bitarray(data["filtered"])
+            filtered_genotypes=[x for i,x in enumerate(genotypes) if passed_filter[i]]
+            self._insert_genotype_bitarray(filtered_genotypes, sample_id=sample_id)
 
     def _insert_genotype_bitarray(self, bitarray, sample_id):
-        pipe = r.pipeline()
+        pipe = self.redis.pipeline()
         for i, j in enumerate(bitarray):
             pipe.setbit(self.__genotype_bitarray_key(sample_id), i, j)
         pipe.execute()    
