@@ -238,7 +238,8 @@ class TBPredictor(BasePredictor):
             base_json,
             depth_threshold=depth_threshold,
             ignore_filtered=ignore_filtered,
-            ignore_minor_calls=ignore_minor_calls)
+                ignore_minor_calls=ignore_minor_calls,
+                variant_to_resistance_json_fp=variant_to_resistance_json_fp)
 
 
 class StaphPredictor(BasePredictor):
@@ -265,4 +266,5 @@ class StaphPredictor(BasePredictor):
             base_json,
             depth_threshold=depth_threshold,
             ignore_filtered=ignore_filtered,
-            ignore_minor_calls=ignore_minor_calls)
+                ignore_minor_calls=ignore_minor_calls,
+                variant_to_resistance_json_fp=variant_to_resistance_json_fp)
