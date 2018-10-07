@@ -189,10 +189,9 @@ def distance():
     data=request.get_json()
     experiment_id = data.get('experiment_id', '')
     distance_type = data.get('distance_type', 'all') 
-    max_distance = data.get('max_distance') 
-    limit = data.get('limit') 
+    kwargs = data.get('params',{}) 
     assert distance_type in ["all", "tree-distance", "nearest-neighbour"]
-    res=distance_task.delay(experiment_id, distance_type, max_distance=max_distance, limit=limit)
+    res=distance_task.delay(experiment_id, distance_type, **kwargs)
     response= json.dumps({"result":"success", "task_id":str(res)}), 200     
     return response
 
@@ -203,7 +202,7 @@ def mappings():
     return json.dumps(mappings)
 
 @app.route('/reverse_mappings', methods=["GET"])
-def mappings():
+def reverse_mappings():
     mappings=MAPPER.isolate_ids_to_experiment_ids()
     return json.dumps(mappings)
 
