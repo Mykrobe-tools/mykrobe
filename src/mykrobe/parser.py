@@ -15,8 +15,6 @@ import argparse
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-DEFAULT_KMER_SIZE = os.environ.get("KMER_SIZE", 31)
-
 def run_subtool(parser, args):
     if args.command == "variants":
         if args.sub_command == 'add':

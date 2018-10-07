@@ -51,12 +51,15 @@ requests_log = logging.getLogger("requests.packages.urllib3")
 requests_log.setLevel(logging.DEBUG)
 requests_log.propagate = True
 
-def send_results(type, results, url, sub_type=None):
+def send_results(type, results, url, sub_type=None, request_type="POST"):
     ## POST /samples/:id/result { type: "…", result: { … } }
     d={'type': type, 'result' : results}
     if sub_type:
         d["subType"]=sub_type
-    r = requests.post(url, json=d)
+    if request_type == "PUT":
+        r=requests.put(url, json=d)
+    else:
+        r = requests.post(url, json=d)
 
 ## Predictor
 
@@ -110,8 +113,10 @@ def bigsi(query_type, query):
     out["results"]=results
     out["query"]=query
     query_id=_hash(json.dumps(query))
-    url=os.path.join(ATLAS_API, "queries", query_id, "results")    
-    send_results(query_type, out, url)
+    user_id=query["user_id"]
+    result_id=query["result_id"]
+    url=os.path.join(ATLAS_API, "users", user_id, "results", result_id)    
+    send_results(query_type, out, url, request_type="PUT")
 
 @app.route('/search', methods=["POST"])
 def search():
