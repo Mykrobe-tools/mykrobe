@@ -7,13 +7,13 @@ ATLAS_API="localhost:8080" DEFAULT_OUTDIR="/atlas/predictor-results/" CELERY_BRO
 ```
 
 ```
-curl -H "Content-Type: application/json" -X POST -d '{"file":"path/to/file", "sample_id": "sample_id"}' localhost:8080/analyses
+curl -H "Content-Type: application/json" -X POST -d '{"file":"path/to/file", "experiment_id": "experiment_id"}' localhost:8080/analyses
 ```
 
 On jessie:
 
 export PATH=/ssd0/software/mccortex/bin/:$PATH
-curl -H "Content-Type: application/json" -X POST -d '{"file":"/atlas/test-data/MDR.fastq.gz", "sample_id": "MDR_test"}' localhost:8080/analyses
+curl -H "Content-Type: application/json" -X POST -d '{"file":"/atlas/test-data/MDR.fastq.gz", "experiment_id": "MDR_test"}' localhost:8080/analyses
 
 
 ## Search query
@@ -45,11 +45,11 @@ curl -H "Content-Type: application/json" -X POST -d '{"type":"protein-variant", 
 
 ## Distance
 ```
-curl -H "Content-Type: application/json" -X POST -d '{"sample_id": "sample_id"}' localhost:8080/distance
+curl -H "Content-Type: application/json" -X POST -d '{"experiment_id": "experiment_id"}' localhost:8080/distance
 
-curl -H "Content-Type: application/json" -X POST -d '{"sample_id": "sample_id", "distance_type":"tree-distance"}' localhost:8080/distance
+curl -H "Content-Type: application/json" -X POST -d '{"experiment_id": "experiment_id", "distance_type":"tree-distance"}' localhost:8080/distance
 
-curl -H "Content-Type: application/json" -X POST -d '{"sample_id": "sample_id", "distance_type":"nearest-neighbour"}' localhost:8080/distance
+curl -H "Content-Type: application/json" -X POST -d '{"experiment_id": "experiment_id", "distance_type":"nearest-neighbour"}' localhost:8080/distance
 
 ```
 

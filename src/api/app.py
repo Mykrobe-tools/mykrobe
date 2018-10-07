@@ -165,14 +165,20 @@ def get_tree_isolates():
 
 
 TREE_ISOLATES=get_tree_isolates()
+DEFAULT_MAX_NN_DISTANCE=12
+DEFAULT_MAX_NN_EXPERIMENTS=100
 @celery.task()
-def distance_task(experiment_id, distance_type):
+def distance_task(experiment_id, distance_type, max_distance=None, limit=None):
+    if max_distance is None:
+        max_distance=DEFAULT_MAX_NN_DISTANCE
+    if limit is None:
+        limit=DEFAULT_MAX_NN_EXPERIMENTS
     if distance_type == "all":
         results=DistanceTaskManager().distance(experiment_id, sort=True)
     elif distance_type == "tree-distance":
         results=DistanceTaskManager().distance(experiment_id, isolates=TREE_ISOLATES, sort=True)        
     elif distance_type == "nearest-neighbour":
-        results=DistanceTaskManager().distance(experiment_id, limit=10, sort=True)
+        results=DistanceTaskManager().distance(experiment_id, max_distance=max_distance, limit=limit, sort=True)
     else:
         raise TypeError("%s is not a valid query" % distance_type)
     url=os.path.join(ATLAS_API, "experiments", experiment_id, "results")
@@ -183,8 +189,10 @@ def distance():
     data=request.get_json()
     experiment_id = data.get('experiment_id', '')
     distance_type = data.get('distance_type', 'all') 
+    max_distance = data.get('max_distance') 
+    limit = data.get('limit') 
     assert distance_type in ["all", "tree-distance", "nearest-neighbour"]
-    res=distance_task.delay(experiment_id, distance_type)
+    res=distance_task.delay(experiment_id, distance_type, max_distance=max_distance, limit=limit)
     response= json.dumps({"result":"success", "task_id":str(res)}), 200     
     return response
 

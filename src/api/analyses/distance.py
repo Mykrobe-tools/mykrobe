@@ -10,8 +10,9 @@ from collections import OrderedDict
 REDIS=redis.StrictRedis(db=2)
 SAMPLES_KEY="samples"
 INTERMEDIATE_RESULT_EXPIRY=300
-def sort_and_filter_distance_dict(d, limit):
+def sort_and_filter_distance_dict(d, max_distance, limit):
     sorted_d = sorted(d.items(), key=operator.itemgetter(1))
+    sorted_d = [x for x in sorted_d if x[1]<=max_distance]
     if limit:
         sorted_d=sorted_d[:limit]
     return OrderedDict(sorted_d)
@@ -59,7 +60,7 @@ class DistanceTaskManager():
             d[q]=diff
         return d    
 
-    def distance(self, primary_sample, samples=None, limit=None, sort=True):
+    def distance(self, primary_sample, max_distance=12, samples=None, limit=None, sort=True):
         if samples is None:
             samples=self.__get_samples()
         if limit is not None:
@@ -67,7 +68,7 @@ class DistanceTaskManager():
         self._build_xor(primary_sample, samples)
         distances = self._count_xor(primary_sample, samples)
         if sort:
-            distances=sort_and_filter_distance_dict(distances, limit)
+            distances=sort_and_filter_distance_dict(distances, max_distance, limit)
         return distances
 
     ## Insert
