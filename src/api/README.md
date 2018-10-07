@@ -33,8 +33,9 @@ ATLAS_API="http://localhost:8080" DEFAULT_OUTDIR="/atlas/predictor-results/" CEL
 ```
 
 ```
-curl -H "Content-Type: application/json" -X POST -d '{"type":"sequence","query":{"seq":"CGGTCAGTCCGTTTGTTCTTGTGGCGAGTGTTGCCGTTTTCTTG", "threshold":0.9} }' localhost:8080/search
+curl -H "Content-Type: application/json" -X POST -d '{"type":"sequence","query":{"seq":"CGGTCAGTCCGTTTGTTCTTGTGGCGAGTGTTGCCGTTTTCTTG", "threshold":0.9, "user_id": "1234567", "result_id": "2345678" } }' localhost:8080/search
 ```
+
 ```
 curl -H "Content-Type: application/json" -X POST -d '{"type":"dna-variant", "query": {"ref":"T","alt":"A","pos":99} }' localhost:8080/search
 ```

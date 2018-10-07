@@ -10,13 +10,13 @@ except ImportError:
 from analyses import PredictorTaskManager
 from analyses import BigsiTaskManager
 from analyses import DistanceTaskManager
+from analyses import MappingsManager
 
 from celery import Celery
 CELERY_BROKER_URL=os.environ.get("CELERY_BROKER_URL", 'redis://localhost:6379') 
 DEFAULT_OUTDIR=os.environ.get("DEFAULT_OUTDIR", "./") 
 ATLAS_API=os.environ.get("ATLAS_API", "https://api.atlas-prod.makeandship.com/") 
-print(ATLAS_API)
-
+MAPPER=MappingsManager()
 def make_celery(app):
     celery = Celery(app.import_name, backend=app.config['CELERY_RESULT_BACKEND'],
                     broker=app.config['CELERY_BROKER_URL'])
@@ -52,7 +52,7 @@ requests_log.setLevel(logging.DEBUG)
 requests_log.propagate = True
 
 def send_results(type, results, url, sub_type=None, request_type="POST"):
-    ## POST /samples/:id/result { type: "…", result: { … } }
+    ## POST /isolates/:id/result { type: "…", result: { … } }
     d={'type': type, 'result' : results}
     if sub_type:
         d["subType"]=sub_type
@@ -64,29 +64,30 @@ def send_results(type, results, url, sub_type=None, request_type="POST"):
 ## Predictor
 
 @celery.task()
-def predictor_task(file, sample_id):
-    results=PredictorTaskManager(DEFAULT_OUTDIR).run_predictor(file, sample_id)
-    url=os.path.join(ATLAS_API, "experiments", sample_id, "results")
-    # send_results("predictor", results, url)
+def predictor_task(file, experiment_id):
+    results=PredictorTaskManager(DEFAULT_OUTDIR).run_predictor(file, experiment_id)
+    url=os.path.join(ATLAS_API, "experiments", experiment_id, "results")
+    send_results("predictor", results, url)
 
 @celery.task()
-def genotype_task(file, sample_id):
-    results=PredictorTaskManager(DEFAULT_OUTDIR).run_genotype(file, sample_id)
-    url=os.path.join(ATLAS_API, "experiments", sample_id, "results")
+def genotype_task(file, experiment_id):
+    results=PredictorTaskManager(DEFAULT_OUTDIR).run_genotype(file, experiment_id)
+    url=os.path.join(ATLAS_API, "experiments", experiment_id, "results")
     # send_results("genotype", results, url)
     ## Insert distance results 
     DistanceTaskManager().insert(results)
     # ## Trigger distance tasks
-    res=distance_task.delay(sample_id, "tree-distance")
-    res=distance_task.delay(sample_id, "nearest-neighbour")
+    res=distance_task.delay(experiment_id, "tree-distance")
+    res=distance_task.delay(experiment_id, "nearest-neighbour")
 
 @app.route('/analyses', methods=["POST"])
 def predictor():
     data=request.get_json()
     file = data.get('file', '')
-    sample_id = data.get('sample_id', '')
-    res=predictor_task.delay(file, sample_id)
-    res=genotype_task.delay(file, sample_id)
+    experiment_id = data.get('experiment_id', '')
+    res=predictor_task.delay(file, experiment_id)
+    res=genotype_task.delay(file, experiment_id)
+    MAPPER.create_mapping(experiment_id, experiment_id)
     return json.dumps({"result":"success", "task_id":str(res)}), 200    
 
 ## BIGSI
@@ -156,41 +157,52 @@ def tree(version):
     return response
 
 TREE_PATH={"1.0":"data/tb_newick.txt"}
-def get_tree_samples():
+def get_tree_isolates():
     newick=load_tree("latest")
     tree=Phylo.read(StringIO(newick), 'newick')
-    tree_samples=[c.name for c in tree.get_terminals()]
-    return tree_samples
+    tree_isolates=[c.name for c in tree.get_terminals()]
+    return tree_isolates
 
 
-TREE_SAMPLES=get_tree_samples()
+TREE_ISOLATES=get_tree_isolates()
 @celery.task()
-def distance_task(sample_id, distance_type):
+def distance_task(experiment_id, distance_type):
     if distance_type == "all":
-        results=DistanceTaskManager().distance(sample_id, sort=True)
+        results=DistanceTaskManager().distance(experiment_id, sort=True)
     elif distance_type == "tree-distance":
-        results=DistanceTaskManager().distance(sample_id, samples=TREE_SAMPLES, sort=True)        
+        results=DistanceTaskManager().distance(experiment_id, isolates=TREE_ISOLATES, sort=True)        
     elif distance_type == "nearest-neighbour":
-        results=DistanceTaskManager().distance(sample_id, limit=10, sort=True)
+        results=DistanceTaskManager().distance(experiment_id, limit=10, sort=True)
     else:
         raise TypeError("%s is not a valid query" % distance_type)
-    url=os.path.join(ATLAS_API, "experiments", sample_id, "results")
+    url=os.path.join(ATLAS_API, "experiments", experiment_id, "results")
     send_results("distance", results, url, sub_type=distance_type)
 
 @app.route('/distance', methods=["POST"])
 def distance():
     data=request.get_json()
-    sample_id = data.get('sample_id', '')
+    experiment_id = data.get('experiment_id', '')
     distance_type = data.get('distance_type', 'all') 
     assert distance_type in ["all", "tree-distance", "nearest-neighbour"]
-    res=distance_task.delay(sample_id, distance_type)
+    res=distance_task.delay(experiment_id, distance_type)
     response= json.dumps({"result":"success", "task_id":str(res)}), 200     
     return response
 
+## Mappings from experiment_id to isolate_id
+@app.route('/mappings', methods=["GET"])
+def mappings():
+    mappings=MAPPER.experiment_ids_to_isolate_ids()
+    return json.dumps(mappings)
 
-## testing experiments requests /experiments/:sample_id/results
-@app.route('/experiments/<sample_id>/results', methods=["POST"])
-def results(sample_id):
+@app.route('/reverse_mappings', methods=["GET"])
+def mappings():
+    mappings=MAPPER.isolate_ids_to_experiment_ids()
+    return json.dumps(mappings)
+
+
+## testing experiments requests /experiments/:experiment_id/results
+@app.route('/experiments/<experiment_id>/results', methods=["POST"])
+def results(experiment_id):
     return request.data,200
 
 @app.route('/queries/<query_id>/results', methods=["POST"])
