@@ -1,3 +1,6 @@
+*.err
+*.tmp
+*.json
 venv*
 mykrobe-data/
 src/mykrobe/data/
