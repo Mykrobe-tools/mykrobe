@@ -28,7 +28,7 @@ class MappingsManager():
     def experiment_ids_to_isolate_ids(self):
         return decode_dict(self.redis.hgetall(self.hkey))
 
-    def experiment_ids_to_isolate_ids(self):
+    def isolate_ids_to_experiment_ids(self):
         return decode_dict(self.redis.hgetall(self.rhkey))        
 
 
