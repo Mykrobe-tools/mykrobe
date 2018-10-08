@@ -16,7 +16,7 @@ from mykrobe.variants.schema.models import Variant
 from mykrobe.probes import AlleleGenerator
 from mykrobe.probes import make_variant_probe
 import math
-
+from mykrobe.constants import DB_PREFIX
 
 def get_non_singelton_variants(db_name):
     client = MongoClient('localhost', 27017)
@@ -31,7 +31,7 @@ def get_non_singelton_variants(db_name):
 
 
 def run(parser, args):
-    db_name = 'mykrobe-%s' % (args.db_name)
+    db_name = '%s-%s' % (DB_PREFIX, args.db_name)
     DB = connect(db_name)
     if args.verbose:
         logger.setLevel(level=logging.DEBUG)
