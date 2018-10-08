@@ -64,7 +64,8 @@ def run_main(parser, args):
         report_all_calls=args.report_all_calls,
         variant_confidence_threshold=args.min_variant_conf,
         sequence_confidence_threshold=args.min_gene_conf,
-        min_gene_percent_covg_threshold=args.min_gene_percent_covg_threshold)
+        min_gene_percent_covg_threshold=args.min_gene_percent_covg_threshold,
+        kmer_size=args.kmer)
     gt.run()
     if not args.keep_tmp:
         cp.remove_temporary_files()

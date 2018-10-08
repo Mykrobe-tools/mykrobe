@@ -60,16 +60,12 @@ def depth_to_expected_kmer_count(depth):
 
 def log_lik_R_S_kmer_count(observed_reference_kmer_count,
                            observed_alternate_kmer_count,
-                           expected_reference_depth,
-                           expected_alternate_depth):
-    expected_reference_kmer_count = depth_to_expected_kmer_count(
-        expected_reference_depth)
-    expected_alternate_kmer_count = depth_to_expected_kmer_count(
-        expected_alternate_depth)
+                           expected_reference_kmer_count,
+                           expected_alternate_kmer_count):
     # logger.debug("%f, %f, %f" % (expected_reference_depth,
     #                              expected_reference_kmer_count, observed_reference_kmer_count))
-    # logger.debug("%f, %f, %f" % (expected_alternate_depth,
-    # expected_alternate_kmer_count, observed_alternate_kmer_count))
+    # logger.debug("%f, %f" % (expected_reference_kmer_count,expected_alternate_kmer_count))
+    # logger.debug("%f, %f" % (observed_reference_kmer_count,observed_alternate_kmer_count))
     lne = log_poisson_prob(
         lam=expected_reference_kmer_count, k=observed_reference_kmer_count)
     le = log_poisson_prob(

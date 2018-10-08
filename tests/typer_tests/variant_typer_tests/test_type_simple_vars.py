@@ -19,11 +19,13 @@ class VariantTyperTest(TestCase):
         reference_coverage = ProbeCoverage(min_depth=100,
                                            percent_coverage=100,
                                            median_depth=100,
-                                           k_count=100)
+                                           k_count=100,
+                                           klen=31)
         alternate_coverages = [ProbeCoverage(min_depth=100,
                                              percent_coverage=3,
                                              median_depth=100,
-                                             k_count=3)]
+                                             k_count=3,
+                                           klen=31)]
         v1 = VariantProbeCoverage(var_name="A123T",
                                   reference_coverages=[reference_coverage],
                                   alternate_coverages=alternate_coverages
@@ -36,11 +38,13 @@ class VariantTyperTest(TestCase):
         reference_coverage = ProbeCoverage(min_depth=100,
                                            percent_coverage=3,
                                            median_depth=100,
-                                           k_count=3)
+                                           k_count=3,
+                                           klen=31)
         alternate_coverages = [ProbeCoverage(min_depth=100,
                                              percent_coverage=100,
                                              median_depth=100,
-                                             k_count=100)]
+                                             k_count=100,
+                                           klen=31)]
         v1 = VariantProbeCoverage(var_name="A123T",
                                   reference_coverages=[reference_coverage],
                                   alternate_coverages=alternate_coverages
@@ -52,11 +56,13 @@ class VariantTyperTest(TestCase):
         reference_coverage = ProbeCoverage(min_depth=100,
                                            percent_coverage=100,
                                            median_depth=50,
-                                           k_count=50)
+                                           k_count=50,
+                                           klen=31)
         alternate_coverages = [ProbeCoverage(min_depth=100,
                                              percent_coverage=100,
                                              median_depth=50,
-                                             k_count=50)]
+                                             k_count=50,
+                                           klen=31)]
         v1 = VariantProbeCoverage(var_name="A123T",
                                   reference_coverages=[reference_coverage],
                                   alternate_coverages=alternate_coverages
@@ -68,11 +74,13 @@ class VariantTyperTest(TestCase):
         reference_coverage = ProbeCoverage(min_depth=11,
                                            percent_coverage=100,
                                            median_depth=42,
-                                           k_count=42)
+                                           k_count=42,
+                                           klen=31)
         alternate_coverages = [ProbeCoverage(min_depth=94,
                                              percent_coverage=100,
                                              median_depth=102,
-                                             k_count=94)]
+                                             k_count=94,
+                                           klen=31)]
         v1 = VariantProbeCoverage(var_name="A123T",
                                   reference_coverages=[reference_coverage],
                                   alternate_coverages=alternate_coverages
@@ -99,11 +107,13 @@ class VariantTyperWithContamination(TestCase):
         reference_coverage = ProbeCoverage(min_depth=100,
                                            percent_coverage=100,
                                            median_depth=80,
-                                           k_count=80)
+                                           k_count=80,
+                                           klen=31)
         alternate_coverages = [ProbeCoverage(min_depth=100,
                                              percent_coverage=100,
                                              median_depth=20,
-                                             k_count=40)]
+                                             k_count=40,
+                                           klen=31)]
         v1 = VariantProbeCoverage(var_name="A123T",
                                   reference_coverages=[reference_coverage],
                                   alternate_coverages=alternate_coverages
@@ -132,15 +142,18 @@ class TestVariantTyperWithMultipleAlternateCoverages(TestCase):
         reference_coverage = ProbeCoverage(min_depth=100,
                                            percent_coverage=70,
                                            median_depth=80,
-                                           k_count=80)
+                                           k_count=80,
+                                           klen=31)
         alt1 = ProbeCoverage(min_depth=100,
                              percent_coverage=70,
                              median_depth=20,
-                             k_count=20)
+                             k_count=20,
+                                           klen=31)
         alt2 = ProbeCoverage(min_depth=100,
                              percent_coverage=100,
                              median_depth=80,
-                             k_count=80)
+                             k_count=80,
+                                           klen=31)
         alternate_coverages = [alt1, alt2]
         v1 = VariantProbeCoverage(var_name="A123T",
                                   reference_coverages=[reference_coverage],
@@ -166,15 +179,18 @@ class TestVariantTyperWithMultipleProbeCoverages(TestCase):
         reference_coverage = ProbeCoverage(min_depth=100,
                                            percent_coverage=80,
                                            median_depth=80,
-                                           k_count=80)
+                                           k_count=80,
+                                           klen=31)
         alt1 = ProbeCoverage(min_depth=100,
                              percent_coverage=50,
                              median_depth=20,
-                             k_count=20)
+                             k_count=20,
+                                           klen=31)
         alt2 = ProbeCoverage(min_depth=100,
                              percent_coverage=40,
                              median_depth=80,
-                             k_count=30)
+                             k_count=30,
+                                           klen=31)
         alternate_coverages = [alt1, alt2]
 
         v1 = VariantProbeCoverage(var_name="A123T",
@@ -185,15 +201,18 @@ class TestVariantTyperWithMultipleProbeCoverages(TestCase):
         reference_coverage = ProbeCoverage(min_depth=100,
                                            percent_coverage=80,
                                            median_depth=80,
-                                           k_count=20)
+                                           k_count=20,
+                                           klen=31)
         alt1 = ProbeCoverage(min_depth=100,
                              percent_coverage=50,
                              median_depth=20,
-                             k_count=20)
+                             k_count=20,
+                                           klen=31)
         alt2 = ProbeCoverage(min_depth=100,
                              percent_coverage=100,
                              median_depth=80,
-                             k_count=100)
+                             k_count=100,
+                                           klen=31)
 
         alternate_coverages = [alt1, alt2]
 
@@ -223,11 +242,13 @@ class TestVariantTyperWithLowMinimum(TestCase):
         reference_coverage = ProbeCoverage(min_depth=131,
                                            percent_coverage=95.2381,
                                            median_depth=155,
-                                           k_count=131)
+                                           k_count=131,
+                                           klen=31)
         alt1 = ProbeCoverage(min_depth=1,
                              percent_coverage=100,
                              median_depth=1,
-                             k_count=1)
+                             k_count=1,
+                                           klen=31)
         alternate_coverages = [alt1]
         v1 = VariantProbeCoverage(var_name="A123T",
                                   reference_coverages=[reference_coverage],
@@ -241,11 +262,13 @@ class TestVariantTyperWithLowMinimum(TestCase):
         reference_coverage = ProbeCoverage(min_depth=2,
                                            percent_coverage=59.52,
                                            median_depth=2,
-                                           k_count=60)
+                                           k_count=60,
+                                           klen=31)
         alt1 = ProbeCoverage(min_depth=1,
                              percent_coverage=83.33,
                              median_depth=1,
-                             k_count=83)
+                             k_count=83,
+                                           klen=31)
         alternate_coverages = [alt1]
         v1 = VariantProbeCoverage(var_name="A123T",
                                   reference_coverages=[reference_coverage],
@@ -264,11 +287,13 @@ class TestVariantTyperWithLowMinimum(TestCase):
         reference_coverage = ProbeCoverage(min_depth=1,
                                            percent_coverage=100,
                                            median_depth=2,
-                                           k_count=2)
+                                           k_count=2,
+                                           klen=31)
         alt1 = ProbeCoverage(min_depth=1,
                              percent_coverage=100,
                              median_depth=1,
-                             k_count=1)
+                             k_count=1,
+                                           klen=31)
         alternate_coverages = [alt1]
         v1 = VariantProbeCoverage(var_name="A123T",
                                   reference_coverages=[reference_coverage],

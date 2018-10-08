@@ -78,6 +78,10 @@ class VariantProbeCoverage(object):
         return self.best_reference_coverage.min_depth
 
     @property
+    def reference_klen(self):
+        return self.best_reference_coverage.klen
+
+    @property
     def alternate_percent_coverage(self):
         return self.best_alternate_coverage.percent_coverage
 
@@ -96,3 +100,7 @@ class VariantProbeCoverage(object):
     @property
     def alternate_min_depth(self):
         return self.best_alternate_coverage.min_depth
+
+    @property
+    def alternate_klen(self):
+        return self.best_alternate_coverage.klen        
