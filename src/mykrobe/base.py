@@ -129,7 +129,7 @@ genotyping_mixin.add_argument(
 genotyping_mixin.add_argument(
     "--min_variant_conf",
     help="minimum genotype confidence for variant genotyping",
-    default=100, type=int)
+    default=150, type=int)
 genotyping_mixin.add_argument(
     "--min_gene_conf",
     help="minimum genotype confidence for gene genotyping",
