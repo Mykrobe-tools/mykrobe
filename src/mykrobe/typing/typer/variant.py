@@ -159,25 +159,37 @@ class KmerCountGenotypeModel(GenotypeModel):
         # logger.debug("%f %f"% (allele_length,depth))
         return (allele_length*depth)+0.01
 
+    def klen_to_dna_len(self, klen):
+        return klen+self.kmer_size-1
+
     def hom_ref_lik(self, variant_probe_coverage):
         hom_ref_likes = []
         # Either alt+cov or alt_covg + contam_covg
         for expected_depth in self.expected_depths:
             # logger.debug("hom ref %s" % variant_probe_coverage.var_name)
-            hom_ref_likes.append(
-                log_lik_R_S_kmer_count(
+            kmer_count_likelihood = log_lik_R_S_kmer_count(
                     variant_probe_coverage.reference_kmer_count,
                     variant_probe_coverage.alternate_kmer_count,
                     self.depth_to_expected_kmer_count(expected_depth, variant_probe_coverage.reference_klen),
                     self.depth_to_expected_kmer_count(expected_depth * self.error_rate/3, variant_probe_coverage.alternate_klen)
-                    ))
-            for contamination in self.contamination_depths:
-                hom_ref_likes.append(
-                    log_lik_R_S_kmer_count(
-                        variant_probe_coverage.reference_kmer_count,
-                        variant_probe_coverage.alternate_kmer_count,
-                        self.depth_to_expected_kmer_count(expected_depth + contamination,variant_probe_coverage.reference_klen),
-                        self.depth_to_expected_kmer_count((expected_depth + contamination) * self.error_rate / 3),variant_probe_coverage.alternate_klen))
+                    )
+            ngaps_likelihood=log_lik_probability_of_N_gaps(expected_depth,
+                                              variant_probe_coverage.reference_percent_coverage,
+                                              self.klen_to_dna_len(variant_probe_coverage.reference_klen))+\
+                             log_lik_probability_of_N_gaps(expected_depth * self.error_rate/3,
+                                              variant_probe_coverage.alternate_percent_coverage,
+                                              self.klen_to_dna_len(variant_probe_coverage.alternate_klen))
+            logger.debug("hom ref kmer_count_likelihood: %f %s" % (kmer_count_likelihood,variant_probe_coverage.var_name))
+            logger.debug("hom ref ngaps_likelihood: %f %s " % (ngaps_likelihood,variant_probe_coverage.var_name))
+
+            hom_ref_likes.append(kmer_count_likelihood + ngaps_likelihood)
+            # for contamination in self.contamination_depths:
+            #     hom_ref_likes.append(
+            #         log_lik_R_S_kmer_count(
+            #             variant_probe_coverage.reference_kmer_count,
+            #             variant_probe_coverage.alternate_kmer_count,
+            #             self.depth_to_expected_kmer_count(expected_depth + contamination,variant_probe_coverage.reference_klen),
+            #             self.depth_to_expected_kmer_count((expected_depth + contamination) * self.error_rate / 3),variant_probe_coverage.alternate_klen))
         return max(hom_ref_likes)
 
     def hom_alt_lik(self, variant_probe_coverage):
@@ -185,20 +197,29 @@ class KmerCountGenotypeModel(GenotypeModel):
         # Either alt+cov or alt_covg + contam_covg
         # logger.debug("hom alt %s" % variant_probe_coverage.var_name)
         for expected_depth in self.expected_depths:
-            hom_alt_liks.append(
-                log_lik_R_S_kmer_count(
+            kmer_count_likelihood = log_lik_R_S_kmer_count(
                     variant_probe_coverage.alternate_kmer_count,
                     variant_probe_coverage.reference_kmer_count,
                     self.depth_to_expected_kmer_count(expected_depth,variant_probe_coverage.reference_klen),
-                    self.depth_to_expected_kmer_count(expected_depth * self.error_rate / 3,variant_probe_coverage.alternate_klen))
-                )
-            for contamination in self.contamination_depths:
-                hom_alt_liks.append(
-                    log_lik_R_S_kmer_count(
-                        variant_probe_coverage.alternate_kmer_count,
-                        variant_probe_coverage.reference_kmer_count,
-                        self.depth_to_expected_kmer_count(expected_depth + contamination,variant_probe_coverage.alternate_klen),
-                        self.depth_to_expected_kmer_count((expected_depth + contamination) * self.error_rate / 3,variant_probe_coverage.reference_klen)))
+                    self.depth_to_expected_kmer_count(expected_depth * self.error_rate / 3,variant_probe_coverage.alternate_klen)
+                    )
+            ngaps_likelihood=log_lik_probability_of_N_gaps(expected_depth * self.error_rate / 3,
+                                              variant_probe_coverage.reference_percent_coverage,
+                                              self.klen_to_dna_len(variant_probe_coverage.reference_klen))+\
+                             log_lik_probability_of_N_gaps(expected_depth,
+                                              variant_probe_coverage.alternate_percent_coverage,
+                                              self.klen_to_dna_len(variant_probe_coverage.alternate_klen))
+            logger.debug("hom alt kmer_count_likelihood: %f %s" % (kmer_count_likelihood,variant_probe_coverage.var_name))
+            logger.debug("hom alt ngaps_likelihood: %f %s " % (ngaps_likelihood,variant_probe_coverage.var_name))
+                
+            hom_alt_liks.append(kmer_count_likelihood + ngaps_likelihood)
+            # for contamination in self.contamination_depths:
+            #     hom_alt_liks.append(
+            #         log_lik_R_S_kmer_count(
+            #             variant_probe_coverage.alternate_kmer_count,
+            #             variant_probe_coverage.reference_kmer_count,
+            #             self.depth_to_expected_kmer_count(expected_depth + contamination,variant_probe_coverage.alternate_klen),
+            #             self.depth_to_expected_kmer_count((expected_depth + contamination) * self.error_rate / 3,variant_probe_coverage.reference_klen)))
         return max(hom_alt_liks)
 
     def het_lik(self, variant_probe_coverage):
@@ -211,14 +232,26 @@ class KmerCountGenotypeModel(GenotypeModel):
         else:
             het_liks = []
             for expected_depth in self.expected_depths:
-                het_liks.append(
-                    log_lik_R_S_kmer_count(
+                kmer_count_likelihood = log_lik_R_S_kmer_count(
                         variant_probe_coverage.alternate_kmer_count,
                         variant_probe_coverage.reference_kmer_count,
                         self.depth_to_expected_kmer_count(expected_depth/2 + (expected_depth/2 * self.error_rate/3),variant_probe_coverage.alternate_klen),
                         self.depth_to_expected_kmer_count(expected_depth/2 + (expected_depth/2 * self.error_rate/3),variant_probe_coverage.reference_klen)
                         )
-                )
+                ngaps_likelihood_ref=log_lik_probability_of_N_gaps(expected_depth/2 + (expected_depth/2 * self.error_rate/3),
+                                                  variant_probe_coverage.reference_percent_coverage,
+                                                  self.klen_to_dna_len(variant_probe_coverage.reference_klen))
+                ngaps_likelihood_alt=log_lik_probability_of_N_gaps(expected_depth/2 + (expected_depth/2 * self.error_rate/3),
+                                                  variant_probe_coverage.alternate_percent_coverage,
+                                                  self.klen_to_dna_len(variant_probe_coverage.alternate_klen))
+                ngaps_likelihood=ngaps_likelihood_ref+ngaps_likelihood_alt
+                logger.debug("het kmer_count_likelihood: %f %s" % (kmer_count_likelihood,variant_probe_coverage.var_name))
+                logger.debug("het ngaps_likelihood_ref: %f %s " % (ngaps_likelihood_ref,variant_probe_coverage.var_name))
+                logger.debug("het ngaps_likelihood_alt: %f %s " % (ngaps_likelihood_alt,variant_probe_coverage.var_name))
+                logger.debug("het ngaps_likelihood: %f %s " % (ngaps_likelihood,variant_probe_coverage.var_name))
+
+
+                het_liks.append(kmer_count_likelihood + ngaps_likelihood)
             return max(het_liks)
 
 
