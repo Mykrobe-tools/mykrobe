@@ -285,9 +285,9 @@ class TestINDELandSNPSAlleleGenerator():
         panel = self.pg2.create(v, context=[v1])
         assert "CGACTAGCCACCATCGCGCATCAGTGCGAGGTCAAAAGCGACCAAAGCGAGCAAGTCGCGGAT" in panel.refs
 
-        assert panel.alts == \
-            ["CGACTAGCCACCATCGCGCATCAGTGCGAGATCAAAAGCGACCAAAGCGAGCAAGTCGCGGAT",
-             "CGACTAGCCACCATCGCGCATCAGTGCGAGATCAAAAGCGACCAAAGCGAGCAAGTCGCCGAT"]
+        assert set(panel.alts) == \
+            set(["CGACTAGCCACCATCGCGCATCAGTGCGAGATCAAAAGCGACCAAAGCGAGCAAGTCGCGGAT",
+             "CGACTAGCCACCATCGCGCATCAGTGCGAGATCAAAAGCGACCAAAGCGAGCAAGTCGCCGAT"])
 
     def test_indel_snp_indel_context(self):
         v = Variant.create(

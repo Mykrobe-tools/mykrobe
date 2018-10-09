@@ -120,11 +120,11 @@ class TestSNPAlleleGenerator():
             start=32,
             alternate_bases=["T"])
         panel = self.pg.create(v, context=[v2])
-        assert panel.refs == ["CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGAT",
-                              "CGATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTGAT"]
-        assert panel.alts == [
+        assert set(panel.refs) == set(["CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGAT",
+                              "CGATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTGAT"])
+        assert set(panel.alts) == set([
             "CGATTAAAGATAGAAATACACGATGCGAGCTATCAAATTTCATAACATCACCATGAGTTTGAT",
-            "CGATTAAAGATAGAAATACACGATGCGAGCTTTCAAATTTCATAACATCACCATGAGTTTGAT"]
+            "CGATTAAAGATAGAAATACACGATGCGAGCTTTCAAATTTCATAACATCACCATGAGTTTGAT"])
 
     def test_simple_variant_with_multiple_nearby_snps(self):
         v = Variant.create(
