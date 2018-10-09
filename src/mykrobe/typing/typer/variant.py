@@ -34,7 +34,8 @@ class VariantTyper(Typer):
                  filters=[],
                  confidence_threshold=3,
                  model="kmer_count", 
-                 kmer_size=31):
+                 kmer_size=31, 
+                 min_proportion_expected_depth=0.3):
 
         super(
             VariantTyper,
@@ -49,6 +50,7 @@ class VariantTyper(Typer):
         self.error_rate = error_rate
         self.minor_freq = minor_freq
         self.kmer_size = kmer_size
+        self.min_proportion_expected_depth = min_proportion_expected_depth
 
         if model == "median_depth":
             self.model = DepthCoverageGenotypeModel(
@@ -105,7 +107,7 @@ class VariantTyper(Typer):
         info = {"coverage": variant_probe_coverage.coverage_dict,
                 "expected_depths": self.expected_depths,
                 "contamination_depths": self.contamination_depths,
-                "filter": "PASS",
+                "filter": [],
                 "conf": confidence}
         if gt == "-/-" and not self.ignore_filtered:
             if variant_probe_coverage.alternate_percent_coverage > variant_probe_coverage.reference_percent_coverage:
@@ -113,13 +115,20 @@ class VariantTyper(Typer):
             else:
                 gt = "0/0"
             if "MISSING_WT" in self.filters:
-                info["filter"] = "MISSING_WT"
+                info["filter"].append("MISSING_WT")
         elif "LOW_PERCENT_COVERAGE" in self.filters and variant_probe_coverage.alternate_percent_coverage < 100 and variant_probe_coverage.reference_percent_coverage < 100:
-            info["filter"] = "LOW_PERCENT_COVERAGE"
+            info["filter"].append("LOW_PERCENT_COVERAGE")
             if self.ignore_filtered:
                 gt = "0/0"
         if "LOW_GT_CONF" in self.filters and (confidence < self.confidence_threshold):
-            info["filter"] = "LOW_GT_CONF"
+            info["filter"].append("LOW_GT_CONF")
+
+        if "LOW_TOTAL_DEPTH" in self.filters:
+            total_depth = variant_probe_coverage.reference_median_depth + variant_probe_coverage.alternate_median_depth
+            expected_depth = self.expected_depths[0]
+            if total_depth < self.min_proportion_expected_depth * expected_depth:
+                logger.debug("%s" % variant_probe_coverage.var_name)
+                info["filter"].append("LOW_TOTAL_DEPTH") 
 
         return {
             "variant": variant,

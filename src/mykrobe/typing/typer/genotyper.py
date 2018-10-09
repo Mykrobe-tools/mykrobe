@@ -278,7 +278,8 @@ class Genotyper(object):
             sequence_confidence_threshold=0,
             min_gene_percent_covg_threshold=100,
             model="median_depth", 
-            kmer_size=31):
+            kmer_size=31,
+            min_proportion_expected_depth=0.3):
         self.sample = sample
         self.variant_covgs = variant_covgs
         self.gene_presence_covgs = gene_presence_covgs
@@ -302,6 +303,7 @@ class Genotyper(object):
         self.sequence_confidence_threshold = sequence_confidence_threshold
         self.min_gene_percent_covg_threshold = min_gene_percent_covg_threshold
         self.kmer_size = kmer_size
+        self.min_proportion_expected_depth = min_proportion_expected_depth
 
     def run(self):
         self._type()
@@ -335,7 +337,8 @@ class Genotyper(object):
             confidence_threshold=self.variant_confidence_threshold,
             filters=self.filters,
             model=self.model,
-            kmer_size=self.kmer_size
+            kmer_size=self.kmer_size,
+            min_proportion_expected_depth=self.min_proportion_expected_depth
         )
         genotypes = []
         filters = []
@@ -346,7 +349,7 @@ class Genotyper(object):
             call = gt.type(probe_coverages, variant=probe_name)
 
             genotypes.append(sum(call["genotype"]))
-            filters.append(int(call["info"]["filter"] == "PASS"))
+            filters.append(int(call["info"]["filter"] == []))
             if sum(call["genotype"]) > 0 or not call[
                     "genotype"] or self.report_all_calls:
                 self.variant_calls[probe_name] = call

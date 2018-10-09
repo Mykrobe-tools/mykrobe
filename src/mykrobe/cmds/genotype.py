@@ -65,7 +65,8 @@ def run_main(parser, args):
         variant_confidence_threshold=args.min_variant_conf,
         sequence_confidence_threshold=args.min_gene_conf,
         min_gene_percent_covg_threshold=args.min_gene_percent_covg_threshold,
-        kmer_size=args.kmer)
+        kmer_size=args.kmer,
+        min_proportion_expected_depth=args.min_proportion_expected_depth)
     gt.run()
     if args.output:
         with open(args.output, 'w') as outfile:

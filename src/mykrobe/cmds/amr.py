@@ -189,7 +189,8 @@ def run(parser, args):
                        variant_confidence_threshold=args.min_variant_conf,
                        sequence_confidence_threshold=args.min_gene_conf,
                        model=args.model,
-                       kmer_size=args.kmer
+                       kmer_size=args.kmer,
+                       min_proportion_expected_depth=args.min_proportion_expected_depth
                        )
         gt.run()
         variant_calls_dict = gt.variant_calls_dict

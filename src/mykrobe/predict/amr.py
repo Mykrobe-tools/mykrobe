@@ -43,8 +43,8 @@ def depth_on_alternate(call):
 
 def is_filtered(call):
     info = call.get('info', {})
-    _filter = info.get('filter', 'PASS')
-    if not _filter == "PASS":
+    _filter = info.get('filter', [])
+    if _filter:
         return True
     else:
         return False

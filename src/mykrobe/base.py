@@ -115,7 +115,7 @@ genotyping_mixin.add_argument(
     '--filters',
     help="don't include filtered genotypes",
     nargs='+',
-    default=["MISSING_WT", "LOW_PERCENT_COVERAGE", "LOW_GT_CONF"],
+    default=["MISSING_WT", "LOW_PERCENT_COVERAGE", "LOW_GT_CONF", "LOW_TOTAL_DEPTH"],
     required=False)
 genotyping_mixin.add_argument(
     '--report_all_calls',
@@ -134,6 +134,10 @@ genotyping_mixin.add_argument(
     "--min_gene_conf",
     help="minimum genotype confidence for gene genotyping",
     default=1, type=int)
+genotyping_mixin.add_argument(
+    "--min_proportion_expected_depth",
+    help="minimum depth required on the sum of both alleles. Default 0.3 (30%)",
+    default=0.3, type=float)
 genotyping_mixin.add_argument(
     "--min_gene_percent_covg_threshold",
     help="all genes alleles found above this percent coverage will be reported (default 100 (only best alleles reported))",
