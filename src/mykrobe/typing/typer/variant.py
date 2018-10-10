@@ -18,7 +18,7 @@ def likelihoods_to_confidence(l):
             "Must have at least 2 likelihoods to calculate confidence")
     l_sorted = sorted(l, reverse=True)
     if l_sorted[2] == l[0]:
-        # 0/1 and 1/1 are most likely - since haploide - conf compare with 0/0
+        # 0/1 and 1/1 are most likely - since haploid - conf compare with 0/0
         return int(round(l_sorted[0] - l[0]))
     else:
         # Otherwise, compare with 2 most likely
@@ -35,7 +35,8 @@ class VariantTyper(Typer):
                  confidence_threshold=3,
                  model="kmer_count", 
                  kmer_size=31, 
-                 min_proportion_expected_depth=0.3):
+                 min_proportion_expected_depth=0.3,
+                 ploidy="diploid"):
 
         super(
             VariantTyper,
@@ -51,6 +52,7 @@ class VariantTyper(Typer):
         self.minor_freq = minor_freq
         self.kmer_size = kmer_size
         self.min_proportion_expected_depth = min_proportion_expected_depth
+        self.ploidy = ploidy
 
         if model == "median_depth":
             self.model = DepthCoverageGenotypeModel(
@@ -91,11 +93,15 @@ class VariantTyper(Typer):
             calls.sort(key=lambda x: x["info"]["conf"], reverse=True)
             return calls[0]
 
+    @property
+    def diploid_model(self):
+        return self.ploidy=="diploid"        
+
     def _type_variant_probe_coverages(
             self, variant_probe_coverage, variant=None):
         hom_ref_likelihood = self.model.hom_ref_lik(variant_probe_coverage)
         hom_alt_likelihood = self.model.hom_alt_lik(variant_probe_coverage)
-        if not self.has_contamination():
+        if not self.has_contamination() and self.diploid_model:
             het_likelihood = self.model.het_lik(variant_probe_coverage)
         else:
             het_likelihood = MIN_LLK

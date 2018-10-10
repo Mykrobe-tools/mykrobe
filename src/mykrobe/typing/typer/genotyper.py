@@ -279,7 +279,8 @@ class Genotyper(object):
             min_gene_percent_covg_threshold=100,
             model="median_depth", 
             kmer_size=31,
-            min_proportion_expected_depth=0.3):
+            min_proportion_expected_depth=0.3,
+            ploidy="diploid"):
         self.sample = sample
         self.variant_covgs = variant_covgs
         self.gene_presence_covgs = gene_presence_covgs
@@ -304,6 +305,7 @@ class Genotyper(object):
         self.min_gene_percent_covg_threshold = min_gene_percent_covg_threshold
         self.kmer_size = kmer_size
         self.min_proportion_expected_depth = min_proportion_expected_depth
+        self.ploidy = ploidy
 
     def run(self):
         self._type()
@@ -338,7 +340,9 @@ class Genotyper(object):
             filters=self.filters,
             model=self.model,
             kmer_size=self.kmer_size,
-            min_proportion_expected_depth=self.min_proportion_expected_depth
+            min_proportion_expected_depth=self.min_proportion_expected_depth,
+            ploidy=self.ploidy,
+            
         )
         genotypes = []
         filters = []

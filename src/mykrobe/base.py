@@ -112,6 +112,13 @@ genotyping_mixin.add_argument(
     help='Genotype model used, default kmer_count. Options kmer_count, median_depth',
     default='kmer_count')
 genotyping_mixin.add_argument(
+    '--ploidy',
+    metavar='ploidy',
+    choices=['diploid', 'haploid'],
+    type=str,
+    help='Use a diploid (includes 0/1 calls) or haploid genotyping model',
+    default='diploid')
+genotyping_mixin.add_argument(
     '--filters',
     help="don't include filtered genotypes",
     nargs='+',
