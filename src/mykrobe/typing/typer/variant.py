@@ -136,6 +136,8 @@ class VariantTyper(Typer):
                 logger.debug("%s" % variant_probe_coverage.var_name)
                 info["filter"].append("LOW_TOTAL_DEPTH") 
 
+        if not self.diploid_model:
+            likelihoods=[likelihoods[0],likelihoods[2]]
         return {
             "variant": variant,
             "genotype": [
