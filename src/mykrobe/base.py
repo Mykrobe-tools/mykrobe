@@ -99,7 +99,11 @@ genotyping_mixin = argparse.ArgumentParser(add_help=False)
 genotyping_mixin.add_argument(
     '--ont',
     action='store_true',
-    help='Set default for ONT data')
+    help='Set default for ONT data. Sets expected_error_rate to 0.15 and ploidy to haploid')
+genotyping_mixin.add_argument(
+    '--ignore_minor_calls',
+    action='store_true',
+    help='Ignore minor calls when running resistance prediction')
 genotyping_mixin.add_argument(
     '--ignore_filtered',
     help="don't include filtered genotypes",

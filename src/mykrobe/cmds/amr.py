@@ -121,7 +121,11 @@ def run(parser, args):
                 hierarchy_json_file))
     if args.ont:
         args.expected_error_rate = 0.15
-        logger.debug("Setting expected error rate to %s (--ont)" %
+        args.ploidy = "haploid"
+        args.ignore_minor_calls = True
+        logger.warning("Setting ploidy to haploid")        
+        logger.warning("Setting ignore_minor_calls to True")        
+        logger.warning("Setting expected error rate to %s (--ont)" %
                      args.expected_error_rate)
         args.model = "kmer_count"
     # Run Cortex
@@ -205,7 +209,7 @@ def run(parser, args):
                               base_json=base_json[args.sample],
                               depth_threshold=args.min_depth,
                               ignore_filtered=True,
-                              ignore_minor_calls=args.ont,
+                              ignore_minor_calls=args.ignore_minor_calls,
                               variant_to_resistance_json_fp=args.custom_variant_to_resistance_json)
         mykrobe_predictor_susceptibility_result = predictor.run()
     base_json[
