@@ -123,7 +123,6 @@ def run(parser, args):
         args.expected_error_rate = 0.15
         logger.debug("Setting expected error rate to %s (--ont)" %
                      args.expected_error_rate)
-        args.filters = ["LOW_GT_CONF"]
         args.model = "kmer_count"
     # Run Cortex
     cp = CoverageParser(
