@@ -82,8 +82,8 @@ def run(parser, args):
         elif args.panel == "atlas":
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
-                "data/panels/tb-walker-probe-set-feb-09-2017.fasta.gz", 
-                "data/panels/tb-k21-probe-set-feb-09-2017.fasta.gz"]                
+                "data/panels/tb-walker-probe-set-feb-09-2017.fasta.gz",
+                "data/panels/tb-k21-probe-set-feb-09-2017.fasta.gz"]
         elif args.panel == "custom":
             if not args.custom_probe_set_path:
                 raise ValueError("Custom panel requires custom_probe_set_path")
@@ -123,8 +123,8 @@ def run(parser, args):
         args.expected_error_rate = 0.15
         args.ploidy = "haploid"
         args.ignore_minor_calls = True
-        logger.warning("Setting ploidy to haploid")        
-        logger.warning("Setting ignore_minor_calls to True")        
+        logger.warning("Setting ploidy to haploid")
+        logger.warning("Setting ignore_minor_calls to True")
         logger.warning("Setting expected error rate to %s (--ont)" %
                      args.expected_error_rate)
         args.model = "kmer_count"
@@ -199,6 +199,8 @@ def run(parser, args):
         gt.run()
         variant_calls_dict = gt.variant_calls_dict
         sequence_calls_dict = gt.sequence_calls_dict
+        kmer_count_error_rate = gt.estimate_kmer_count_error_rate()
+        logger.info("Estimated error rate for kmer count model: " + str(round(100 * kmer_count_error_rate, 2)) + "%")
     else:
         depths = [cp.estimate_depth()]
     args.quiet = q
