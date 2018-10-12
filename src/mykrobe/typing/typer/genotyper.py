@@ -277,7 +277,7 @@ class Genotyper(object):
             variant_confidence_threshold=1,
             sequence_confidence_threshold=0,
             min_gene_percent_covg_threshold=100,
-            model="median_depth", 
+            model="median_depth",
             kmer_size=31,
             min_proportion_expected_depth=0.3,
             ploidy="diploid"):
@@ -342,7 +342,7 @@ class Genotyper(object):
             kmer_size=self.kmer_size,
             min_proportion_expected_depth=self.min_proportion_expected_depth,
             ploidy=self.ploidy,
-            
+
         )
         genotypes = []
         filters = []
@@ -392,3 +392,25 @@ class Genotyper(object):
                 info=params)
         except AttributeError:
             return None
+
+
+    def estimate_kmer_count_error_rate(self):
+        '''Returns error rate of kmer counts, as a float in the interval (0,1]'''
+        correct_kmer_count = 0
+        incorrect_kmer_count = 0
+
+        for probe_id, variant_call in self.variant_calls_dict.items():
+            try:
+                genotype = variant_call["genotype"]
+                cov_dict = variant_call["info"]["coverage"]
+            except:
+                continue
+
+            if genotype == [0, 0]:
+                correct_kmer_count += cov_dict["reference"]["kmer_count"]
+                incorrect_kmer_count += cov_dict["alternate"]["kmer_count"]
+            elif genotype == [1, 1]:
+                correct_kmer_count += cov_dict["alternate"]["kmer_count"]
+                incorrect_kmer_count += cov_dict["reference"]["kmer_count"]
+
+        return incorrect_kmer_count / (incorrect_kmer_count + correct_kmer_count)
