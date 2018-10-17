@@ -31,6 +31,72 @@ GN_PANELS = [
     "data/panels/gn-amr-genes-extended"]
 
 
+import numpy as np
+from mykrobe.typing.models.base import ProbeCoverage
+from mykrobe.typing.models.variant import VariantProbeCoverage
+from mykrobe.typing.typer.variant import VariantTyper
+
+class ConfThresholder:
+    def __init__(self, error_rate, mean_depth, kmer_length, iterations=10000):
+        self.error_rate = error_rate
+        self.mean_depth = mean_depth
+        self.iterations = iterations
+        self.kmer_length = kmer_length
+
+        # For now, store the coverage as well, in case we need to debug.
+        # In future, could just store the confidences, as that's all we
+        # need to decide on the cutoff
+        self.log_conf_and_covg = []
+
+
+    def _simulate_snps(self):
+        ref_covg = np.random.poisson(lam=self.mean_depth, size=self.iterations)
+        alt_covg = np.random.binomial(self.mean_depth, self.error_rate, size=self.iterations)
+        f = open('test.covs', 'w')
+        print('Ref_cov', 'Alt_cov', 'Cov', 'Conf', sep='\t', file=f)
+        probe_coverage_list = []
+        vtyper = VariantTyper([self.mean_depth], error_rate=self.error_rate, kmer_size=self.kmer_length)
+
+        for i in range(self.iterations):
+            c1 = ref_covg[i]
+            c2 = alt_covg[i]
+            if c1 + c2 == 0:
+                continue
+
+            min_depth = 1 # not used?
+            # Check what allele_length means in depth_to_expected_kmer_coun()! Probably need to change next two lines...
+            ref_k_count = ((2 + self.kmer_length) * ref_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
+            alt_k_count = ((2 + self.kmer_length) * alt_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
+            ref_probe_coverage = ProbeCoverage(100, self.mean_depth, min_depth, ref_k_count, self.kmer_length + 2)
+            alt_probe_coverage = ProbeCoverage(0, self.mean_depth, min_depth, alt_k_count, self.kmer_length + 2)
+            vpc = VariantProbeCoverage([ref_probe_coverage], [alt_probe_coverage])
+            call = vtyper.type(vpc)
+
+            cov = np.log10(c1 + c2)
+            conf = call['info']['conf']
+            self.log_conf_and_covg.append((conf, cov))
+            print(c1, c2, cov, conf, sep='\t', file=f)
+
+        f.close()
+        self.log_conf_and_covg.sort(reverse=True)
+        with open('test.log_conf_and_covg.tsv', 'w') as f:
+            print('Conf\tCov', file=f)
+            for t in self.log_conf_and_covg:
+                print(*t, sep='\t', file=f)
+
+
+    def get_conf_threshold(self, percent_to_keep=95):
+        '''percent_to_keep determines the confidence cutoff in terms of
+        simulatead confience scores. Should be in (0,100]. eg default of 95
+        means that we choose a cutoff that would keep 95% of the data'''
+        if len(self.log_conf_and_covg) == 0:
+            self._simulate_snps()
+
+        conf_cutoff_index = int(0.01 * percent_to_keep * len(self.log_conf_and_covg))
+        return self.log_conf_and_covg[conf_cutoff_index][0]
+
+
+
 class MykrobePredictorResult(object):
 
     def __init__(self, susceptibility, phylogenetics,
@@ -201,6 +267,15 @@ def run(parser, args):
         sequence_calls_dict = gt.sequence_calls_dict
         kmer_count_error_rate = gt.estimate_kmer_count_error_rate()
         logger.info("Estimated error rate for kmer count model: " + str(round(100 * kmer_count_error_rate, 2)) + "%")
+        logger.info("Expected depth: " + str(depths[0]))
+        conf_thresholder = ConfThresholder(kmer_count_error_rate, depths[0], args.kmer)
+        import time
+        time_start = time.time()
+        conf_threshold = conf_thresholder.get_conf_threshold()
+        time_end = time.time()
+        time_to_sim = time_end - time_start
+        logger.info('Simulation time: ' + str(time_to_sim))
+        logger.info("Confidence cutoff: " + str(conf_threshold))
     else:
         depths = [cp.estimate_depth()]
     args.quiet = q
