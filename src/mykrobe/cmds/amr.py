@@ -35,6 +35,8 @@ import numpy as np
 from mykrobe.typing.models.base import ProbeCoverage
 from mykrobe.typing.models.variant import VariantProbeCoverage
 from mykrobe.typing.typer.variant import VariantTyper
+import random
+random.seed(42)
 
 class ConfThresholder:
     def __init__(self, error_rate, mean_depth, kmer_length, iterations=10000):
@@ -47,6 +49,21 @@ class ConfThresholder:
         # In future, could just store the confidences, as that's all we
         # need to decide on the cutoff
         self.log_conf_and_covg = []
+
+
+    @classmethod
+    def _simulate_percent_coverage(cls, kmers_to_sample, kmers_in_allele):
+        '''Simulates sampling kmers, returning the percent coverage.
+        This means the % of kmers that are found by the simulation'''
+        found_kmers = set()
+
+        for _ in range(kmers_to_sample):
+            j = random.randint(1, kmers_in_allele)
+            found_kmers.add(j)
+            if len(found_kmers) == kmers_in_allele:
+                return 100.0
+
+        return 100 * len(found_kmers) / kmers_in_allele
 
 
     def _simulate_snps(self):
@@ -67,8 +84,14 @@ class ConfThresholder:
             # Check what allele_length means in depth_to_expected_kmer_coun()! Probably need to change next two lines...
             ref_k_count = ((2 + self.kmer_length) * ref_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
             alt_k_count = ((2 + self.kmer_length) * alt_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
-            ref_probe_coverage = ProbeCoverage(100, self.mean_depth, min_depth, ref_k_count, self.kmer_length + 2)
-            alt_probe_coverage = ProbeCoverage(0, self.mean_depth, min_depth, alt_k_count, self.kmer_length + 2)
+            logging.debug('ref_k_count ' + str(ref_k_count) + '. alt_k_count ' + str(alt_k_count))
+
+            ref_percent_coverage = ConfThresholder._simulate_percent_coverage(int(ref_k_count), 2 + self.kmer_length)
+            alt_percent_coverage = ConfThresholder._simulate_percent_coverage(int(alt_k_count), 2 + self.kmer_length)
+            logging.debug('ref_percent_coverage ' + str(ref_percent_coverage) + '.  alt_percent_coverage ' + str(alt_percent_coverage))
+
+            ref_probe_coverage = ProbeCoverage(ref_percent_coverage, self.mean_depth, min_depth, ref_k_count, self.kmer_length + 2)
+            alt_probe_coverage = ProbeCoverage(alt_percent_coverage, self.mean_depth, min_depth, alt_k_count, self.kmer_length + 2)
             vpc = VariantProbeCoverage([ref_probe_coverage], [alt_probe_coverage])
             call = vtyper.type(vpc)
 
