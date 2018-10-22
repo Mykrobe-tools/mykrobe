@@ -67,38 +67,36 @@ class ConfThresholder:
 
 
     def _simulate_snps(self):
-        ref_covg = np.random.poisson(lam=self.mean_depth, size=self.iterations)
-        alt_covg = np.random.binomial(self.mean_depth, self.error_rate, size=self.iterations)
+        correct_covg = np.random.poisson(lam=self.mean_depth, size=self.iterations)
+        incorrect_covg = np.random.binomial(self.mean_depth, self.error_rate, size=self.iterations)
         f = open('test.covs', 'w')
         print('Ref_cov', 'Alt_cov', 'Cov', 'Conf', sep='\t', file=f)
         probe_coverage_list = []
         vtyper = VariantTyper([self.mean_depth], error_rate=self.error_rate, kmer_size=self.kmer_length)
 
         for i in range(self.iterations):
-            c1 = ref_covg[i]
-            c2 = alt_covg[i]
-            if c1 + c2 == 0:
+            if correct_covg[i] + incorrect_covg[i] == 0:
                 continue
 
             min_depth = 1 # not used?
             # Check what allele_length means in depth_to_expected_kmer_coun()! Probably need to change next two lines...
-            ref_k_count = ((2 + self.kmer_length) * ref_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
-            alt_k_count = ((2 + self.kmer_length) * alt_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
-            logging.debug('ref_k_count ' + str(ref_k_count) + '. alt_k_count ' + str(alt_k_count))
+            correct_k_count = ((2 + self.kmer_length) * correct_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
+            incorrect_k_count = ((2 + self.kmer_length) * incorrect_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
+            logging.debug('correct_k_count ' + str(correct_k_count) + '. incorrect_k_count ' + str(incorrect_k_count))
 
-            ref_percent_coverage = ConfThresholder._simulate_percent_coverage(int(ref_k_count), 2 + self.kmer_length)
-            alt_percent_coverage = ConfThresholder._simulate_percent_coverage(int(alt_k_count), 2 + self.kmer_length)
-            logging.debug('ref_percent_coverage ' + str(ref_percent_coverage) + '.  alt_percent_coverage ' + str(alt_percent_coverage))
+            correct_percent_coverage = ConfThresholder._simulate_percent_coverage(int(correct_k_count), 2 + self.kmer_length)
+            incorrect_percent_coverage = ConfThresholder._simulate_percent_coverage(int(incorrect_k_count), 2 + self.kmer_length)
+            logging.debug('correct_percent_coverage ' + str(correct_percent_coverage) + '.  incorrect_percent_coverage ' + str(incorrect_percent_coverage))
 
-            ref_probe_coverage = ProbeCoverage(ref_percent_coverage, self.mean_depth, min_depth, ref_k_count, self.kmer_length + 2)
-            alt_probe_coverage = ProbeCoverage(alt_percent_coverage, self.mean_depth, min_depth, alt_k_count, self.kmer_length + 2)
-            vpc = VariantProbeCoverage([ref_probe_coverage], [alt_probe_coverage])
+            correct_probe_coverage = ProbeCoverage(correct_percent_coverage, self.mean_depth, min_depth, correct_k_count, self.kmer_length + 2)
+            incorrect_probe_coverage = ProbeCoverage(incorrect_percent_coverage, self.mean_depth, min_depth, incorrect_k_count, self.kmer_length + 2)
+            vpc = VariantProbeCoverage([correct_probe_coverage], [incorrect_probe_coverage])
             call = vtyper.type(vpc)
 
-            cov = np.log10(c1 + c2)
+            cov = np.log10(correct_covg[i] + incorrect_covg[i])
             conf = call['info']['conf']
             self.log_conf_and_covg.append((conf, cov))
-            print(c1, c2, cov, conf, sep='\t', file=f)
+            print(correct_covg[i], incorrect_covg[i], cov, conf, sep='\t', file=f)
 
         f.close()
         self.log_conf_and_covg.sort(reverse=True)
