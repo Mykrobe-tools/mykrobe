@@ -298,11 +298,11 @@ def run(parser, args):
         logger.info("Expected depth: " + str(depths[0]))
         conf_thresholder = ConfThresholder(kmer_count_error_rate, depths[0], args.kmer, incorrect_kmer_to_pc_cov)
         time_start = time.time()
-        conf_threshold = conf_thresholder.get_conf_threshold()
+        conf_threshold = conf_thresholder.get_conf_threshold(percent_to_keep=args.conf_percent_cutoff)
         time_end = time.time()
         time_to_sim = time_end - time_start
         logger.info('Simulation time: ' + str(time_to_sim))
-        logger.info("Confidence cutoff: " + str(conf_threshold))
+        logger.info("Confidence cutoff (using percent cutoff " + str(args.conf_percent_cutoff) + "%): " + str(conf_threshold))
         gt = Genotyper(sample=args.sample,
                        expected_depths=depths,
                        expected_error_rate=kmer_count_error_rate,

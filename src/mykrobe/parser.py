@@ -110,6 +110,12 @@ parser_amr.add_argument(
     type=int,
     help='min_depth',
     default=1)
+parser_amr.add_argument(
+    '--conf_percent_cutoff',
+    metavar='conf_percent_cutoff',
+    type=float,
+    help='Confidence cutoff threshold. Number between 0 and 100. Default is %(default)s',
+    default=95)
 parser_amr.set_defaults(func=run_subtool)
 
 # ##################
