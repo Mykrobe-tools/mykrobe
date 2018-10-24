@@ -36,13 +36,15 @@ from mykrobe.typing.models.base import ProbeCoverage
 from mykrobe.typing.models.variant import VariantProbeCoverage
 from mykrobe.typing.typer.variant import VariantTyper
 import random
+import time
 random.seed(42)
 
 class ConfThresholder:
-    def __init__(self, error_rate, mean_depth, kmer_length, iterations=10000):
+    def __init__(self, error_rate, mean_depth, kmer_length, incorrect_kmer_to_pc_cov, iterations=10000):
         self.error_rate = error_rate
         self.mean_depth = mean_depth
         self.iterations = iterations
+        self.incorrect_kmer_to_pc_cov = incorrect_kmer_to_pc_cov
         self.kmer_length = kmer_length
 
         # For now, store the coverage as well, in case we need to debug.
@@ -66,11 +68,22 @@ class ConfThresholder:
         return 100 * len(found_kmers) / kmers_in_allele
 
 
+    @classmethod
+    def _get_incorrect_kmer_percent_cov(cls, k_count, incorrect_kmer_to_pc_cov):
+        i = k_count
+        while i >= 0:
+            if i in incorrect_kmer_to_pc_cov:
+                return incorrect_kmer_to_pc_cov[i]
+            i -= 1
+
+        return 0
+
+
     def _simulate_snps(self):
         correct_covg = np.random.poisson(lam=self.mean_depth, size=self.iterations)
         incorrect_covg = np.random.binomial(self.mean_depth, self.error_rate, size=self.iterations)
-        f = open('test.covs', 'w')
-        print('Ref_cov', 'Alt_cov', 'Cov', 'Conf', sep='\t', file=f)
+        f = open('test.simulate_snps_data.tsv', 'w')
+        print('Correct_cov', 'Incorrect_cov', 'correct_k_count', 'incorrect_k_count', 'correct_percent_coverage', 'incorrect_percent_coverage', 'Cov', 'Conf', sep='\t', file=f)
         probe_coverage_list = []
         vtyper = VariantTyper([self.mean_depth], error_rate=self.error_rate, kmer_size=self.kmer_length)
 
@@ -84,10 +97,10 @@ class ConfThresholder:
             incorrect_k_count = ((2 + self.kmer_length) * incorrect_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
             logging.debug('correct_k_count ' + str(correct_k_count) + '. incorrect_k_count ' + str(incorrect_k_count))
 
-            correct_percent_coverage = ConfThresholder._simulate_percent_coverage(int(correct_k_count), 2 + self.kmer_length)
-            incorrect_percent_coverage = ConfThresholder._simulate_percent_coverage(int(incorrect_k_count), 2 + self.kmer_length)
-            logging.debug('correct_percent_coverage ' + str(correct_percent_coverage) + '.  incorrect_percent_coverage ' + str(incorrect_percent_coverage))
-
+            #correct_percent_coverage = ConfThresholder._simulate_percent_coverage(int(correct_k_count), 2 + self.kmer_length)
+            #incorrect_percent_coverage = ConfThresholder._simulate_percent_coverage(int(incorrect_k_count), 2 + self.kmer_length)
+            correct_percent_coverage = 100
+            incorrect_percent_coverage = ConfThresholder._get_incorrect_kmer_percent_cov(int(incorrect_k_count), self.incorrect_kmer_to_pc_cov)
             correct_probe_coverage = ProbeCoverage(correct_percent_coverage, self.mean_depth, min_depth, correct_k_count, self.kmer_length + 2)
             incorrect_probe_coverage = ProbeCoverage(incorrect_percent_coverage, self.mean_depth, min_depth, incorrect_k_count, self.kmer_length + 2)
             vpc = VariantProbeCoverage([correct_probe_coverage], [incorrect_probe_coverage])
@@ -96,14 +109,10 @@ class ConfThresholder:
             cov = np.log10(correct_covg[i] + incorrect_covg[i])
             conf = call['info']['conf']
             self.log_conf_and_covg.append((conf, cov))
-            print(correct_covg[i], incorrect_covg[i], cov, conf, sep='\t', file=f)
+            print(correct_covg[i], incorrect_covg[i], correct_k_count, incorrect_k_count, correct_percent_coverage, incorrect_percent_coverage, cov, conf, sep='\t', file=f)
 
         f.close()
         self.log_conf_and_covg.sort(reverse=True)
-        with open('test.log_conf_and_covg.tsv', 'w') as f:
-            print('Conf\tCov', file=f)
-            for t in self.log_conf_and_covg:
-                print(*t, sep='\t', file=f)
 
 
     def get_conf_threshold(self, percent_to_keep=95):
@@ -284,19 +293,36 @@ def run(parser, args):
                        ploidy=args.ploidy
                        )
         gt.run()
-        variant_calls_dict = gt.variant_calls_dict
-        sequence_calls_dict = gt.sequence_calls_dict
-        kmer_count_error_rate = gt.estimate_kmer_count_error_rate()
+        kmer_count_error_rate, incorrect_kmer_to_pc_cov = gt.estimate_kmer_count_error_rate_and_incorrect_kmer_to_percent_cov()
         logger.info("Estimated error rate for kmer count model: " + str(round(100 * kmer_count_error_rate, 2)) + "%")
         logger.info("Expected depth: " + str(depths[0]))
-        conf_thresholder = ConfThresholder(kmer_count_error_rate, depths[0], args.kmer)
-        import time
+        conf_thresholder = ConfThresholder(kmer_count_error_rate, depths[0], args.kmer, incorrect_kmer_to_pc_cov)
         time_start = time.time()
         conf_threshold = conf_thresholder.get_conf_threshold()
         time_end = time.time()
         time_to_sim = time_end - time_start
         logger.info('Simulation time: ' + str(time_to_sim))
         logger.info("Confidence cutoff: " + str(conf_threshold))
+        gt = Genotyper(sample=args.sample,
+                       expected_depths=depths,
+                       expected_error_rate=kmer_count_error_rate,
+                       variant_covgs=cp.variant_covgs,
+                       gene_presence_covgs=cp.covgs["presence"],
+                       base_json=base_json,
+                       contamination_depths=[],
+                       report_all_calls=True,
+                       ignore_filtered=True,
+                       filters=args.filters,
+                       variant_confidence_threshold=conf_threshold,
+                       sequence_confidence_threshold=args.min_gene_conf,
+                       model=args.model,
+                       kmer_size=args.kmer,
+                       min_proportion_expected_depth=args.min_proportion_expected_depth,
+                       ploidy=args.ploidy
+                       )
+        gt.run()
+        variant_calls_dict = gt.variant_calls_dict
+        sequence_calls_dict = gt.sequence_calls_dict
     else:
         depths = [cp.estimate_depth()]
     args.quiet = q
