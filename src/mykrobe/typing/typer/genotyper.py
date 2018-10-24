@@ -394,10 +394,15 @@ class Genotyper(object):
             return None
 
 
-    def estimate_kmer_count_error_rate(self):
-        '''Returns error rate of kmer counts, as a float in the interval (0,1]'''
+    def estimate_kmer_count_error_rate_and_incorrect_kmer_to_percent_cov(self):
+        '''Returns error rate of kmer counts, as a float in the interval [0,1],
+        and dict of incorrect kmer count to mean observed percent allele coverage'''
         correct_kmer_count = 0
         incorrect_kmer_count = 0
+        incorrect_kmer_to_pc_cov = {}
+
+        f = open('test.estimated_error_rate.tsv', 'w')
+        print('g1\tg2\tref\talt', file=f)
 
         for probe_id, variant_call in self.variant_calls_dict.items():
             try:
@@ -406,11 +411,26 @@ class Genotyper(object):
             except:
                 continue
 
+            print(*genotype, cov_dict["reference"]["kmer_count"], cov_dict["alternate"]["kmer_count"], sep='\t', file=f)
             if genotype == [0, 0]:
                 correct_kmer_count += cov_dict["reference"]["kmer_count"]
-                incorrect_kmer_count += cov_dict["alternate"]["kmer_count"]
+                incorrect_kmer = cov_dict["alternate"]["kmer_count"]
+                pc_cov = cov_dict["alternate"]["percent_coverage"]
             elif genotype == [1, 1]:
                 correct_kmer_count += cov_dict["alternate"]["kmer_count"]
-                incorrect_kmer_count += cov_dict["reference"]["kmer_count"]
+                incorrect_kmer = cov_dict["reference"]["kmer_count"]
+                pc_cov = cov_dict["reference"]["percent_coverage"]
 
-        return incorrect_kmer_count / (incorrect_kmer_count + correct_kmer_count)
+            incorrect_kmer_count += incorrect_kmer
+            if incorrect_kmer not in incorrect_kmer_to_pc_cov:
+                incorrect_kmer_to_pc_cov[incorrect_kmer] = []
+            incorrect_kmer_to_pc_cov[incorrect_kmer].append(pc_cov)
+
+        f.close()
+        for incorrect_kmer, cov_list in incorrect_kmer_to_pc_cov.items():
+            incorrect_kmer_to_pc_cov[incorrect_kmer] = sum(cov_list) / len(cov_list)
+
+        incorrect_kmer_to_pc_cov[0] = 0
+        error_rate = incorrect_kmer_count / (incorrect_kmer_count + correct_kmer_count)
+        return error_rate, incorrect_kmer_to_pc_cov
+
