@@ -401,9 +401,6 @@ class Genotyper(object):
         incorrect_kmer_count = 0
         incorrect_kmer_to_pc_cov = {}
 
-        f = open('test.estimated_error_rate.tsv', 'w')
-        print('g1\tg2\tref\talt', file=f)
-
         for probe_id, variant_call in self.variant_calls_dict.items():
             try:
                 genotype = variant_call["genotype"]
@@ -411,7 +408,6 @@ class Genotyper(object):
             except:
                 continue
 
-            print(*genotype, cov_dict["reference"]["kmer_count"], cov_dict["alternate"]["kmer_count"], sep='\t', file=f)
             if genotype == [0, 0]:
                 correct_kmer_count += cov_dict["reference"]["kmer_count"]
                 incorrect_kmer = cov_dict["alternate"]["kmer_count"]
@@ -426,7 +422,6 @@ class Genotyper(object):
                 incorrect_kmer_to_pc_cov[incorrect_kmer] = []
             incorrect_kmer_to_pc_cov[incorrect_kmer].append(pc_cov)
 
-        f.close()
         for incorrect_kmer, cov_list in incorrect_kmer_to_pc_cov.items():
             incorrect_kmer_to_pc_cov[incorrect_kmer] = sum(cov_list) / len(cov_list)
 
