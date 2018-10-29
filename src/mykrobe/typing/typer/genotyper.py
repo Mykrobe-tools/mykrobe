@@ -416,6 +416,8 @@ class Genotyper(object):
                 correct_kmer_count += cov_dict["alternate"]["kmer_count"]
                 incorrect_kmer = cov_dict["reference"]["kmer_count"]
                 pc_cov = cov_dict["reference"]["percent_coverage"]
+            else:
+                continue
 
             incorrect_kmer_count += incorrect_kmer
             if incorrect_kmer not in incorrect_kmer_to_pc_cov:
