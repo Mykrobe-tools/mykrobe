@@ -93,16 +93,16 @@ class ConfThresholder:
 
             min_depth = 1 # not used?
             # Check what allele_length means in depth_to_expected_kmer_coun()! Probably need to change next two lines...
-            correct_k_count = ((2 + self.kmer_length) * correct_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
-            incorrect_k_count = ((2 + self.kmer_length) * incorrect_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
+            correct_k_count = (self.kmer_length * correct_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
+            incorrect_k_count = (self.kmer_length * incorrect_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
             logging.debug('correct_k_count ' + str(correct_k_count) + '. incorrect_k_count ' + str(incorrect_k_count))
 
             #correct_percent_coverage = ConfThresholder._simulate_percent_coverage(int(correct_k_count), 2 + self.kmer_length)
             #incorrect_percent_coverage = ConfThresholder._simulate_percent_coverage(int(incorrect_k_count), 2 + self.kmer_length)
             correct_percent_coverage = 100
             incorrect_percent_coverage = ConfThresholder._get_incorrect_kmer_percent_cov(int(incorrect_k_count), self.incorrect_kmer_to_pc_cov)
-            correct_probe_coverage = ProbeCoverage(correct_percent_coverage, self.mean_depth, min_depth, correct_k_count, self.kmer_length + 2)
-            incorrect_probe_coverage = ProbeCoverage(incorrect_percent_coverage, self.mean_depth, min_depth, incorrect_k_count, self.kmer_length + 2)
+            correct_probe_coverage = ProbeCoverage(correct_percent_coverage, self.mean_depth, min_depth, correct_k_count, self.kmer_length)
+            incorrect_probe_coverage = ProbeCoverage(incorrect_percent_coverage, self.mean_depth, min_depth, incorrect_k_count, self.kmer_length)
             vpc = VariantProbeCoverage([correct_probe_coverage], [incorrect_probe_coverage])
             call = vtyper.type(vpc)
 
