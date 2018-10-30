@@ -40,10 +40,10 @@ class TestINDELAlleleGenerator():
         assert v.is_deletion
         panel = self.pg.create(v)
         assert_no_overlapping_snps(panel)                     
-        assert "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG" in panel.refs
+        assert "GATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG" in panel.refs
         assert self.pg._calculate_length_delta_from_indels(v, []) == 1
         assert panel.alts == [
-            "CGATTAAAGATAGAAATACACGATGCGAGCATCAAATTTCATAACATCACCATGAGTTTGA"]
+            "GATTAAAGATAGAAATACACGATGCGAGCATCAAATTTCATAACATCACCATGAGTTTGA"]
 
     def test_simple_deletion2(self):
         v = Variant.create(

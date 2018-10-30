@@ -305,9 +305,9 @@ class AlleleGenerator(object):
             pos = v.start
             start_delta = int(math.floor(float(delta) / 2))
             end_delta = int(math.ceil(float(delta) / 2))
-            start_index = pos - kmer - start_delta#+ 1
+            start_index = pos - kmer - start_delta+ 1
             end_index = pos + kmer + end_delta-1   
-            min_probe_length=(2 * kmer) - 1 #-1
+            min_probe_length=(2 * kmer) - 1 -1
         else:
             pos = v.start
             start_delta = int(math.floor(float(delta) / 2))
