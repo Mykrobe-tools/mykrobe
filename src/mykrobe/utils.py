@@ -78,3 +78,7 @@ def lazyprop(fn):
             setattr(self, attr_name, fn(self))
         return getattr(self, attr_name)
     return _lazyprop
+
+def seq_to_kmers(seq, kmer_size):
+    for i in range(len(seq)-kmer_size+1):
+        yield seq[i:i+kmer_size]    

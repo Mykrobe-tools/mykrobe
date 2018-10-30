@@ -5,6 +5,8 @@ from mykrobe.variants.schema.models import Reference
 from mykrobe.variants.schema.models import ReferenceSet
 from mongoengine import connect
 DB = connect('mykrobe-test')
+from base import assert_no_overlapping_snps
+from mykrobe.utils import seq_to_kmers
 
 
 class TestINDELAlleleGenerator():
@@ -37,10 +39,11 @@ class TestINDELAlleleGenerator():
         assert v.is_indel
         assert v.is_deletion
         panel = self.pg.create(v)
-        assert "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGAT" in panel.refs
+        assert_no_overlapping_snps(panel)                     
+        assert "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG" in panel.refs
         assert self.pg._calculate_length_delta_from_indels(v, []) == 1
         assert panel.alts == [
-            "CGATTAAAGATAGAAATACACGATGCGAGCATCAAATTTCATAACATCACCATGAGTTTGATC"]
+            "CGATTAAAGATAGAAATACACGATGCGAGCATCAAATTTCATAACATCACCATGAGTTTGA"]
 
     def test_simple_deletion2(self):
         v = Variant.create(
@@ -50,9 +53,10 @@ class TestINDELAlleleGenerator():
             start=32,
             alternate_bases=["A"])
         panel = self.pg.create(v)
-        assert "GATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGATC" in panel.refs
+        assert_no_overlapping_snps(panel)                     
+        assert "GATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGA" in panel.refs
         assert panel.alts == [
-            "GATTAAAGATAGAAATACACGATGCGAGCAACAAATTTCATAACATCACCATGAGTTTGATCC"]
+            "GATTAAAGATAGAAATACACGATGCGAGCAACAAATTTCATAACATCACCATGAGTTTGAT"]
 
     def test_simple_deletion3(self):
         v = Variant.create(
@@ -62,9 +66,10 @@ class TestINDELAlleleGenerator():
             start=2902618,
             alternate_bases=["T"])
         panel = self.pg.create(v)
-        assert "TAACAAAATCCTTTTTATAACGCAAGTTCATTTTATACTACTGCTCAATTTTTTTACTTTTAT" in panel.refs
+        assert_no_overlapping_snps(panel)                     
+        assert "TTTATACTACTGCTCAATTTTTTTACTTTTATNNNNNNNNNNNNNNNNNNNNNNNNNNNNN" in panel.refs
         assert panel.alts == [
-            "ATAACAAAATCCTTTTTATAACGCAAGTTCATTTTATACTACTGCTCAATTTTTTTACTTTTT"]
+            "TTTATACTACTGCTCAATTTTTTTACTTTTTNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"]
 
     def test_simple_deletion4(self):
         v = Variant.create(
@@ -74,9 +79,10 @@ class TestINDELAlleleGenerator():
             start=32,
             alternate_bases=["A"])
         panel = self.pg.create(v)
-        assert "GATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGATC" in panel.refs
+        assert_no_overlapping_snps(panel)                     
+        assert "GATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGA" in panel.refs
         assert panel.alts == [
-            "CGATTAAAGATAGAAATACACGATGCGAGCAAAAATTTCATAACATCACCATGAGTTTGATCC"]
+            "CGATTAAAGATAGAAATACACGATGCGAGCAAAAATTTCATAACATCACCATGAGTTTGAT"]
 
     def test_simple_insertion1(self):
         v = Variant.create(
@@ -86,11 +92,12 @@ class TestINDELAlleleGenerator():
             start=1,
             alternate_bases=["TTTC"])
         panel = self.pg.create(v)
+#        assert_no_overlapping_snps(panel)### Skip this test for vars in first k bases of ref                    
         assert v.is_indel
         assert v.is_insertion
-        assert "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGAT" in panel.refs
+        assert "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG" in panel.refs
         assert panel.alts == [
-            "TTTCGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGAT"]
+            "TTTCGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG"]
 
     def test_simple_insertion2(self):
         v = Variant.create(
@@ -100,9 +107,10 @@ class TestINDELAlleleGenerator():
             start=1,
             alternate_bases=["CTTT"])
         panel = self.pg.create(v)
-        assert "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGAT" in panel.refs
+#        assert_no_overlapping_snps(panel)### Skip this test for vars in first k bases of ref                    
+        assert "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG" in panel.refs
         assert panel.alts == [
-            "CTTTGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGAT"]
+            "CTTTGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG"]
 
     def test_simple_insertion3(self):
         v = Variant.create(
@@ -112,9 +120,10 @@ class TestINDELAlleleGenerator():
             start=31,
             alternate_bases=["ATTT"])
         panel = self.pg.create(v)
-        assert "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGAT" in panel.refs
+        assert_no_overlapping_snps(panel)                     
+        assert "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG" in panel.refs
         assert panel.alts == [
-            "CGATTAAAGATAGAAATACACGATGCGAGCATTTATCAAATTTCATAACATCACCATGAGTTTGAT"]
+            "CGATTAAAGATAGAAATACACGATGCGAGCATTTATCAAATTTCATAACATCACCATGAGTTTG"]
 
     def test_simple_insertion4(self):
         v = Variant.create(
@@ -124,9 +133,10 @@ class TestINDELAlleleGenerator():
             start=32,
             alternate_bases=["AGGGG"])
         panel = self.pg.create(v)
-        assert "GATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGATC" in panel.refs
+        assert_no_overlapping_snps(panel)                     
+        assert "GATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGA" in panel.refs
         assert panel.alts == [
-            "GATTAAAGATAGAAATACACGATGCGAGCAAGGGGTCAAATTTCATAACATCACCATGAGTTTGATC"]
+            "GATTAAAGATAGAAATACACGATGCGAGCAAGGGGTCAAATTTCATAACATCACCATGAGTTTGA"]
 
     def test_simple_insertion5(self):
         v = Variant.create(
@@ -136,9 +146,10 @@ class TestINDELAlleleGenerator():
             start=2902618,
             alternate_bases=["ATGC"])
         panel = self.pg.create(v)
-        assert "TAACAAAATCCTTTTTATAACGCAAGTTCATTTTATACTACTGCTCAATTTTTTTACTTTTAT" in panel.refs
+        assert_no_overlapping_snps(panel)                     
+        assert "TTTATACTACTGCTCAATTTTTTTACTTTTATNNNNNNNNNNNNNNNNNNNNNNNNNNNNN" in panel.refs
         assert panel.alts == [
-            "TAACAAAATCCTTTTTATAACGCAAGTTCATTTTATACTACTGCTCAATTTTTTTACTTTTATGCT"]
+            "TTTATACTACTGCTCAATTTTTTTACTTTTATGCTNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"]
 
     def test_double_insertion(self):
         v = Variant.create(
@@ -156,9 +167,10 @@ class TestINDELAlleleGenerator():
         context = [v1]
         assert self.pg2._remove_overlapping_contexts(v, [v1]) == []
         panel = self.pg2.create(v, context=context)
-        assert "ATCTAGCCGCAAGGGCGCGAGCAGACGCAGAATCGCATGATTTGAGCTCAAATCATGCGATTC" in panel.refs
+        assert_no_overlapping_snps(panel)                     
+        assert "ATCTAGCCGCAAGGGCGCGAGCAGACGCAGAATCGCATGATTTGAGCTCAAATCATGCGAT" in panel.refs
         assert panel.alts == [
-            "ATCTAGCCGCAAGGGCGCGAGCAGACGCAGACGCTGGCGGGCGATCGCATGATTTGAGCTCAAATCATGCGATTC"]
+            "ATCTAGCCGCAAGGGCGCGAGCAGACGCAGACGCTGGCGGGCGATCGCATGATTTGAGCTCAAATCATGCGAT"]
 
     def test_double_indel_fail(self):
         v = Variant.create(
@@ -175,13 +187,15 @@ class TestINDELAlleleGenerator():
             alternate_bases=["ACC"])
         context = [v1]
         panel = self.pg2.create(v, context=context)
-        assert "GGCGCACACAATGATCGGTGGCAATACCGACCACATCGACCTCATCGACGCCGCGTTGCCGCA" in panel.refs
-        assert "GGCGCACACAATGATCGGTGGCAATACCGACCACATCGACCTCATCGACGCCGCGTTGCCGCA" not in panel.alts 
+        assert_no_overlapping_snps(panel)                     
+        assert "GGCGCACACAATGATCGGTGGCAATACCGACCACATCGACCTCATCGACGCCGCGTTGCCG" in panel.refs
+        assert "GGCGCACACAATGATCGGTGGCAATACCGACCACATCGACCTCATCGACGCCGCGTTGCCG" not in panel.alts 
 
     def test_large_insertion(self):
         v = Variant.create(variant_sets=self.variant_sets, reference=self.reference, reference_bases="CCGCCGGCCCCGCCGTTT", start=1636155, alternate_bases=[
                            "CTGCCGGCCCCGCCGGCGCCGCCCAATCCACCGAAGCCCCTCCCTTCGGTGGGGTCGCTGCCGCCGTCGCCGCCGTCACCGCCCTTGCCGCCGGCCCCGCCGTCGCCGCCGGCTCCGGCGGTGCCGTCGCCGCCCTGGCCGCCGGCCCCGCCGTTTCCG"])
         panel = self.pg2.create(v, context=[])
-        assert "AGACCTAGCAGGGTGCCGGCGCCGCCCTTGCCGCCGGCCCCGCCGTTTCCGCCGCCGCCATCG" in panel.refs
+        assert_no_overlapping_snps(panel)                     
+        assert "AGACCTAGCAGGGTGCCGGCGCCGCCCTTGCCGCCGGCCCCGCCGTTTCCGCCGCCGCCAT" in panel.refs
         assert panel.alts == [
-            "GGTTGGATCGCCACCGGCGCCACCGGCGCCGCCCGCGCCACCAGCACCGCCGCTGCCATCTGGGTCCGTCGAGTCGCCGAGGACGCCGGCGCCGCCATTGTCGCCAAATACCGTGAGACCTAGCAGGGTGCCGGCGCCGCCCTTGCTGCCGGCCCCGCCGGCGCCGCCCAATCCACCGAAGCCCCTCCCTTCGGTGGGGTCGCTGCCGCCGTCGCCGCCGTCACCGCCCTTGCCGCCGGCCCCGCCGTCGCCGCCGGCTCCGGCGGTGCCGTCGCCGCCCTGGCCGCCGGCCCCGCCGTTTCCGCCGCCGCCGCCATCGCCGATGATGTTTTCCCCGCCCTTGCCGCCAGCCCCAGCGTTCCCGCCGGCTCCGCCACTGGCGCCGGTGCCGCCGGGTGCAACGGCGTTGGCGCCGTTACCGCCGTTGCCGCCTTT"]
+            "GGTTGGATCGCCACCGGCGCCACCGGCGCCGCCCGCGCCACCAGCACCGCCGCTGCCATCTGGGTCCGTCGAGTCGCCGAGGACGCCGGCGCCGCCATTGTCGCCAAATACCGTGAGACCTAGCAGGGTGCCGGCGCCGCCCTTGCTGCCGGCCCCGCCGGCGCCGCCCAATCCACCGAAGCCCCTCCCTTCGGTGGGGTCGCTGCCGCCGTCGCCGCCGTCACCGCCCTTGCCGCCGGCCCCGCCGTCGCCGCCGGCTCCGGCGGTGCCGTCGCCGCCCTGGCCGCCGGCCCCGCCGTTTCCGCCGCCGCCGCCATCGCCGATGATGTTTTCCCCGCCCTTGCCGCCAGCCCCAGCGTTCCCGCCGGCTCCGCCACTGGCGCCGGTGCCGCCGGGTGCAACGGCGTTGGCGCCGTTACCGCCGTTGCCGCCT"]

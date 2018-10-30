@@ -64,6 +64,8 @@ class AlleleGenerator(object):
     def _read_reference(self):
         for record in SeqIO.parse(self.reference_filepath, 'fasta'):
             self.ref += list(record.seq)
+        ### Pad with Ns for SNPs at the end of the reference
+        self.ref.extend(["N"]*self.kmer)            
         self.ref_length = len(self.ref)
 
     def create(self, v, context=[]):
@@ -125,9 +127,7 @@ class AlleleGenerator(object):
         return copy(self.ref[start_index:end_index])
 
     def _get_alternate_reference_segment(self, v, context):
-        ref_segment_length_delta = self._calculate_length_delta_from_indels(
-            v,
-            context)
+        ref_segment_length_delta = self._calculate_length_delta_from_indels(v,            context)
         i, start_index, end_index = self._get_start_end(
             v, delta=ref_segment_length_delta)
         return self._get_reference_segment(start_index, end_index)
@@ -138,8 +138,7 @@ class AlleleGenerator(object):
         # For each context, create the background and alternate
         alternates = []
         for context_combo in context_combinations:
-            ref_segment_length_delta = self._calculate_length_delta_from_indels(
-                v, context_combo)
+            ref_segment_length_delta = self._calculate_length_delta_from_indels(v, context_combo)
             i, start_index, end_index = self._get_start_end(
                 v, delta=ref_segment_length_delta)
             alternate_reference_segment = self._get_reference_segment(
@@ -292,32 +291,44 @@ class AlleleGenerator(object):
         shift = 0
         kmer = self.kmer
         if len(v.reference_bases) > 2 * kmer:
+            print("hi")
             kmer = int(math.ceil(float(len(v.reference_bases)) / 2)) + 5
         elif (v.length > 2 * kmer):
+            print("ho")
             kmer = int(math.ceil(float(v.length) / 2)) + 5
         if len(v.reference_bases) > kmer:
+            print("hj")
             shift = int(
                 (kmer - 1) - math.floor(float((2 * kmer + 1) - len(v.reference_bases)) / 2))
-        pos = v.start
-        start_delta = int(math.floor(float(delta) / 2))
-        end_delta = int(math.ceil(float(delta) / 2))
-        start_index = pos - kmer - start_delta
-        end_index = pos + kmer + end_delta + 1
+        print(v.is_deletion)
+        if v.is_deletion:
+            pos = v.start
+            start_delta = int(math.floor(float(delta) / 2))
+            end_delta = int(math.ceil(float(delta) / 2))
+            start_index = pos - kmer - start_delta#+ 1
+            end_index = pos + kmer + end_delta-1   
+            min_probe_length=(2 * kmer) - 1 #-1
+        else:
+            pos = v.start
+            start_delta = int(math.floor(float(delta) / 2))
+            end_delta = int(math.ceil(float(delta) / 2))
+            start_index = pos - kmer - start_delta
+            end_index = pos + kmer + end_delta-1            
+            min_probe_length=(2 * kmer) - 1
+
+#        print(pos, kmer, delta, start_delta, end_delta, start_index, end_index)
         i = kmer - 1 + start_delta
+        ### Is the variant at the start of the sequence? This is a special case.
         if start_index < 0:
             diff = abs(start_index)
             start_index = 0
             end_index += diff
             i -= diff
-        elif end_index > self.ref_length:
-            diff = abs(end_index - self.ref_length)
-            end_index = self.ref_length
-            start_index -= diff
-            i += diff
         start_index += shift
         end_index += shift
         i -= shift
-        if (end_index - start_index) >= (2 * kmer) + 1:
+        # print(start_index, end_index)
+        if (end_index - start_index) >= min_probe_length:
             return (i, start_index, end_index)
         else:
             return self._get_start_end(v, delta=0)
