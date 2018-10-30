@@ -198,7 +198,7 @@ class TestRegions():
             ['CTC2156103TGC', 'CTC2156103AGC', 'CTC2156103GGC', 'CTC2156103CGC'])
         DB.drop_database('mykrobe-test')
 
-    def test_make_variant_panel(self):
+    def test_make_variant_panel1(self):
         ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
         gene = self.gm.get_gene("rpoB")
         for var in self.gm.get_variant_names("rpoB", "D3A"):
@@ -212,7 +212,8 @@ class TestRegions():
             panel = ag.create(v)
             for alt in panel.alts:
                 seq = copy.copy(str(gene.seq))
-                seq = seq.replace(panel.refs[0][25:], alt[25:])
+                assert Seq(seq).translate()[2] == "D"    
+                seq = seq.replace(panel.refs[0][25:], alt[24:])
                 assert seq != str(gene.seq)
                 assert Seq(seq).translate()[2] == "A"
         DB.drop_database('mykrobe-test')
@@ -231,7 +232,7 @@ class TestRegions():
             panel = ag.create(v)
             for alt in panel.alts:
                 seq = copy.copy(str(gene.seq.reverse_complement()))
-                seq = seq.replace(panel.refs[0][:39], alt[:39])
+                seq = seq.replace(panel.refs[0][:39], alt[:39+len(alt)-len(panel.refs[0])])
                 assert seq != str(gene.seq)
                 assert Seq(seq).reverse_complement().translate()[2] == "A"
         DB.drop_database('mykrobe-test')
@@ -393,5 +394,6 @@ class TestRegions():
         seq = str(
             self.reference_seq[panel_ref_start:panel_ref_start + len(panel.refs[0])])
         assert seq == panel.refs[0]
-        assert alt[:-1] == seq[:30] + seq[31:]
+        print(alt,seq[:31] + seq[31:])
+        assert alt == seq[:30] + seq[31:]
         DB.drop_database('mykrobe-test')
