@@ -13,6 +13,8 @@ import datetime
 import math
 from mykrobe.utils import make_hash
 from mykrobe.utils import split_var_name
+from mykrobe.utils import seq_to_kmers
+
 from mykrobe.variants.schema.models.base import CreateAndSaveMixin
 from mykrobe.variants.schema.models import Variant
 
@@ -63,6 +65,7 @@ class AlleleGenerator(object):
 
     def _read_reference(self):
         for record in SeqIO.parse(self.reference_filepath, 'fasta'):
+            self.reference_sequence=record.seq
             self.ref += list(record.seq)
         ### Pad with Ns for SNPs at the end of the reference
         self.ref.extend(["N"]*self.kmer)            
@@ -79,7 +82,28 @@ class AlleleGenerator(object):
         references = self._generate_alternates_on_all_backgrounds(
             null_variant, context)
         alternates = self._generate_alternates_on_all_backgrounds(v, context)
+        ## The alternates shouldn't contain kmers in the reference
+        if v.is_indel:
+            alternates=self.trim_uninformative_kmers(alternates)
         return Panel(v, references, v.start, alternates)
+
+    def trim_uninformative_kmers(self, alternates):
+        new_alternates=[]
+        for alt in alternates:
+            alt="".join(alt)
+            informative_kmers=[]
+            for i,k in enumerate(seq_to_kmers(alt, self.kmer)):
+                if not k in self.reference_sequence:
+                    informative_kmers.append(i)
+            if informative_kmers:
+                trim=(min(informative_kmers), max(informative_kmers))
+                alt=alt[trim[0]:trim[1]+self.kmer]
+            assert alt
+            new_alternates.append(alt)
+        return new_alternates
+
+
+
 
     def _check_valid_variant(self, v):
         index = v.start - 1
@@ -291,32 +315,18 @@ class AlleleGenerator(object):
         shift = 0
         kmer = self.kmer
         if len(v.reference_bases) > 2 * kmer:
-            print("hi")
             kmer = int(math.ceil(float(len(v.reference_bases)) / 2)) + 5
         elif (v.length > 2 * kmer):
-            print("ho")
             kmer = int(math.ceil(float(v.length) / 2)) + 5
         if len(v.reference_bases) > kmer:
-            print("hj")
             shift = int(
                 (kmer - 1) - math.floor(float((2 * kmer + 1) - len(v.reference_bases)) / 2))
-        print(v.is_deletion)
-        if v.is_deletion:
-            pos = v.start
-            start_delta = int(math.floor(float(delta) / 2))
-            end_delta = int(math.ceil(float(delta) / 2))
-            start_index = pos - kmer - start_delta+ 1
-            end_index = pos + kmer + end_delta-1   
-            min_probe_length=(2 * kmer) - 1 -1
-        else:
-            pos = v.start
-            start_delta = int(math.floor(float(delta) / 2))
-            end_delta = int(math.ceil(float(delta) / 2))
-            start_index = pos - kmer - start_delta
-            end_index = pos + kmer + end_delta-1            
-            min_probe_length=(2 * kmer) - 1
-
-#        print(pos, kmer, delta, start_delta, end_delta, start_index, end_index)
+        pos = v.start
+        start_delta = int(math.floor(float(delta) / 2))
+        end_delta = int(math.ceil(float(delta) / 2))
+        start_index = pos - kmer - start_delta
+        end_index = pos + kmer + end_delta-1            
+        min_probe_length=(2 * kmer) - 1
         i = kmer - 1 + start_delta
         ### Is the variant at the start of the sequence? This is a special case.
         if start_index < 0:
