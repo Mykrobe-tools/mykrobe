@@ -340,6 +340,7 @@ class TestINDELandSNPSAlleleGenerator():
             start=1503655,
             alternate_bases=["ATGCCGCCGCC"])
         panel = self.pg2.create(v, context=[v1, v2])
+        assert_no_overlapping_snps(panel)                             
         assert "ATCCTGGAGCCCACCAGCGGAAACACCGGCATTTCGCTGGCGATGGCGGCCCGGTTGAAGG" in panel.refs
         assert set(panel.alts) == set([
             "CCATCGGAGCCCACCAGCGGAAACACCGGCACGCTGGCGATGGCGGCCCGGTTGAAGGGGT",
