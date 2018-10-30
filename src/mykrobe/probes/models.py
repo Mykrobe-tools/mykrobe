@@ -84,13 +84,23 @@ class AlleleGenerator(object):
         alternates = self._generate_alternates_on_all_backgrounds(v, context)
         ## The alternates shouldn't contain kmers in the reference
         if v.is_indel:
-            alternates=self.trim_uninformative_kmers(alternates)
+            alternates=self.trim_uninformative_kmers(alternates, references)   
         return Panel(v, references, v.start, alternates)
 
-    def trim_uninformative_kmers(self, alternates):
+    def trim_uninformative_kmers(self, alternates, references=[]):
         new_alternates=[]
-        for alt in alternates:
+        for ref, alt in zip(references, alternates):
             alt="".join(alt)
+            ref="".join(ref)
+            informative_kmers=[]
+            for i,k in enumerate(seq_to_kmers(alt, self.kmer)):
+                if not k in ref:
+                    informative_kmers.append(i)
+            if informative_kmers:
+                trim=(min(informative_kmers), max(informative_kmers))
+                alt=alt[trim[0]:trim[1]+self.kmer]
+            assert alt
+
             informative_kmers=[]
             for i,k in enumerate(seq_to_kmers(alt, self.kmer)):
                 if not k in self.reference_sequence:
@@ -98,7 +108,8 @@ class AlleleGenerator(object):
             if informative_kmers:
                 trim=(min(informative_kmers), max(informative_kmers))
                 alt=alt[trim[0]:trim[1]+self.kmer]
-            assert alt
+            assert alt   
+                     
             new_alternates.append(alt)
         return new_alternates
 

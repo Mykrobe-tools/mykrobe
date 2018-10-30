@@ -6,7 +6,7 @@ from mykrobe.variants.schema.models import ReferenceSet
 from mongoengine import connect
 DB = connect('mykrobe-test')
 import pytest
-from base import assert_no_overlapping_snps
+from base import assert_no_overlapping_kmers
 
 class TestSNPAlleleGenerator():
 
@@ -42,7 +42,7 @@ class TestSNPAlleleGenerator():
         assert panel.refs[0][-32:] != panel.alts[0][-32:]
         assert panel.refs[0][-31:] != panel.alts[0][-31:]   
 
-        assert_no_overlapping_snps(panel)     
+        assert_no_overlapping_kmers(panel)     
 
         assert panel.refs == [
             "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG"]
@@ -59,7 +59,7 @@ class TestSNPAlleleGenerator():
             start=32,
             alternate_bases=["T"])
         panel = self.pg.create(v)
-        assert_no_overlapping_snps(panel)     
+        assert_no_overlapping_kmers(panel)     
 
         assert panel.refs == [
             "GATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGA"]
@@ -84,7 +84,7 @@ class TestSNPAlleleGenerator():
             start=1,
             alternate_bases=["T"])
         panel = self.pg.create(v)
-#        assert_no_overlapping_snps(panel) ## Will have overlapping kmers only if the SNP is in the i
+#        assert_no_overlapping_kmers(panel) ## Will have overlapping kmers only if the SNP is in the i
         assert panel.refs == [
             "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG"]
         assert panel.alts == [
@@ -98,7 +98,7 @@ class TestSNPAlleleGenerator():
             start=2902618,
             alternate_bases=["T"])
         panel = self.pg.create(v)
-        assert_no_overlapping_snps(panel)     
+        assert_no_overlapping_kmers(panel)     
 
         assert panel.refs == [
             "TTTATACTACTGCTCAATTTTTTTACTTTTATNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"]
@@ -131,7 +131,7 @@ class TestSNPAlleleGenerator():
             start=32,
             alternate_bases=["T"])
         panel = self.pg.create(v, context=[v2])
-        assert_no_overlapping_snps(panel)     
+        assert_no_overlapping_kmers(panel)     
 
         assert set(panel.refs) == set(["CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG",
                               "CGATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTG"])
@@ -160,7 +160,7 @@ class TestSNPAlleleGenerator():
             alternate_bases=["G"])
 
         panel = self.pg.create(v, context=[v2, v3])
-        assert_no_overlapping_snps(panel)     
+        assert_no_overlapping_kmers(panel)     
 
         assert panel.refs == ['CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGAT',
                               'CGATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTGAT',
@@ -210,7 +210,7 @@ class TestSNPAlleleGenerator():
         assert (self.pg._split_context([v, v3, v4, v5])) == [
             [v, v4, v5], [v, v3, v5]]
         panel = self.pg.create(v, context=[v2, v3, v4, v5])
-        assert_no_overlapping_snps(panel)             
+        assert_no_overlapping_kmers(panel)             
         assert sorted(panel.refs) == sorted(
             [
                 "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG",
@@ -265,7 +265,7 @@ class TestSNPAlleleGenerator():
             start=30,
             alternate_bases=["T"])
         panel = self.pg.create(v, context=[v2, v3, v4, v5])
-        assert_no_overlapping_snps(panel)             
+        assert_no_overlapping_kmers(panel)             
         assert sorted(panel.refs) == sorted([
             "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG",
             "CGATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTG",
