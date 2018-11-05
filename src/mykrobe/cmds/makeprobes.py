@@ -12,8 +12,8 @@ from pymongo.errors import ServerSelectionTimeoutError
 from Bio.Seq import Seq
 
 
-from atlas.variants.schema.models import Variant
-from atlas.variants.schema.models import ReferenceSet
+from mykrobe.variants.schema.models import Variant
+from mykrobe.variants.schema.models import ReferenceSet
 from mykrobe.variants.schema.models import Reference
 
 from mykrobe.utils import split_var_name
