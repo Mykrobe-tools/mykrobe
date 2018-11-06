@@ -80,7 +80,7 @@ class VariantTyper(Typer):
         for variant_probe_coverage in variant_probe_coverages:
             calls.append(
                 self._type_variant_probe_coverages(
-                    variant_probe_coverage, variant))
+                    variant_probe_coverage, variant_probe_coverage.var_name))
         hom_alt_calls = [c for c in calls if sum(c["genotype"]) > 1]
         het_calls = [c for c in calls if sum(c["genotype"]) == 1]
         if hom_alt_calls:
