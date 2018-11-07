@@ -14,8 +14,9 @@ class VariantProbeCoverage(object):
         self.alternate_coverages = alternate_coverages
         self.var_name = var_name
         self.params = params
-        self.best_alternate_coverage = self._choose_best_alternate_coverage()
-        self.best_reference_coverage = self._choose_best_reference_coverage()
+        if self.reference_coverages and self.alternate_coverages:
+            self.best_alternate_coverage = self._choose_best_alternate_coverage()
+            self.best_reference_coverage = self._choose_best_reference_coverage()
 
     def _choose_best_coverage(self, coverages):
         coverages.sort(

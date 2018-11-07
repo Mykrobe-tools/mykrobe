@@ -43,7 +43,7 @@ def read(*names, **kwargs):
 
 setup(
     name='mykrobe',
-    version='0.1.2',
+    version='0.1.3',
     license='MIT',
     description='Mykrobe atlas',
     # long_description='%s\n%s' % (

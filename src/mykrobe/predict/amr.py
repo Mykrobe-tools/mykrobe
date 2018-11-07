@@ -106,6 +106,7 @@ class BasePredictor(object):
 
     def _update_resistance_prediction(self, allele_name, variant_or_gene):
         variant_or_gene_names = self._get_names(allele_name)
+        variant_or_gene_names += self._get_names(variant_or_gene["variant"])
         for name in variant_or_gene_names:
             drugs = self._get_drugs(name)
             resistance_prediction = self._resistance_prediction(

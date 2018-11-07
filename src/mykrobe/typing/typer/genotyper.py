@@ -194,67 +194,34 @@ class CoverageParser(object):
                     self.covgs[panel_type][name]["median"] = []
 
     def _parse_variant_panel(self, row):
-        allele, median_depth, min_depth, percent_coverage, k_count, klen = self._parse_summary_covgs_row(
-            row)
-        params = get_params(allele)
+        probe, median_depth, min_depth, percent_coverage, k_count, klen = self._parse_summary_covgs_row(row)
+        params = get_params(probe)
+        probe_type=probe.split('-')[0]
         if 'var_name' in params:
-            var_name = params.get('var_name')
+            var_name = params.get('gene')+"_"+params.get('mut')+"-"+params.get('var_name')
         else:
             var_name = allele.split('?')[0].split('-')[1]
-
-        num_alts = int(params.get("num_alts", 0))
-        reference_coverages = [ProbeCoverage(
-            percent_coverage=percent_coverage,
-            median_depth=median_depth,
-            min_depth=min_depth,
-            k_count=k_count,
-            klen=klen)]
-        alt_or_ref = 'ref'
-        alternate_coverages = []
-        for i in range(num_alts-1):
-            row = next(self.reader)
-            ref_allele, median_depth, min_depth, percent_coverage, k_count, klen = self._parse_summary_covgs_row(
-                row)
-            if ref_allele.split('-')[0] != 'ref':
-                logger.warning(
-                    "Fewer ref alleles than alt alleles for %s" % ref_allele)
-                alternate_coverages.append(ProbeCoverage(
-                    min_depth=min_depth,
-                    k_count=k_count,
-                    percent_coverage=percent_coverage,
-                    median_depth=median_depth,
-                    klen=klen))
-                num_alts -= 1
-                break
-
-            assert ref_allele.split('-')[0] == 'ref'
-            reference_coverages.append(ProbeCoverage(
-                percent_coverage=percent_coverage,
-                median_depth=median_depth,
-                min_depth=min_depth,
-                k_count=k_count,
-                klen=klen))
-        for i in range(num_alts):
-            row = next(self.reader)
-            alt_allele, median_depth, min_depth, percent_coverage, k_count, klen = self._parse_summary_covgs_row(
-                row)
-            assert alt_allele.split('-')[0] == 'alt'
-            alternate_coverages.append(
-                ProbeCoverage(
-                    min_depth=min_depth,
-                    k_count=k_count,
-                    percent_coverage=percent_coverage,
-                    median_depth=median_depth,
-                    klen=klen))
-        variant_probe_coverage = VariantProbeCoverage(
-            reference_coverages=reference_coverages,
-            alternate_coverages=alternate_coverages,
-            var_name=var_name,
-            params=params)
-        try:
-            self.variant_covgs[allele].append(variant_probe_coverage)
-        except KeyError:
-            self.variant_covgs[allele] = [variant_probe_coverage]
+        if not var_name in self.variant_covgs:
+            variant_probe_coverage=VariantProbeCoverage(
+                        reference_coverages=[],
+                        alternate_coverages=[],
+                        var_name=probe,
+                        params=params)
+            self.variant_covgs[var_name] = variant_probe_coverage
+        probe_coverage=ProbeCoverage(
+                        min_depth=min_depth,
+                        k_count=k_count,
+                        percent_coverage=percent_coverage,
+                        median_depth=median_depth,
+                        klen=klen)
+        if probe_type=="ref":
+            self.variant_covgs[var_name].reference_coverages.append(probe_coverage)
+            self.variant_covgs[var_name].best_reference_coverage=self.variant_covgs[var_name]._choose_best_reference_coverage()
+        elif probe_type=="alt":
+            self.variant_covgs[var_name].alternate_coverages.append(probe_coverage)
+            self.variant_covgs[var_name].best_alternate_coverage=self.variant_covgs[var_name]._choose_best_alternate_coverage()                
+        else:
+            raise ValueError("probe_type must be ref or alt")
 
 
 class Genotyper(object):
@@ -346,8 +313,9 @@ class Genotyper(object):
         )
         genotypes = []
         filters = []
-        for probe_name, probe_coverages in self.variant_covgs.items():
-            probe_id = self._name_to_id(probe_name)
+        for probe_id, probe_coverages in self.variant_covgs.items():
+            probe_name = self._name_to_id(probe_coverages.var_name)
+
             variant = None
 
             call = gt.type(probe_coverages, variant=probe_name)
