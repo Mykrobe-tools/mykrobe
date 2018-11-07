@@ -305,8 +305,8 @@ def run(parser, args):
         logger.info("Confidence cutoff (using percent cutoff " + str(args.conf_percent_cutoff) + "%): " + str(conf_threshold))
         gt = Genotyper(sample=args.sample,
                        expected_depths=depths,
-                       #expected_error_rate=kmer_count_error_rate,
-                       expected_error_rate=args.expected_error_rate,
+                       expected_error_rate=kmer_count_error_rate,
+                       #expected_error_rate=args.expected_error_rate,
                        variant_covgs=cp.variant_covgs,
                        gene_presence_covgs=cp.covgs["presence"],
                        base_json=base_json,
