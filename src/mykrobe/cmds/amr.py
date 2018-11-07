@@ -82,8 +82,8 @@ class ConfThresholder:
     def _simulate_snps(self):
         correct_covg = np.random.poisson(lam=self.mean_depth, size=self.iterations)
         incorrect_covg = np.random.binomial(self.mean_depth, self.error_rate, size=self.iterations)
-        f = open('test.simulate_snps_data.tsv', 'w')
-        print('Correct_cov', 'Incorrect_cov', 'correct_k_count', 'incorrect_k_count', 'correct_percent_coverage', 'incorrect_percent_coverage', 'Cov', 'Conf', sep='\t', file=f)
+        #f = open('test.simulate_snps_data.tsv', 'w')
+        #print('Correct_cov', 'Incorrect_cov', 'correct_k_count', 'incorrect_k_count', 'correct_percent_coverage', 'incorrect_percent_coverage', 'Cov', 'Conf', sep='\t', file=f)
         probe_coverage_list = []
         vtyper = VariantTyper([self.mean_depth], error_rate=self.error_rate, kmer_size=self.kmer_length)
 
@@ -108,9 +108,9 @@ class ConfThresholder:
             cov = np.log10(correct_covg[i] + incorrect_covg[i])
             conf = call['info']['conf']
             self.log_conf_and_covg.append((conf, cov))
-            print(correct_covg[i], incorrect_covg[i], correct_k_count, incorrect_k_count, correct_percent_coverage, incorrect_percent_coverage, cov, conf, sep='\t', file=f)
+            #print(correct_covg[i], incorrect_covg[i], correct_k_count, incorrect_k_count, correct_percent_coverage, incorrect_percent_coverage, cov, conf, sep='\t', file=f)
 
-        f.close()
+        #f.close()
         self.log_conf_and_covg.sort(reverse=True)
 
 
