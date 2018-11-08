@@ -121,7 +121,7 @@ class ConfThresholder:
         if len(self.log_conf_and_covg) == 0:
             self._simulate_snps()
 
-        conf_cutoff_index = int(0.01 * percent_to_keep * len(self.log_conf_and_covg))
+        conf_cutoff_index = min(int(0.01 * percent_to_keep * len(self.log_conf_and_covg)), len(self.log_conf_and_covg) - 1)
         return self.log_conf_and_covg[conf_cutoff_index][0]
 
 
