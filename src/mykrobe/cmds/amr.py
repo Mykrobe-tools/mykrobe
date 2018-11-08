@@ -223,6 +223,12 @@ def run(parser, args):
         logger.warning("Setting expected error rate to %s (--ont)" %
                      args.expected_error_rate)
         args.model = "kmer_count"
+
+    # If the user didn't specify the conf_percent_cutoff, then set it
+    # depending on whether or not the --ont flag was used
+    if args.conf_percent_cutoff == -1:
+        args.conf_percent_cutoff = 95 if args.ont else 100
+
     # Run Cortex
     cp = CoverageParser(
         sample=args.sample,
@@ -292,35 +298,40 @@ def run(parser, args):
                        ploidy=args.ploidy
                        )
         gt.run()
-        kmer_count_error_rate, incorrect_kmer_to_pc_cov = gt.estimate_kmer_count_error_rate_and_incorrect_kmer_to_percent_cov()
-        logger.info("Estimated error rate for kmer count model: " + str(round(100 * kmer_count_error_rate, 2)) + "%")
-        logger.info("Expected depth: " + str(depths[0]))
-        conf_thresholder = ConfThresholder(kmer_count_error_rate, depths[0], args.kmer, incorrect_kmer_to_pc_cov)
-        time_start = time.time()
-        conf_threshold = conf_thresholder.get_conf_threshold(percent_to_keep=args.conf_percent_cutoff)
-        time_end = time.time()
-        time_to_sim = time_end - time_start
-        logger.info('Simulation time: ' + str(time_to_sim))
-        logger.info("Confidence cutoff (using percent cutoff " + str(args.conf_percent_cutoff) + "%): " + str(conf_threshold))
-        gt = Genotyper(sample=args.sample,
-                       expected_depths=depths,
-                       expected_error_rate=kmer_count_error_rate,
-                       #expected_error_rate=args.expected_error_rate,
-                       variant_covgs=cp.variant_covgs,
-                       gene_presence_covgs=cp.covgs["presence"],
-                       base_json=base_json,
-                       contamination_depths=[],
-                       report_all_calls=True,
-                       ignore_filtered=True,
-                       filters=args.filters,
-                       variant_confidence_threshold=conf_threshold,
-                       sequence_confidence_threshold=args.min_gene_conf,
-                       model=args.model,
-                       kmer_size=args.kmer,
-                       min_proportion_expected_depth=args.min_proportion_expected_depth,
-                       ploidy=args.ploidy
-                       )
-        gt.run()
+
+        # conf_percent_cutoff == 100 means that we want to keep all variant calls,
+        # in which case there is no need to run the simulations
+        if args.conf_percent_cutoff < 100:
+            kmer_count_error_rate, incorrect_kmer_to_pc_cov = gt.estimate_kmer_count_error_rate_and_incorrect_kmer_to_percent_cov()
+            logger.info("Estimated error rate for kmer count model: " + str(round(100 * kmer_count_error_rate, 2)) + "%")
+            logger.info("Expected depth: " + str(depths[0]))
+            conf_thresholder = ConfThresholder(kmer_count_error_rate, depths[0], args.kmer, incorrect_kmer_to_pc_cov)
+            time_start = time.time()
+            conf_threshold = conf_thresholder.get_conf_threshold(percent_to_keep=args.conf_percent_cutoff)
+            time_end = time.time()
+            time_to_sim = time_end - time_start
+            logger.info('Simulation time: ' + str(time_to_sim))
+            logger.info("Confidence cutoff (using percent cutoff " + str(args.conf_percent_cutoff) + "%): " + str(conf_threshold))
+            gt = Genotyper(sample=args.sample,
+                           expected_depths=depths,
+                           expected_error_rate=kmer_count_error_rate,
+                           #expected_error_rate=args.expected_error_rate,
+                           variant_covgs=cp.variant_covgs,
+                           gene_presence_covgs=cp.covgs["presence"],
+                           base_json=base_json,
+                           contamination_depths=[],
+                           report_all_calls=True,
+                           ignore_filtered=True,
+                           filters=args.filters,
+                           variant_confidence_threshold=conf_threshold,
+                           sequence_confidence_threshold=args.min_gene_conf,
+                           model=args.model,
+                           kmer_size=args.kmer,
+                           min_proportion_expected_depth=args.min_proportion_expected_depth,
+                           ploidy=args.ploidy
+                           )
+            gt.run()
+
         variant_calls_dict = gt.variant_calls_dict
         sequence_calls_dict = gt.sequence_calls_dict
     else:
