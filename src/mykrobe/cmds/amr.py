@@ -4,10 +4,16 @@ logger = logging.getLogger(__name__)
 
 from pprint import pprint
 import json
+import numpy as np
 import os
+import random
+import time
 from mykrobe.utils import check_args
 from mykrobe.typing import CoverageParser
 from mykrobe.typing import Genotyper
+from mykrobe.typing.models.base import ProbeCoverage
+from mykrobe.typing.models.variant import VariantProbeCoverage
+from mykrobe.typing.typer.variant import VariantTyper
 from mykrobe.predict import TBPredictor
 from mykrobe.predict import StaphPredictor
 from mykrobe.predict import MykrobePredictorSusceptibilityResult
@@ -31,12 +37,6 @@ GN_PANELS = [
     "data/panels/gn-amr-genes-extended"]
 
 
-import numpy as np
-from mykrobe.typing.models.base import ProbeCoverage
-from mykrobe.typing.models.variant import VariantProbeCoverage
-from mykrobe.typing.typer.variant import VariantTyper
-import random
-import time
 random.seed(42)
 
 class ConfThresholder:
