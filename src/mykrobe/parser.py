@@ -114,7 +114,7 @@ parser_amr.add_argument(
     '--conf_percent_cutoff',
     metavar='conf_percent_cutoff',
     type=float,
-    help='Number between 0 and 100. Determines --min_variant_conf, by simulating variants and choosing the cutoff that would keep x% of the variants. Default is 95 if --ont, otherwise --min_variant_conf is used as the cutoff',
+    help='Number between 0 and 100. Determines --min_variant_conf, by simulating variants and choosing the cutoff that would keep x% of the variants. Default is 90 if --ont, otherwise --min_variant_conf is used as the cutoff',
     default=-1)
 parser_amr.set_defaults(func=run_subtool)
 

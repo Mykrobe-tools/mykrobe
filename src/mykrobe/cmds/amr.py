@@ -227,7 +227,7 @@ def run(parser, args):
     # If the user didn't specify the conf_percent_cutoff, then set it
     # depending on whether or not the --ont flag was used
     if args.conf_percent_cutoff == -1:
-        args.conf_percent_cutoff = 95 if args.ont else 100
+        args.conf_percent_cutoff = 90 if args.ont else 100
 
     # Run Cortex
     cp = CoverageParser(
