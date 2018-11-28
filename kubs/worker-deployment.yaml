@@ -1,0 +1,24 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: analysis-worker
+  labels:
+    app: analysis-worker
+    tier: analysis-worker
+spec:
+  selector:
+    matchLabels:
+      app: analysis-worker
+  template:
+    metadata:
+      labels:
+        app: analysis-worker
+    spec:       
+      containers:
+      - name: analysis-worker
+        image: phelimb/mykrobe:api
+        command: ["celery"]
+        args: ["-A", "app.celery", "worker"]
+        envFrom:
+          - configMapRef:
+              name: analysis-env

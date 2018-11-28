@@ -1,0 +1,28 @@
+analysis-apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: analysis-api
+  labels:
+    app: analysis-api  
+    tier: front    
+spec:
+  selector:
+    matchLabels:
+      app: analysis-api
+  template:
+    metadata:
+      labels:
+        app: analysis-api  
+    spec:    
+      imagePullSecrets:
+        - name: private-registry-key
+      containers:
+      - name: analysis-api
+        image: phelimb/mykrobe:api
+        command: ["flask"]
+        args: ["run", "--port", 8080]
+        ports:
+          - containerPort: 8080
+        envFrom:
+          - configMapRef:
+              name: env
