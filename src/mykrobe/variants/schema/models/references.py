@@ -18,6 +18,7 @@ class Reference(Document, CreateAndSaveMixin):
 
     `Reference`s are designed to be immutable.
     """
+
     name = StringField(unique=True, required=True)
     md5checksum = StringField(unique=True, required=True)
     reference_sets = ListField(ReferenceField("ReferenceSet"), required=True)
@@ -38,16 +39,29 @@ class Reference(Document, CreateAndSaveMixin):
     ncbi_taxon_id = IntField()
 
     @classmethod
-    def create(cls, name, md5checksum, reference_sets,
-               length=None, source_accessions=[],
-               sourceURI=None, is_derived=None, source_divergence=None,
-               ncbi_taxon_id=None):
-        return cls(name=name, md5checksum=md5checksum,
-                   reference_sets=reference_sets,
-                   length=length, source_accessions=source_accessions,
-                   sourceURI=sourceURI, is_derived=is_derived,
-                   source_divergence=source_divergence,
-                   ncbi_taxon_id=ncbi_taxon_id)
+    def create(
+        cls,
+        name,
+        md5checksum,
+        reference_sets,
+        length=None,
+        source_accessions=[],
+        sourceURI=None,
+        is_derived=None,
+        source_divergence=None,
+        ncbi_taxon_id=None,
+    ):
+        return cls(
+            name=name,
+            md5checksum=md5checksum,
+            reference_sets=reference_sets,
+            length=length,
+            source_accessions=source_accessions,
+            sourceURI=sourceURI,
+            is_derived=is_derived,
+            source_divergence=source_divergence,
+            ncbi_taxon_id=ncbi_taxon_id,
+        )
 
 
 class ReferenceSet(Document, CreateAndSaveMixin):
@@ -94,13 +108,23 @@ class ReferenceSet(Document, CreateAndSaveMixin):
     ncbi_taxon_id = IntField()
 
     @classmethod
-    def create(cls, name, description=None, assembly_id=None,
-               sourceURI=None, is_derived=None,
-               ncbi_taxon_id=None):
-        return cls(name=name, description=description,
-                   assembly_id=assembly_id,
-                   sourceURI=sourceURI, is_derived=is_derived,
-                   ncbi_taxon_id=ncbi_taxon_id)
+    def create(
+        cls,
+        name,
+        description=None,
+        assembly_id=None,
+        sourceURI=None,
+        is_derived=None,
+        ncbi_taxon_id=None,
+    ):
+        return cls(
+            name=name,
+            description=description,
+            assembly_id=assembly_id,
+            sourceURI=sourceURI,
+            is_derived=is_derived,
+            ncbi_taxon_id=ncbi_taxon_id,
+        )
 
     @property
     def references(self):

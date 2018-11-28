@@ -34,16 +34,16 @@ class VariantSetMetadata(Document, CreateAndSaveMixin):
 
     @classmethod
     def create(
-            cls,
-            key,
-            value,
-            type,
-            variant_set,
-            number=None,
-            description=None,
-            info=None):
-        return cls(key=key, value=value, type=type, description=description,
-                   info=info, variant_set=variant_set)
+        cls, key, value, type, variant_set, number=None, description=None, info=None
+    ):
+        return cls(
+            key=key,
+            value=value,
+            type=type,
+            description=description,
+            info=info,
+            variant_set=variant_set,
+        )
 
 
 class VariantSet(Document, CreateAndSaveMixin):
@@ -53,9 +53,10 @@ class VariantSet(Document, CreateAndSaveMixin):
     `VariantSet` belongs to a `Dataset`.
     The variant set is equivalent to a VCF file.
     """
+
     name = StringField(required=True, unique=True)
-    dataset = ReferenceField('Dataset')
-    reference_set = ReferenceField('ReferenceSet', required=True)
+    dataset = ReferenceField("Dataset")
+    reference_set = ReferenceField("ReferenceSet", required=True)
 
     @classmethod
     def create(cls, name, reference_set, dataset=None):
@@ -72,7 +73,7 @@ class VariantSet(Document, CreateAndSaveMixin):
 
 
 class CallSet(Document, CreateAndSaveMixin):
-    meta = {'allow_inheritance': True}
+    meta = {"allow_inheritance": True}
 
     """
          A `CallSet` is a collection of variant calls for a particular sample.
@@ -100,30 +101,23 @@ class VariantCallSet(CallSet):
     # that a variant can exist in multiple variant sets, something not allowed
     # by ga4gh schema.
 
-    variant_sets = ListField(ReferenceField('VariantSet'))
+    variant_sets = ListField(ReferenceField("VariantSet"))
 
     @classmethod
     def create(cls, name, variant_sets, sample_id=None, info={}):
-        c = cls(name=name, variant_sets=variant_sets, sample_id=sample_id,
-                info=info)
+        c = cls(name=name, variant_sets=variant_sets, sample_id=sample_id, info=info)
         return c.save()
 
 
 def convert_string_gt_to_list_int_gt(variant, genotype):
     try:
-        return [int(i) for i in genotype.split('/')]
+        return [int(i) for i in genotype.split("/")]
     except ValueError:
         return []
 
 
 class Call(Document, CreateAndSaveMixin):
-    meta = {'allow_inheritance': True,
-            'indexes': [
-                {
-                    'fields': ['call_set']
-                }
-            ]
-            }
+    meta = {"allow_inheritance": True, "indexes": [{"fields": ["call_set"]}]}
     """
     A `Call` represents the determination of genotype with respect to a
     particular `Variant`.
@@ -138,7 +132,7 @@ class Call(Document, CreateAndSaveMixin):
     the ordering of the calls on this `Variant`.
     The number of results will also be the same.
     """
-    call_set = ReferenceField('CallSet', required=True)
+    call_set = ReferenceField("CallSet", required=True)
     """
     The genotype of this variant call.
 
@@ -189,60 +183,60 @@ class Call(Document, CreateAndSaveMixin):
 
 class VariantCall(Call):
 
-    meta = {'indexes': [
-        {
-            'fields': ['call_set']
-        },
-        {
-            'fields': ['variant']
-        }
-    ]
-    }
-    variant = ReferenceField('Variant', required=True)  # Not in ga4gh
+    meta = {"indexes": [{"fields": ["call_set"]}, {"fields": ["variant"]}]}
+    variant = ReferenceField("Variant", required=True)  # Not in ga4gh
     # If this field is not null, this variant call's genotype ordering implies
     # the phase of the bases and is consistent with any other variant calls on
     # the same contig which have the same phaseset string.
     phaseset = GenericReferenceField(default=None)
 
     @classmethod
-    def create(cls, variant, genotype, call_set=None, genotype_likelihoods=[],
-               phaseset=None, info={}):
+    def create(
+        cls,
+        variant,
+        genotype,
+        call_set=None,
+        genotype_likelihoods=[],
+        phaseset=None,
+        info={},
+    ):
         if isinstance(genotype, str):
             genotype = convert_string_gt_to_list_int_gt(variant, genotype)
         if variant:
-            cls._check_genotype_likelihood_length(
-                genotype_likelihoods,
-                variant)
+            cls._check_genotype_likelihood_length(genotype_likelihoods, variant)
         return cls(
             variant=variant,
             genotype=genotype,
             call_set=call_set,
             genotype_likelihoods=genotype_likelihoods,
             phaseset=phaseset,
-            info=info)
+            info=info,
+        )
 
     @classmethod
     def _check_genotype_likelihood_length(cls, genotype_likelihood, variant):
         if len(variant.alternate_bases) == 1:
             if not len(genotype_likelihood) == 3:
                 raise ValueError(
-                    "Biallelic sites should have 3 genotype likelihoods. AA,AB,BB")
+                    "Biallelic sites should have 3 genotype likelihoods. AA,AB,BB"
+                )
         elif len(variant.alternate_bases) == 2:
             if not len(genotype_likelihood) == 6:
                 raise ValueError(
-                    "Biallelic sites should have 6 genotype likelihoods. AA,AB,BB,AC,BC,CC, etc")
+                    "Biallelic sites should have 6 genotype likelihoods. AA,AB,BB,AC,BC,CC, etc"
+                )
         else:
             raise NotImplementedError(
-                "Haven't implemented check for > triallelic sites")
+                "Haven't implemented check for > triallelic sites"
+            )
 
 
 class SequenceCall(Call):
 
-    sequence = ReferenceField('Sequence', required=True)
+    sequence = ReferenceField("Sequence", required=True)
 
     @classmethod
-    def create(cls, sequence, call_set, genotype, genotype_likelihoods=[],
-               info={}):
+    def create(cls, sequence, call_set, genotype, genotype_likelihoods=[], info={}):
         if isinstance(genotype, str):
             genotype = convert_string_gt_to_list_int_gt(sequence, genotype)
         return cls(
@@ -250,11 +244,12 @@ class SequenceCall(Call):
             call_set=call_set,
             genotype=genotype,
             genotype_likelihoods=genotype_likelihoods,
-            info=info)
+            info=info,
+        )
 
 
 def lazyprop(fn):
-    attr_name = '_' + fn.__name__
+    attr_name = "_" + fn.__name__
 
     @property
     def _lazyprop(self):
@@ -262,6 +257,7 @@ def lazyprop(fn):
             setattr(self, attr_name, fn(self))
             self.save()
         return getattr(self, attr_name)
+
     return _lazyprop
 
 
@@ -284,7 +280,7 @@ def is_snp(reference_bases, alternate_bases):
     for alt in alternate_bases:
         if alt is None:
             return False
-        if alt not in ['A', 'C', 'G', 'T', 'N', '*']:
+        if alt not in ["A", "C", "G", "T", "N", "*"]:
             return False
     return True
 
@@ -329,17 +325,12 @@ def var_length(reference_bases, alternate_bases):
 
 
 class Variant(Document, CreateAndSaveMixin):
-    meta = {'indexes': [
-        {
-            'fields': ['start']
-        },
-        {
-            'fields': ['var_hash']
-        },
-        {
-            'fields': ['variant_sets']
-        }
-    ]
+    meta = {
+        "indexes": [
+            {"fields": ["start"]},
+            {"fields": ["var_hash"]},
+            {"fields": ["variant_sets"]},
+        ]
     }
     """A `Variant` represents a change in DNA sequence relative to some reference.
        For example, a variant could represent a SNP or an insertion.
@@ -350,7 +341,7 @@ class Variant(Document, CreateAndSaveMixin):
       """
     # Here, we've broken from ga4gh as they demand every variant belongs to a
     # single variant set. See CallSet.
-    variant_sets = ListField(ReferenceField('VariantSet'), required=True)
+    variant_sets = ListField(ReferenceField("VariantSet"), required=True)
     # The var_hash is a unique description on a variant. We use the hash of
     # "ref+pos+alt".
     var_hash = StringField(required=True)
@@ -367,10 +358,7 @@ class Variant(Document, CreateAndSaveMixin):
 
     # Each variant is defined against a single reference.
     # We can't have the same variant more than once i
-    reference = ReferenceField(
-        "Reference",
-        required=True,
-        unique_with="var_hash")
+    reference = ReferenceField("Reference", required=True, unique_with="var_hash")
 
     length = IntField(required=False, default=None)
     is_snp = BooleanField(required=True)
@@ -379,11 +367,18 @@ class Variant(Document, CreateAndSaveMixin):
     is_insertion = BooleanField(required=True)
 
     @classmethod
-    def create(cls, start, reference_bases,
-               alternate_bases, variant_sets=None, reference=None, end=None,
-               names=[], info={}):
-        var_name = "".join(
-            [reference_bases, str(start), "/".join(alternate_bases)])
+    def create(
+        cls,
+        start,
+        reference_bases,
+        alternate_bases,
+        variant_sets=None,
+        reference=None,
+        end=None,
+        names=[],
+        info={},
+    ):
+        var_name = "".join([reference_bases, str(start), "/".join(alternate_bases)])
         if var_name not in names:
             names.append(var_name)
         return cls(
@@ -393,17 +388,14 @@ class Variant(Document, CreateAndSaveMixin):
             reference_bases=reference_bases,
             alternate_bases=alternate_bases,
             reference=reference,
-            var_hash=make_var_hash(
-                reference_bases,
-                start,
-                alternate_bases),
+            var_hash=make_var_hash(reference_bases, start, alternate_bases),
             names=names,
             info=info,
             length=var_length(reference_bases, alternate_bases),
             is_snp=is_snp(reference_bases, alternate_bases),
             is_indel=is_indel(reference_bases, alternate_bases),
             is_deletion=is_deletion(reference_bases, alternate_bases),
-            is_insertion=is_insertion(reference_bases, alternate_bases)
+            is_insertion=is_insertion(reference_bases, alternate_bases),
         )
 
     @property
@@ -418,8 +410,9 @@ class Variant(Document, CreateAndSaveMixin):
 
     @property
     def var_name(self):
-        return "".join([self.reference_bases, str(
-            self.start), "/".join(self.alternate_bases)])
+        return "".join(
+            [self.reference_bases, str(self.start), "/".join(self.alternate_bases)]
+        )
 
     def add_to_variant_sets(self, variant_sets):
         self.update(add_to_set__variant_sets=variant_sets)
@@ -460,16 +453,11 @@ class Variant(Document, CreateAndSaveMixin):
 
     @queryset_manager
     def ph_snps(doc_cls, queryset):
-        return queryset.filter(
-            is_indel=True,
-            is_deletion=False,
-            is_insertion=False)
+        return queryset.filter(is_indel=True, is_deletion=False, is_insertion=False)
 
     def overlapping(self, other):
         """Do these variants overlap in the reference"""
-        return (
-            other.start in self.ref_range) or (
-            self.start in other.ref_range)
+        return (other.start in self.ref_range) or (self.start in other.ref_range)
 
     @property
     def ref_range(self):
@@ -486,10 +474,11 @@ class Variant(Document, CreateAndSaveMixin):
                 reference_bases=self.reference_bases,
                 alternate_bases=[alt],
                 reference=self.reference,
-                end=self.end)
+                end=self.end,
+            )
             variants.append(var)
         return variants
 
     def seen_in_samples(self):
-        variant_call_sets = self.calls.distinct('call_set')
+        variant_call_sets = self.calls.distinct("call_set")
         return [variant_call_set.sample_id for variant_call_set in variant_call_sets]

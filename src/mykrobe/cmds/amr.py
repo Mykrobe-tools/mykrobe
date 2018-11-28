@@ -1,5 +1,6 @@
 from __future__ import print_function
 import logging
+
 logger = logging.getLogger(__name__)
 
 from pprint import pprint
@@ -21,21 +22,32 @@ from mongoengine import IntField
 from mongoengine import DictField
 from mongoengine import StringField
 
-STAPH_PANELS = ["data/panels/staph-species-160227.fasta.gz",
-                "data/panels/staph-amr-bradley_2015-feb-17-2017.fasta.gz"]
+STAPH_PANELS = [
+    "data/panels/staph-species-160227.fasta.gz",
+    "data/panels/staph-amr-bradley_2015-feb-17-2017.fasta.gz",
+]
 
 GN_PANELS = [
     "data/panels/gn-amr-genes",
     "data/panels/Escherichia_coli",
     "data/panels/Klebsiella_pneumoniae",
-    "data/panels/gn-amr-genes-extended"]
+    "data/panels/gn-amr-genes-extended",
+]
 
 
 class MykrobePredictorResult(object):
-
-    def __init__(self, susceptibility, phylogenetics,
-                 variant_calls, sequence_calls,
-                 kmer, probe_sets, files, version, model):
+    def __init__(
+        self,
+        susceptibility,
+        phylogenetics,
+        variant_calls,
+        sequence_calls,
+        kmer,
+        probe_sets,
+        files,
+        version,
+        model,
+    ):
         self.susceptibility = susceptibility
         self.phylogenetics = phylogenetics
         self.variant_calls = variant_calls
@@ -47,16 +59,18 @@ class MykrobePredictorResult(object):
         self.model = model
 
     def to_dict(self):
-        return {"susceptibility": list(self.susceptibility.to_dict().values())[0],
-                "phylogenetics": list(self.phylogenetics.to_dict().values())[0],
-                "variant_calls": self.variant_calls,
-                "sequence_calls": self.sequence_calls,
-                "kmer": self.kmer,
-                "probe_sets": self.probe_sets,
-                "files": self.files,
-                "version": self.version,
-                "genotype_model": self.model
-                }
+        return {
+            "susceptibility": list(self.susceptibility.to_dict().values())[0],
+            "phylogenetics": list(self.phylogenetics.to_dict().values())[0],
+            "variant_calls": self.variant_calls,
+            "sequence_calls": self.sequence_calls,
+            "kmer": self.kmer,
+            "probe_sets": self.probe_sets,
+            "files": self.files,
+            "version": self.version,
+            "genotype_model": self.model,
+        }
+
     # For database document
     # susceptibility = EmbeddedDocumentField("MykrobePredictorSusceptibilityResult")
     # phylogenetics = EmbeddedDocumentField("MykrobePredictorPhylogeneticsResult")
@@ -74,22 +88,25 @@ def run(parser, args):
         if args.panel == "bradley-2015":
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
-                "data/panels/tb-bradley-probe-set-feb-09-2017.fasta.gz"]
+                "data/panels/tb-bradley-probe-set-feb-09-2017.fasta.gz",
+            ]
         elif args.panel == "walker-2015":
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
-                "data/panels/tb-walker-probe-set-feb-09-2017.fasta.gz"]
+                "data/panels/tb-walker-probe-set-feb-09-2017.fasta.gz",
+            ]
         elif args.panel == "atlas":
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
-                "data/panels/tb-walker-probe-set-feb-09-2017.fasta.gz", 
-                "data/panels/tb-k21-probe-set-feb-09-2017.fasta.gz"]                
+                "data/panels/tb-walker-probe-set-feb-09-2017.fasta.gz",
+                "data/panels/tb-k21-probe-set-feb-09-2017.fasta.gz",
+            ]
         elif args.panel == "custom":
             if not args.custom_probe_set_path:
                 raise ValueError("Custom panel requires custom_probe_set_path")
             TB_PANELS = [
                 args.custom_probe_set_path,
-                "data/panels/tb-species-170421.fasta.gz"
+                "data/panels/tb-species-170421.fasta.gz",
             ]
     Predictor = None
     if not args.species:
@@ -108,25 +125,22 @@ def run(parser, args):
     version["mykrobe-atlas"] = atlas_version
     # Get real paths for panels
     panels = [
-        os.path.realpath(
-            os.path.join(
-                os.path.dirname(__file__),
-                "..",
-                f)) for f in panels]
+        os.path.realpath(os.path.join(os.path.dirname(__file__), "..", f))
+        for f in panels
+    ]
     if hierarchy_json_file is not None:
         hierarchy_json_file = os.path.realpath(
-            os.path.join(
-                os.path.dirname(__file__),
-                "..",
-                hierarchy_json_file))
+            os.path.join(os.path.dirname(__file__), "..", hierarchy_json_file)
+        )
     if args.ont:
         args.expected_error_rate = 0.15
         args.ploidy = "haploid"
         args.ignore_minor_calls = True
-        logger.warning("Setting ploidy to haploid")        
-        logger.warning("Setting ignore_minor_calls to True")        
-        logger.warning("Setting expected error rate to %s (--ont)" %
-                     args.expected_error_rate)
+        logger.warning("Setting ploidy to haploid")
+        logger.warning("Setting ignore_minor_calls to True")
+        logger.warning(
+            "Setting expected error rate to %s (--ont)" % args.expected_error_rate
+        )
         args.model = "kmer_count"
     # Run Cortex
     cp = CoverageParser(
@@ -139,36 +153,36 @@ def run(parser, args):
         verbose=False,
         tmp_dir=args.tmp,
         skeleton_dir=args.skeleton_dir,
-        mccortex31_path=args.mccortex31_path)
+        mccortex31_path=args.mccortex31_path,
+    )
     cp.run()
-    logger.debug('CoverageParser complete')
+    logger.debug("CoverageParser complete")
 
     # Detect species
     species_predictor = AMRSpeciesPredictor(
-        phylo_group_covgs=cp.covgs.get(
-            "complex",
-            cp.covgs.get(
-                "phylo_group",
-                {})),
-        sub_complex_covgs=cp.covgs.get(
-            "sub-complex",
-            {}),
+        phylo_group_covgs=cp.covgs.get("complex", cp.covgs.get("phylo_group", {})),
+        sub_complex_covgs=cp.covgs.get("sub-complex", {}),
         species_covgs=cp.covgs["species"],
-        lineage_covgs=cp.covgs.get(
-            "sub-species",
-            {}),
-        hierarchy_json_file=hierarchy_json_file)
+        lineage_covgs=cp.covgs.get("sub-species", {}),
+        hierarchy_json_file=hierarchy_json_file,
+    )
     phylogenetics = species_predictor.run()
 
     # ## AMR prediction
 
     depths = []
     if species_predictor.is_saureus_present():
-        depths = [species_predictor.out_json["phylogenetics"]
-                  ["phylo_group"]["Staphaureus"]["median_depth"]]
+        depths = [
+            species_predictor.out_json["phylogenetics"]["phylo_group"]["Staphaureus"][
+                "median_depth"
+            ]
+        ]
     elif species_predictor.is_mtbc_present():
-        depths = [species_predictor.out_json["phylogenetics"]["phylo_group"][
-            "Mycobacterium_tuberculosis_complex"]["median_depth"]]
+        depths = [
+            species_predictor.out_json["phylogenetics"]["phylo_group"][
+                "Mycobacterium_tuberculosis_complex"
+            ]["median_depth"]
+        ]
     # pprint (species_predictor.out_json["phylogenetics"]["species"])
     # Genotype
     q = args.quiet
@@ -179,23 +193,24 @@ def run(parser, args):
         depths = [1]
     gt = None
     if depths or args.force:
-        gt = Genotyper(sample=args.sample,
-                       expected_depths=depths,
-                       expected_error_rate=args.expected_error_rate,
-                       variant_covgs=cp.variant_covgs,
-                       gene_presence_covgs=cp.covgs["presence"],
-                       base_json=base_json,
-                       contamination_depths=[],
-                       report_all_calls=True,
-                       ignore_filtered=True,
-                       filters=args.filters,
-                       variant_confidence_threshold=args.min_variant_conf,
-                       sequence_confidence_threshold=args.min_gene_conf,
-                       model=args.model,
-                       kmer_size=args.kmer,
-                       min_proportion_expected_depth=args.min_proportion_expected_depth,
-                       ploidy=args.ploidy
-                       )
+        gt = Genotyper(
+            sample=args.sample,
+            expected_depths=depths,
+            expected_error_rate=args.expected_error_rate,
+            variant_covgs=cp.variant_covgs,
+            gene_presence_covgs=cp.covgs["presence"],
+            base_json=base_json,
+            contamination_depths=[],
+            report_all_calls=True,
+            ignore_filtered=True,
+            filters=args.filters,
+            variant_confidence_threshold=args.min_variant_conf,
+            sequence_confidence_threshold=args.min_gene_conf,
+            model=args.model,
+            kmer_size=args.kmer,
+            min_proportion_expected_depth=args.min_proportion_expected_depth,
+            ploidy=args.ploidy,
+        )
         gt.run()
         variant_calls_dict = gt.variant_calls_dict
         sequence_calls_dict = gt.sequence_calls_dict
@@ -204,16 +219,17 @@ def run(parser, args):
     args.quiet = q
     mykrobe_predictor_susceptibility_result = MykrobePredictorSusceptibilityResult()
     if gt is not None and (max(depths) > args.min_depth or args.force):
-        predictor = Predictor(variant_calls=gt.variant_calls,
-                              called_genes=gt.sequence_calls_dict,
-                              base_json=base_json[args.sample],
-                              depth_threshold=args.min_depth,
-                              ignore_filtered=True,
-                              ignore_minor_calls=args.ignore_minor_calls,
-                              variant_to_resistance_json_fp=args.custom_variant_to_resistance_json)
+        predictor = Predictor(
+            variant_calls=gt.variant_calls,
+            called_genes=gt.sequence_calls_dict,
+            base_json=base_json[args.sample],
+            depth_threshold=args.min_depth,
+            ignore_filtered=True,
+            ignore_minor_calls=args.ignore_minor_calls,
+            variant_to_resistance_json_fp=args.custom_variant_to_resistance_json,
+        )
         mykrobe_predictor_susceptibility_result = predictor.run()
-    base_json[
-        args.sample] = MykrobePredictorResult(
+    base_json[args.sample] = MykrobePredictorResult(
         susceptibility=mykrobe_predictor_susceptibility_result,
         phylogenetics=phylogenetics,
         variant_calls=variant_calls_dict,
@@ -222,13 +238,14 @@ def run(parser, args):
         files=args.seq,
         kmer=args.kmer,
         version=version,
-        model=args.model).to_dict()
+        model=args.model,
+    ).to_dict()
     if not args.keep_tmp:
         cp.remove_temporary_files()
 
     # write to file is specified by user, otherwise send to stdout
     if args.output:
-        with open(args.output, 'w') as outfile:
+        with open(args.output, "w") as outfile:
             json.dump(base_json, outfile, indent=4)
     else:
         print(json.dumps(base_json, indent=4))

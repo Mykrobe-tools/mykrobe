@@ -1,1 +1,1 @@
-DB_PREFIX="atlas"
+DB_PREFIX = "atlas"

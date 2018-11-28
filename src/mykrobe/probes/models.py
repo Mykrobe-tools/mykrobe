@@ -27,26 +27,14 @@ def unique(seq):
 
 class VariantPanel(Document, CreateAndSaveMixin):
 
-    meta = {'indexes': [
-        {
-            'fields': ['variant']
-        },
-        {
-            'fields': ['var_hash']
-        }
+    meta = {"indexes": [{"fields": ["variant"]}, {"fields": ["var_hash"]}]}
 
-    ]
-    }
-
-    variant = ReferenceField('Variant')
+    variant = ReferenceField("Variant")
     var_hash = StringField()
 
     @classmethod
     def create(cls, variant):
-        return cls(
-            variant=variant,
-            var_hash=variant.var_hash
-        )
+        return cls(variant=variant, var_hash=variant.var_hash)
 
     def __repr__(self):
         return "VariantPanel %s" % self._name
@@ -64,11 +52,11 @@ class AlleleGenerator(object):
         self._read_reference()
 
     def _read_reference(self):
-        for record in SeqIO.parse(self.reference_filepath, 'fasta'):
-            self.reference_sequence=record.seq
+        for record in SeqIO.parse(self.reference_filepath, "fasta"):
+            self.reference_sequence = record.seq
             self.ref += list(record.seq)
         ### Pad with Ns for SNPs at the end of the reference
-        self.ref.extend(["N"]*self.kmer)            
+        self.ref.extend(["N"] * self.kmer)
         self.ref_length = len(self.ref)
 
     def create(self, v, context=[]):
@@ -78,61 +66,59 @@ class AlleleGenerator(object):
         context = self._remove_contexts_not_within_k(v, context)
         wild_type_reference = self._get_wildtype_reference(v)
         null_variant = Variant.create(
-            v.start, v.reference_bases, alternate_bases=[v.reference_bases])
-        references = self._generate_alternates_on_all_backgrounds(
-            null_variant, context)
+            v.start, v.reference_bases, alternate_bases=[v.reference_bases]
+        )
+        references = self._generate_alternates_on_all_backgrounds(null_variant, context)
         alternates = self._generate_alternates_on_all_backgrounds(v, context)
         ## The alternates shouldn't contain kmers in the reference
         if v.is_indel:
-            alternates=self.trim_uninformative_kmers(alternates, references)   
+            alternates = self.trim_uninformative_kmers(alternates, references)
         return Panel(v, references, v.start, alternates)
 
     def trim_uninformative_kmers(self, alternates, references=[]):
-        new_alternates=[]
+        new_alternates = []
         for ref, alt in zip(references, alternates):
-            alt="".join(alt)
-            ref="".join(ref)
-            informative_kmers=[]
-            for i,k in enumerate(seq_to_kmers(alt, self.kmer)):
+            alt = "".join(alt)
+            ref = "".join(ref)
+            informative_kmers = []
+            for i, k in enumerate(seq_to_kmers(alt, self.kmer)):
                 if not k in ref:
                     informative_kmers.append(i)
             if informative_kmers:
-                trim=(min(informative_kmers), max(informative_kmers))
-                alt=alt[trim[0]:trim[1]+self.kmer]
+                trim = (min(informative_kmers), max(informative_kmers))
+                alt = alt[trim[0] : trim[1] + self.kmer]
             assert alt
 
-            informative_kmers=[]
-            for i,k in enumerate(seq_to_kmers(alt, self.kmer)):
+            informative_kmers = []
+            for i, k in enumerate(seq_to_kmers(alt, self.kmer)):
                 if not k in self.reference_sequence:
                     informative_kmers.append(i)
             if informative_kmers:
-                trim=(min(informative_kmers), max(informative_kmers))
-                alt=alt[trim[0]:trim[1]+self.kmer]
-            assert alt   
-                     
+                trim = (min(informative_kmers), max(informative_kmers))
+                alt = alt[trim[0] : trim[1] + self.kmer]
+            assert alt
+
             new_alternates.append(alt)
         return new_alternates
-
-
-
 
     def _check_valid_variant(self, v):
         index = v.start - 1
         if not len(v.alternate_bases) == 1:
             raise NotImplementedError(
-                "Probes can only be built for homozygous variants at this time")
-        if "".join(
-                self.ref[index:(index + len(v.reference_bases))]) != v.reference_bases:
+                "Probes can only be built for homozygous variants at this time"
+            )
+        if (
+            "".join(self.ref[index : (index + len(v.reference_bases))])
+            != v.reference_bases
+        ):
             raise ValueError(
-                "Cannot create alleles as ref at pos %i is not %s (it's %s) are you sure you're using one-based co-ordinates?" %
-                (v.start,
-                 v.reference_bases,
-                 "".join(
-                     self.ref[
-                         index: (
-                             index +
-                             len(
-                                 v.reference_bases))])))
+                "Cannot create alleles as ref at pos %i is not %s (it's %s) are you sure you're using one-based co-ordinates?"
+                % (
+                    v.start,
+                    v.reference_bases,
+                    "".join(self.ref[index : (index + len(v.reference_bases))]),
+                )
+            )
         if v.start <= 0:
             raise ValueError("Position should be 1 based")
 
@@ -162,9 +148,10 @@ class AlleleGenerator(object):
         return copy(self.ref[start_index:end_index])
 
     def _get_alternate_reference_segment(self, v, context):
-        ref_segment_length_delta = self._calculate_length_delta_from_indels(v,            context)
+        ref_segment_length_delta = self._calculate_length_delta_from_indels(v, context)
         i, start_index, end_index = self._get_start_end(
-            v, delta=ref_segment_length_delta)
+            v, delta=ref_segment_length_delta
+        )
         return self._get_reference_segment(start_index, end_index)
 
     def _generate_alternates_on_all_backgrounds(self, v, context):
@@ -173,34 +160,43 @@ class AlleleGenerator(object):
         # For each context, create the background and alternate
         alternates = []
         for context_combo in context_combinations:
-            ref_segment_length_delta = self._calculate_length_delta_from_indels(v, context_combo)
+            ref_segment_length_delta = self._calculate_length_delta_from_indels(
+                v, context_combo
+            )
             i, start_index, end_index = self._get_start_end(
-                v, delta=ref_segment_length_delta)
+                v, delta=ref_segment_length_delta
+            )
             alternate_reference_segment = self._get_reference_segment(
-                start_index,
-                end_index)
+                start_index, end_index
+            )
             try:
                 background = self._generate_background_using_context(
-                    i,
-                    v,
-                    alternate_reference_segment,
-                    context_combo)
+                    i, v, alternate_reference_segment, context_combo
+                )
             except (ValueError, AssertionError) as e:
                 m = "Could not process context combo %s. " % (
-                    ",".join([c.var_name for c in context_combo] + [v.var_name]))
+                    ",".join([c.var_name for c in context_combo] + [v.var_name])
+                )
                 raise ValueError("\n".join([m, str(e)]))
             alternate = copy(background)
             i -= self._calculate_length_delta_from_variant_list(
-                [c for c in context_combo if c.start <= v.start and c.is_indel])
-            if not "".join(
-                    alternate[i:(i + len(v.reference_bases))]) == v.reference_bases:
-                raise ValueError("Could not process context combo %s. %s != %s " %
-                                 (",".join([c.var_name for c in context_combo] +
-                                           [v.var_name]), "".join(alternate[i:(i +
-                                                                               len(v.reference_bases))]), v.reference_bases))
+                [c for c in context_combo if c.start <= v.start and c.is_indel]
+            )
+            if (
+                not "".join(alternate[i : (i + len(v.reference_bases))])
+                == v.reference_bases
+            ):
+                raise ValueError(
+                    "Could not process context combo %s. %s != %s "
+                    % (
+                        ",".join([c.var_name for c in context_combo] + [v.var_name]),
+                        "".join(alternate[i : (i + len(v.reference_bases))]),
+                        v.reference_bases,
+                    )
+                )
             else:
                 for alt in v.alternate_bases:
-                    alternate[i: i + len(v.reference_bases)] = alt
+                    alternate[i : i + len(v.reference_bases)] = alt
                     alternates.append(alternate)
         return alternates
 
@@ -210,17 +206,13 @@ class AlleleGenerator(object):
             # Create contexts if multiple variants at given posision
             contexts = self._create_multiple_contexts(context)
             for context in contexts:
-                context_combinations = self._get_combinations_of_backgrounds(
-                    context)
+                context_combinations = self._get_combinations_of_backgrounds(context)
                 context_list.extend(context_combinations)
         return context_list
 
     def _generate_background_using_context(
-            self,
-            i,
-            v,
-            alternate_reference_segment,
-            context):
+        self, i, v, alternate_reference_segment, context
+    ):
         backgrounds = [alternate_reference_segment]
         new_background = copy(alternate_reference_segment)
 
@@ -229,39 +221,45 @@ class AlleleGenerator(object):
             for alt in variant.alternate_bases:
                 j = i + variant.start - v.start
                 j -= self._calculate_length_delta_from_variant_list(
-                    [c for c in variants_added if c.start <= variant.start and c.is_indel])
+                    [
+                        c
+                        for c in variants_added
+                        if c.start <= variant.start and c.is_indel
+                    ]
+                )
                 if j <= len(new_background) and j >= 0:
                     if j + len(variant.reference_bases) > len(new_background):
-                        hang = j + \
-                            len(variant.reference_bases) - len(new_background)
-                        assert "".join(
-                            new_background[
-                                j: len(new_background)]) == variant.reference_bases[
-                            :len(
-                                variant.reference_bases) -
-                            hang]
-                        new_background[
-                            j: j +
-                            len(
-                                variant.reference_bases)] = alt[
-                            :len(
-                                variant.reference_bases) -
-                            hang]
+                        hang = j + len(variant.reference_bases) - len(new_background)
+                        assert (
+                            "".join(new_background[j : len(new_background)])
+                            == variant.reference_bases[
+                                : len(variant.reference_bases) - hang
+                            ]
+                        )
+                        new_background[j : j + len(variant.reference_bases)] = alt[
+                            : len(variant.reference_bases) - hang
+                        ]
                     else:
-                        if not "".join(new_background[
-                                j: j + len(variant.reference_bases)]) == variant.reference_bases:
+                        if (
+                            not "".join(
+                                new_background[j : j + len(variant.reference_bases)]
+                            )
+                            == variant.reference_bases
+                        ):
                             raise ValueError(
-                                "Could not process variant %s. %s != %s " %
-                                (variant.var_name,
-                                 "".join(
-                                     new_background[
-                                         j: j +
-                                         len(
-                                             variant.reference_bases)]),
-                                    variant.reference_bases))
+                                "Could not process variant %s. %s != %s "
+                                % (
+                                    variant.var_name,
+                                    "".join(
+                                        new_background[
+                                            j : j + len(variant.reference_bases)
+                                        ]
+                                    ),
+                                    variant.reference_bases,
+                                )
+                            )
                         else:
-                            new_background[
-                                j: j + len(variant.reference_bases)] = alt
+                            new_background[j : j + len(variant.reference_bases)] = alt
                     variants_added.append(variant)
                 else:
                     del context[e]
@@ -275,7 +273,8 @@ class AlleleGenerator(object):
         # This is only run when there are multiple variants at the same
         # position
         compatiblity_of_contexts = [
-            self._all_variants_are_combatible(context) for context in contexts]
+            self._all_variants_are_combatible(context) for context in contexts
+        ]
         if self._are_contexts_all_valid(compatiblity_of_contexts):
             return contexts
         else:
@@ -327,17 +326,19 @@ class AlleleGenerator(object):
         kmer = self.kmer
         if len(v.reference_bases) > 2 * kmer:
             kmer = int(math.ceil(float(len(v.reference_bases)) / 2)) + 5
-        elif (v.length > 2 * kmer):
+        elif v.length > 2 * kmer:
             kmer = int(math.ceil(float(v.length) / 2)) + 5
         if len(v.reference_bases) > kmer:
             shift = int(
-                (kmer - 1) - math.floor(float((2 * kmer + 1) - len(v.reference_bases)) / 2))
+                (kmer - 1)
+                - math.floor(float((2 * kmer + 1) - len(v.reference_bases)) / 2)
+            )
         pos = v.start
         start_delta = int(math.floor(float(delta) / 2))
         end_delta = int(math.ceil(float(delta) / 2))
         start_index = pos - kmer - start_delta
-        end_index = pos + kmer + end_delta-1            
-        min_probe_length=(2 * kmer) - 1
+        end_index = pos + kmer + end_delta - 1
+        min_probe_length = (2 * kmer) - 1
         i = kmer - 1 + start_delta
         ### Is the variant at the start of the sequence? This is a special case.
         if start_index < 0:
@@ -371,24 +372,18 @@ class AlleleGenerator(object):
 
 
 class Panel(object):
-
     def __init__(self, variant, refs, start, alts):
         self.variant = variant
         self.refs = unique(["".join(ref) for ref in refs])
         self.start = start
         self.alts = unique(["".join(alt) for alt in alts])
-        self.alts=list(set(self.alts)-set(self.refs))
+        self.alts = list(set(self.alts) - set(self.refs))
 
 
 class Mutation(object):
-
     def __init__(
-            self,
-            var_name,
-            reference,
-            gene=None,
-            mut=None,
-            protein_coding_var=False):
+        self, var_name, reference, gene=None, mut=None, protein_coding_var=False
+    ):
         self.var_name = var_name
         self.gene = gene
         if mut:
@@ -424,7 +419,11 @@ class Mutation(object):
     @property
     def variant(self):
         ref, start, alt = split_var_name(self.var_name)
-        return Variant.create(variant_sets=None, start=int(start),
-                              end=0, reference_bases=ref,
-                              alternate_bases=[alt],
-                              reference=self.reference)
+        return Variant.create(
+            variant_sets=None,
+            start=int(start),
+            end=0,
+            reference_bases=ref,
+            alternate_bases=[alt],
+            reference=self.reference,
+        )

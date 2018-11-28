@@ -7,11 +7,11 @@ import json
 
 logger = logging.getLogger(__name__)
 import redis
+
 r = redis.StrictRedis()
 
 
-class BitarrayDistance():
-
+class BitarrayDistance:
     def __init__(self, redis=r):
         self.redis = redis
 
@@ -31,7 +31,7 @@ class BitarrayDistance():
         pipe = r.pipeline()
         for i, j in enumerate(bitarray):
             pipe.setbit("_".join([sample_id, "filters"]), i, j)
-        pipe.execute()        
+        pipe.execute()
 
     def _create_genotype_bitarray(self, sorted_calls):
         bitarray = [int(call > 1) for call in sorted_calls]

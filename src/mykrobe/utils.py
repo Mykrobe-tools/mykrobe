@@ -9,7 +9,8 @@ def check_args(args):
         args.db_name = os.environ.get("DB_NAME")
     if args.db_name is None:
         raise ValueError(
-            "db_name needs to be set. Either run with --db_name :db_name or export DB_NAME=:db_name")
+            "db_name needs to be set. Either run with --db_name :db_name or export DB_NAME=:db_name"
+        )
     return args
 
 
@@ -18,8 +19,7 @@ def make_hash(s):
 
 
 def make_var_hash(ref, pos, alts):
-    var = "".join(
-        [ref, str(pos), "/".join(alts)])
+    var = "".join([ref, str(pos), "/".join(alts)])
     return make_hash(var)
 
 
@@ -44,7 +44,7 @@ def get_params(url):
     except IndexError:
         return params
     p_str = p_str.split(" ")[0]
-    p_str = p_str.split('&')
+    p_str = p_str.split("&")
     for p in p_str:
         k, v = p.split("=")
         params[k] = v
@@ -58,27 +58,29 @@ def median(lst):
     lstLen = len(lst)
     index = (lstLen - 1) // 2
 
-    if (lstLen % 2):
+    if lstLen % 2:
         return sortedLst[index]
     else:
         return (sortedLst[index] + sortedLst[index + 1]) / 2.0
 
 
 def load_json(f):
-    with open(f, 'r') as infile:
+    with open(f, "r") as infile:
         return json.load(infile)
 
 
 def lazyprop(fn):
-    attr_name = '_' + fn.__name__
+    attr_name = "_" + fn.__name__
 
     @property
     def _lazyprop(self):
         if not hasattr(self, attr_name):
             setattr(self, attr_name, fn(self))
         return getattr(self, attr_name)
+
     return _lazyprop
 
+
 def seq_to_kmers(seq, kmer_size):
-    for i in range(len(seq)-kmer_size+1):
-        yield seq[i:i+kmer_size]    
+    for i in range(len(seq) - kmer_size + 1):
+        yield seq[i : i + kmer_size]

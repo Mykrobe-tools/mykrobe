@@ -24,7 +24,7 @@ def is_record_valid(record):
         if sample["GT"] is None:
             valid = False
         else:
-            if sum([int(i) for i in sample['GT'].split('/')]) < 2:
+            if sum([int(i) for i in sample["GT"].split("/")]) < 2:
                 valid = False
         try:
             if sample["GT_CONF"] <= 1:
@@ -36,9 +36,9 @@ def is_record_valid(record):
 
 def get_genotype_likelihood(sample):
     try:
-        genotype_likelihood = sample['GT_CONF']
+        genotype_likelihood = sample["GT_CONF"]
     except AttributeError:
-        genotype_likelihood = sample['GQ']
+        genotype_likelihood = sample["GQ"]
     return genotype_likelihood
 
 
@@ -49,12 +49,11 @@ def run(parser, args):
         logger.setLevel(logging.ERROR)
     else:
         logger.setLevel(logging.INFO)
-    DBNAME = '%s-%s' % (DB_PREFIX, args.db_name)
+    DBNAME = "%s-%s" % (DB_PREFIX, args.db_name)
     db = client[DBNAME]
     connect(DBNAME)
     logger.debug("Using DB %s" % DBNAME)
-    reference_set_name = ".".join(os.path.basename(
-        args.reference_set).split(".")[:-1])
+    reference_set_name = ".".join(os.path.basename(args.reference_set).split(".")[:-1])
     try:
         reference_set = ReferenceSet.objects.get(name=reference_set_name)
     except DoesNotExist:
@@ -62,9 +61,8 @@ def run(parser, args):
         # Hack
     try:
         reference = Reference.create_and_save(
-            name=reference_set_name,
-            reference_sets=[reference_set],
-            md5checksum="NA")
+            name=reference_set_name, reference_sets=[reference_set], md5checksum="NA"
+        )
     except:
         pass
     vcf = VCF(args.vcf, reference_set.id, method=args.method, force=args.force)

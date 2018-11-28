@@ -7,6 +7,7 @@ from mykrobe.version import __version__
 from pprint import pprint
 import json
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -17,10 +18,12 @@ def run_main(parser, args):
         args.expected_error_rate = 0.15
         args.filters = ["LOW_GT_CONF"]
         args.model = "kmer_count"
-        logger.debug("Setting expected error rate to %s (--ont)" %
-                     args.expected_error_rate)
         logger.debug(
-            "Removing LOW_PERCENT_COVERAGE filter (increases sensitivity - in particular for ONT data)")
+            "Setting expected error rate to %s (--ont)" % args.expected_error_rate
+        )
+        logger.debug(
+            "Removing LOW_PERCENT_COVERAGE filter (increases sensitivity - in particular for ONT data)"
+        )
 
     if args.min_variant_conf is None:
         args.min_variant_conf = 100
@@ -36,7 +39,8 @@ def run_main(parser, args):
         skeleton_dir=args.skeleton_dir,
         threads=args.threads,
         memory=args.memory,
-        mccortex31_path=args.mccortex31_path)
+        mccortex31_path=args.mccortex31_path,
+    )
     cp.run()
     if args.expected_depth is None:
         args.expected_depth = cp.estimate_depth()
@@ -52,8 +56,7 @@ def run_main(parser, args):
     gt = Genotyper(
         sample=args.sample,
         expected_error_rate=args.expected_error_rate,
-        expected_depths=[
-            args.expected_depth],
+        expected_depths=[args.expected_depth],
         variant_covgs=cp.variant_covgs,
         gene_presence_covgs=cp.covgs["presence"],
         base_json=base_json,
@@ -68,13 +71,12 @@ def run_main(parser, args):
         kmer_size=args.kmer,
         min_proportion_expected_depth=args.min_proportion_expected_depth,
         ploidy=args.ploidy,
-
-        )
+    )
     gt.run()
     if args.output:
-        with open(args.output, 'w') as outfile:
+        with open(args.output, "w") as outfile:
             json.dump(gt.out_json, outfile, indent=4)
-                
+
     if not args.keep_tmp:
         cp.remove_temporary_files()
     return gt.out_json

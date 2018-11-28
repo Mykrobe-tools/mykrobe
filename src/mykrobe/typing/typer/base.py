@@ -2,19 +2,19 @@ MIN_LLK = -99999999
 DEFAULT_ERROR_RATE = 0.05
 DEFAULT_MINOR_FREQ = 0.2
 import logging
+
 logger = logging.getLogger(__name__)
 
 
 class Typer(object):
-
     def __init__(
-            self,
-            expected_depths,
-            contamination_depths=[],
-            error_rate=0.05,
-            ignore_filtered=False,
-            filters=[],
-            confidence_threshold=1
+        self,
+        expected_depths,
+        contamination_depths=[],
+        error_rate=0.05,
+        ignore_filtered=False,
+        filters=[],
+        confidence_threshold=1,
     ):
         self.expected_depths = expected_depths
         self.contamination_depths = contamination_depths

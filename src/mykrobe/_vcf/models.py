@@ -23,14 +23,14 @@ def split_GT(GT):
 
 
 class VCF(object):
-
     def __init__(
-            self,
-            f,
-            reference_set_id,
-            method="NotSpecified",
-            force=False,
-            append_to_global_variant_set=True):
+        self,
+        f,
+        reference_set_id,
+        method="NotSpecified",
+        force=False,
+        append_to_global_variant_set=True,
+    ):
         self.f = f
         self.reference_set = ReferenceSet.objects.get(id=reference_set_id)
         self.references = self._create_reference_lookup()
@@ -50,7 +50,7 @@ class VCF(object):
         return refs
 
     def add_to_database(self):
-        with open(self.f, 'r') as infile:
+        with open(self.f, "r") as infile:
             self.vcf_reader = vcf.Reader(infile)
             self._create_new_variant_set()
             self._create_variant_set_meta_data()
@@ -66,16 +66,18 @@ class VCF(object):
                     c = VariantCall.create(
                         variant=v,
                         call_set=self.call_sets[call.sample],
-                        genotype=call['GT'],
-                        genotype_likelihoods=genotype_likelihoods)
+                        genotype=call["GT"],
+                        genotype_likelihoods=genotype_likelihoods,
+                    )
                     self.calls.append(c)
 
         VariantCall.objects.insert(self.calls)
 
     def _get_or_create_variant(self, record):
         try:
-            var_hash = make_var_hash(record.REF, record.POS, [
-                str(a) for a in record.ALT])
+            var_hash = make_var_hash(
+                record.REF, record.POS, [str(a) for a in record.ALT]
+            )
             v = Variant.objects.get(var_hash=var_hash)
             v.add_to_variant_set(self.vcf_variant_set)
         except DoesNotExist:
@@ -83,22 +85,23 @@ class VCF(object):
                 reference = self.references[record.CHROM]
             except KeyError as e:
                 raise KeyError(
-                    "Reference %s cannot be found in reference set %s (%s). Please add it to the database." %
-                    (record.CHROM, self.reference_set.id, self.reference_set.name))
+                    "Reference %s cannot be found in reference set %s (%s). Please add it to the database."
+                    % (record.CHROM, self.reference_set.id, self.reference_set.name)
+                )
             v = Variant.create_and_save(
                 variant_sets=self.variant_sets,
                 start=record.POS,
                 reference_bases=record.REF,
-                alternate_bases=[
-                    str(a) for a in record.ALT],
+                alternate_bases=[str(a) for a in record.ALT],
                 reference=reference,
-                names=[record.ID])
+                names=[record.ID],
+            )
         return v
 
     def _remove_variant_set(self, variant_set_name):
         vs = VariantSet.objects.get(
-            name=variant_set_name,
-            reference_set=self.reference_set)
+            name=variant_set_name, reference_set=self.reference_set
+        )
         for call_set in VariantCallSet.objects(variant_sets=vs):
             call_set.variant_sets.remove(vs)
             call_set.save()
@@ -112,37 +115,33 @@ class VCF(object):
         vs.delete()
 
     def _create_new_variant_set(self):
-        variant_set_name = os.path.basename(
-            self.f)
-        if VariantSet.objects(
-                name=variant_set_name,
-                reference_set=self.reference_set):
+        variant_set_name = os.path.basename(self.f)
+        if VariantSet.objects(name=variant_set_name, reference_set=self.reference_set):
             if not self.force:
                 raise NotUniqueError(
-                    "VariantSet %s already exists. Rerun with -f to recreate." %
-                    variant_set_name)
+                    "VariantSet %s already exists. Rerun with -f to recreate."
+                    % variant_set_name
+                )
             else:
                 self._remove_variant_set(variant_set_name)
         self.vcf_variant_set = VariantSet.create_and_save(
-            name=variant_set_name,
-            reference_set=self.reference_set)
+            name=variant_set_name, reference_set=self.reference_set
+        )
 
     def _create_call_sets(self):
         for sample in self.vcf_reader.samples:
             try:
                 cs = VariantCallSet.create_and_save(
-                    name="_".join(
-                        [
-                            sample,
-                            self.method]),
+                    name="_".join([sample, self.method]),
                     variant_sets=self.variant_sets,
                     sample_id=sample,
-                    info={
-                        "variant_caller": self.method})
+                    info={"variant_caller": self.method},
+                )
             except NotUniqueError:
                 raise ValueError(
-                    "There is already a call set for sample %s with method %s " %
-                    (sample, self.method))
+                    "There is already a call set for sample %s with method %s "
+                    % (sample, self.method)
+                )
             else:
                 self.call_sets[sample] = cs
 
@@ -159,55 +158,49 @@ class VCF(object):
             vs = VariantSet.objects.get(name=GLOBAL_VARIANT_SET_NAME)
         except:
             vs = VariantSet.create_and_save(
-                name=GLOBAL_VARIANT_SET_NAME,
-                reference_set=self.reference_set)
+                name=GLOBAL_VARIANT_SET_NAME, reference_set=self.reference_set
+            )
         return vs
 
     def _create_variant_set_meta_data(self):
         for variant_set in self.variant_sets:
             for k, v in self.vcf_reader.metadata.items():
-                if not VariantSetMetadata.objects(
-                        key=k,
-                        variant_set=variant_set):
+                if not VariantSetMetadata.objects(key=k, variant_set=variant_set):
                     vsm = VariantSetMetadata.create_and_save(
                         key=k,
                         value="metadata",
                         type="metadata",
-                        variant_set=variant_set)
+                        variant_set=variant_set,
+                    )
             for k, v in self.vcf_reader.infos.items():
-                if not VariantSetMetadata.objects(
-                        key=k,
-                        variant_set=variant_set):
+                if not VariantSetMetadata.objects(key=k, variant_set=variant_set):
                     vsm = VariantSetMetadata.create_and_save(
                         key=k,
                         value="infos",
                         type=v.type,
                         variant_set=variant_set,
-                        number=int(
-                            v.num),
-                        description=v.desc)
+                        number=int(v.num),
+                        description=v.desc,
+                    )
             for k, v in self.vcf_reader.filters.items():
-                if not VariantSetMetadata.objects(
-                        key=k,
-                        variant_set=variant_set):
+                if not VariantSetMetadata.objects(key=k, variant_set=variant_set):
                     vsm = VariantSetMetadata.create_and_save(
                         key=k,
                         value="filters",
                         type="filters",
                         variant_set=variant_set,
-                        description=v.desc)
+                        description=v.desc,
+                    )
             for k, v in self.vcf_reader.formats.items():
-                if not VariantSetMetadata.objects(
-                        key=k,
-                        variant_set=variant_set):
+                if not VariantSetMetadata.objects(key=k, variant_set=variant_set):
                     vsm = VariantSetMetadata.create_and_save(
                         key=k,
                         value="formats",
                         type=v.type,
                         variant_set=variant_set,
-                        number=int(
-                            v.num),
-                        description=v.desc)
+                        number=int(v.num),
+                        description=v.desc,
+                    )
 
     def _is_record_valid(self, record):
         valid = True
@@ -216,7 +209,7 @@ class VCF(object):
                 valid = False
             else:
                 try:
-                    if sum([int(i) for i in split_GT(sample['GT'])]) < 2:
+                    if sum([int(i) for i in split_GT(sample["GT"])]) < 2:
                         valid = False
                 except ValueError:
                     valid = False
@@ -229,9 +222,10 @@ class VCF(object):
 
     def _get_genotype_likelihoods(self, sample):
         try:
-            genotype_likelihoods = [float(i) for i in sample['GL']]
+            genotype_likelihoods = [float(i) for i in sample["GL"]]
         except:
             genotype_likelihoods = [0, 0, 0]
             genotype_likelihoods[
-                sum([int(i) for i in sample['GT'].split('/')])] = sample["GT_CONF"]
+                sum([int(i) for i in sample["GT"].split("/")])
+            ] = sample["GT_CONF"]
         return genotype_likelihoods
