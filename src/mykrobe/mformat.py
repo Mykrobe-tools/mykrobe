@@ -83,30 +83,23 @@ def get_variant_calls(d):
     variants = []
     for variant_name, variant_call in d.items():
         if variant_call.get("_cls") != "Call.SequenceCall":
-            wt_depth = variant_call.get('info',{}).get('coverage',{}).get("reference",{}).get("median_depth")
-            alt_depth = variant_call.get('info',{}).get('coverage',{}).get("alternate",{}).get("median_depth")
-
-            wt_per_cov = variant_call.get('info',{}).get('coverage',{}).get("reference",{}).get("percent_coverage")
-            alt_per_cov = variant_call.get('info',{}).get('coverage',{}).get("alternate",{}).get("percent_coverage")
-            if wt_per_cov < 100:
-                wt_depth = 0
-            if alt_per_cov <100:
-                alt_depth =0 
+            ref_kmer_count = variant_call.get('info',{}).get('coverage',{}).get("reference",{}).get("kmer_count")
+            alt_kmer_count = variant_call.get('info',{}).get('coverage',{}).get("alternate",{}).get("kmer_count")
             conf = variant_call.get('info',{}).get('conf',"1")
 
             variants.append(":".join([variant_name,
-                             str(int(alt_depth)),str(int(wt_depth)), str(int(conf))
+                             str(int(ref_kmer_count)),str(int(alt_kmer_count)), str(int(conf))
                            ]))
     return ";".join(variants)
 
 
 def json_to_csv(json_dict):
     header = [
+        "sample",    
         "drug",
         "susceptibility",  
-        "variants (dna_variant-AA_variant:alt_depth:ref_depth:conf) [use --format json for more info]",
+        "variants (dna_variant-AA_variant:ref_kmer_count:alt_kmer_count:conf) [use --format json for more info]",
         "genes (prot_mut-ref_mut:percent_covg:depth) [use --format json for more info]",              
-        "sample",
 
         "mykrobe_version",
         "files",
@@ -144,14 +137,14 @@ def json_to_csv(json_dict):
             call = d.get('susceptibility', {}).get(drug, {})
             called_by_variants = get_variant_calls(call.get("called_by",{}))
             called_by_genes = get_called_genes(call.get("called_by",{}))
-            row = [drug,
+            row = [sample_name,
+                drug,
                 call.get(
                     "predict",
                     'N'),
                 called_by_variants, 
                 called_by_genes,  
-                sample_name,
-                              
+
                 d.get("version",{}).get("mykrobe-predictor","-1"),
                 files,
                 probe_sets,
