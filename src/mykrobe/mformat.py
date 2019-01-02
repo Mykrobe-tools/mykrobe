@@ -48,26 +48,6 @@ def get_lineage_string(d):
         per_cov.append(str(v.get("percent_coverage")))
     return ";".join(s), ";".join(per_cov), ";".join(depth)
 
-
-def get_file_name(f):
-    sample_name = os.path.basename(f).split('.')[0]
-    return sample_name
-
-
-def get_sample_name(f):
-    return list(f.keys())[0]
-
-def get_plate_name(f):
-    return f.split('/')[-3]
-
-def get_expected_depth(d):
-    return str(d.get("expected_depth", -1))
-
-
-def get_mean_read_length(d):
-    return str(d.get("mean_read_length", -1))
-
-
 def get_called_genes(d, drug=None):
     variants = []
     for variant_name, variant_call in d.items():
