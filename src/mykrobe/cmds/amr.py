@@ -4,10 +4,12 @@ logger = logging.getLogger(__name__)
 
 from pprint import pprint
 import json
+
 import numpy as np
 import os
 import random
 import time
+from mykrobe.mformat import json_to_csv
 from mykrobe.utils import check_args
 from mykrobe.typing import CoverageParser
 from mykrobe.typing import Genotyper
@@ -362,8 +364,13 @@ def run(parser, args):
         cp.remove_temporary_files()
 
     # write to file is specified by user, otherwise send to stdout
+    if args.output_format == "csv":
+        output=json_to_csv(base_json)
+    else:
+        output=json.dumps(base_json, indent=4)
+
     if args.output:
         with open(args.output, 'w') as outfile:
-            json.dump(base_json, outfile, indent=4)
+            outfile.write(output)
     else:
-        print(json.dumps(base_json, indent=4))
+        print(output)
