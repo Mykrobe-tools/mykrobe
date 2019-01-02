@@ -90,8 +90,8 @@ parser_amr.add_argument(
     metavar='panel',
     type=str,
     help='variant panel (default:walker-2015). custom requires custom_probe_set_path and custom_variant_to_resistance_json to be set',
-    choices=['bradley-2015', 'walker-2015', 'atlas', 'custom'],
-    default='walker-2015')
+    choices=['bradley-2015', 'walker-2015', 'hunt-2019', 'atlas', 'custom'],
+    default='hunt-2019')
 parser_amr.add_argument(
     '--custom_probe_set_path',
     metavar='custom_probe_set_path',

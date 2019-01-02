@@ -168,6 +168,7 @@ def run(parser, args):
     args = parser.parse_args()
     hierarchy_json_file = None
     if args.panel is not None:
+        variant_to_resistance_json_fp=None
         if args.panel == "bradley-2015":
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
@@ -176,6 +177,16 @@ def run(parser, args):
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
                 "data/panels/tb-walker-probe-set-feb-09-2017.fasta.gz"]
+        elif args.panel == "hunt-2019":
+            TB_PANELS = [
+                "data/panels/tb-species-170421.fasta.gz",
+                "data/panels/tb-hunt-probe-set-jan-03-2019.fasta.gz"]                
+            data_dir = os.path.abspath(
+                        os.path.join(
+                        os.path.dirname(__file__),
+                        '../data/predict/tb/'))
+            variant_to_resistance_json_fp=os.path.join(data_dir,
+                "variant_to_resistance_drug-jan-03-2019.json")                
         elif args.panel == "atlas":
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
@@ -188,6 +199,7 @@ def run(parser, args):
                 args.custom_probe_set_path,
                 "data/panels/tb-species-170421.fasta.gz"
             ]
+            variant_to_resistance_json_fp=args.custom_variant_to_resistance_json
     Predictor = None
     if not args.species:
         panels = TB_PANELS + GN_PANELS + STAPH_PANELS
@@ -347,7 +359,7 @@ def run(parser, args):
                               depth_threshold=args.min_depth,
                               ignore_filtered=True,
                               ignore_minor_calls=args.ignore_minor_calls,
-                              variant_to_resistance_json_fp=args.custom_variant_to_resistance_json)
+                              variant_to_resistance_json_fp=variant_to_resistance_json_fp)
         mykrobe_predictor_susceptibility_result = predictor.run()
     base_json[
         args.sample] = MykrobePredictorResult(
