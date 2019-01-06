@@ -27,6 +27,8 @@ def run_subtool(parser, args):
             from mykrobe.cmds.makeprobes import run
     elif args.command == "predict":
         from mykrobe.cmds.amr import run
+    elif args.command == "panels":
+        from mykrobe.cmds.amr import describe_panels as run        
     elif args.command == "genotype":
         from mykrobe.cmds.genotype import run
 
@@ -90,8 +92,8 @@ parser_amr.add_argument(
     metavar='panel',
     type=str,
     help='variant panel (default:walker-2015). custom requires custom_probe_set_path and custom_variant_to_resistance_json to be set',
-    choices=['bradley-2015', 'walker-2015', 'hunt-2019', 'atlas', 'custom'],
-    default='hunt-2019')
+    choices=['bradley-2015', 'walker-2015', '201901', 'atlas', 'custom'],
+    default='201901')
 parser_amr.add_argument(
     '--custom_probe_set_path',
     metavar='custom_probe_set_path',
@@ -124,6 +126,11 @@ parser_amr.add_argument(
     choices=['json', 'csv'],
     default='csv')
 parser_amr.set_defaults(func=run_subtool)
+
+parser_panels = subparsers.add_parser(
+    'panels',
+    help="A description of the AMR panels available within Mykrobe predict")
+parser_panels.set_defaults(func=run_subtool)
 
 # ##################
 # ### Variants ##

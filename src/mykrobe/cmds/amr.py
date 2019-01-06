@@ -162,6 +162,18 @@ class MykrobePredictorResult(object):
     # variant_calls = DictField()
     # sequence_calls = DictField()
 
+def describe_panels(parser, args):
+    all_panels={"tb":
+                {"bradley-2015":"AMR panel described in Bradley, P et al. Rapid antibiotic-resistance predictions from genome sequence data for Staphylococcus aureus and Mycobacterium tuberculosis. Nat. Commun. 6:10063 doi: 10.1038/ncomms10063 (2015).",
+                 "walker-2015":"AMR panel described in Walker, Timothy M et al. Whole-genome sequencing for prediction of Mycobacterium tuberculosis drug susceptibility and resistance: a retrospective cohort study. The Lancet Infectious Diseases , Volume 15 , Issue 10 , 1193 - 1202",
+                  "201901":"AMR panel based on first line drugs from Walker 2018 variants (DOI 10.1056/NEJMoa1800474), and second line drugs from Walker 2015 panel."},
+            "staph":{"default":"AMR panel described in Bradley, P et al. Rapid antibiotic-resistance predictions from genome sequence data for Staphylococcus aureus and Mycobacterium tuberculosis. Nat. Commun. 6:10063 doi: 10.1038/ncomms10063 (2015)."}}
+    print("\t".join(["species", "panel-name", "description"]))            
+    for species, panels in all_panels.items():
+        for panel_name, description in panels.items():
+            print("\t".join([species, panel_name, description]))            
+
+        
 
 def run(parser, args):
     base_json = {args.sample: {}}
@@ -177,7 +189,7 @@ def run(parser, args):
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
                 "data/panels/tb-walker-probe-set-feb-09-2017.fasta.gz"]
-        elif args.panel == "hunt-2019":
+        elif args.panel == "201901":
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
                 "data/panels/tb-hunt-probe-set-jan-03-2019.fasta.gz"]                
