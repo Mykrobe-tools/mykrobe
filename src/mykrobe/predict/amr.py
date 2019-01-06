@@ -104,6 +104,8 @@ class BasePredictor(object):
                 gene = gene[0]
             self._update_resistance_prediction(name, gene)
 
+      
+
     def _update_resistance_prediction(self, allele_name, variant_or_gene):
         variant_or_gene_names = self._get_names(allele_name)
         if "variant" in variant_or_gene:
@@ -131,12 +133,10 @@ class BasePredictor(object):
                 if resistance_prediction in ["r", "R"]:
                     variant_or_gene['variant'] = None
                     try:
-                        self.resistance_predictions[drug]["called_by"][
-                            "-".join(variant_or_gene_names)] = variant_or_gene
+                        self.resistance_predictions[drug]["called_by"][allele_name] = variant_or_gene
                     except KeyError:
                         self.resistance_predictions[drug]["called_by"] = {}
-                        self.resistance_predictions[drug]["called_by"][
-                            "-".join(variant_or_gene_names)] = variant_or_gene
+                        self.resistance_predictions[drug]["called_by"][allele_name] = variant_or_gene
 
     def _get_names(self, allele_name):
         names = []

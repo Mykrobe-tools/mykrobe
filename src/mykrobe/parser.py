@@ -12,7 +12,7 @@ from mykrobe.base import force_mixin
 from mykrobe.base import genotyping_mixin
 
 import argparse
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def run_subtool(parser, args):
