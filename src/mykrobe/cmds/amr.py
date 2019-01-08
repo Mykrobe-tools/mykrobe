@@ -181,15 +181,15 @@ def run(parser, args):
     hierarchy_json_file = None
     if args.panel is not None:
         variant_to_resistance_json_fp=None
-        if args.panel == "bradley-2015":
+        if args.species == "tb" and args.panel == "bradley-2015":
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
                 "data/panels/tb-bradley-probe-set-jan-2019.fasta.gz"]
-        elif args.panel == "walker-2015":
+        elif args.species == "tb" and  args.panel == "walker-2015":
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
                 "data/panels/tb-walker-probe-set-jan-2019.fasta.gz"]
-        elif args.panel == "201901":
+        elif args.species == "tb" and  args.panel == "201901":
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
                 "data/panels/tb-hunt-probe-set-jan-03-2019.fasta.gz"]                
@@ -199,7 +199,7 @@ def run(parser, args):
                         '../data/predict/tb/'))
             variant_to_resistance_json_fp=os.path.join(data_dir,
                 "variant_to_resistance_drug-jan-03-2019.json")                
-        elif args.panel == "atlas":
+        elif args.species == "tb" and args.panel == "atlas":
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
                 "data/panels/tb-walker-probe-set-jan-2019.fasta.gz",
@@ -219,6 +219,7 @@ def run(parser, args):
         panels = STAPH_PANELS
         Predictor = StaphPredictor
         args.kmer = 15  # Forced
+        variant_to_resistance_json_fp=None
     elif args.species == "tb":
         panels = TB_PANELS
         hierarchy_json_file = "data/phylo/mtbc_hierarchy.json"
