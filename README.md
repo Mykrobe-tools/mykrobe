@@ -16,7 +16,7 @@ Tested on python 2.7, 3.4, 3.5, and 3.6.
     cd mykrobe
     
     ## Download pre-built probesets
-    wget -O mykrobe-data.tar.gz https://goo.gl/DXb9hN && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data
+    wget -O mykrobe-data.tar.gz https://bit.ly/2H9HKTU && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data
     
     pip install .
     
@@ -509,3 +509,7 @@ To run tests:
 To run tests for a particular python version run, e.g. python 3.6:
 
     tox -e py36
+
+# Release
+
+See dist/README.md
