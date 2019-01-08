@@ -392,6 +392,7 @@ def run(parser, args):
     if args.output_format == "csv":
         output=json_to_csv(base_json)
     else:
+        ## Verbose json output requires --report_all_calls
         if not args.report_all_calls:
             del base_json[args.sample]["variant_calls"]
             del base_json[args.sample]["sequence_calls"]        
