@@ -392,6 +392,9 @@ def run(parser, args):
     if args.output_format == "csv":
         output=json_to_csv(base_json)
     else:
+        if not args.report_all_calls:
+            del base_json[args.sample]["variant_calls"]
+            del base_json[args.sample]["sequence_calls"]        
         output=json.dumps(base_json, indent=4)
 
     if args.output:
