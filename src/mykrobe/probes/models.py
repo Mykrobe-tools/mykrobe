@@ -13,6 +13,8 @@ import datetime
 import math
 from mykrobe.utils import make_hash
 from mykrobe.utils import split_var_name
+from mykrobe.utils import seq_to_kmers
+
 from mykrobe.variants.schema.models.base import CreateAndSaveMixin
 from mykrobe.variants.schema.models import Variant
 
@@ -63,7 +65,10 @@ class AlleleGenerator(object):
 
     def _read_reference(self):
         for record in SeqIO.parse(self.reference_filepath, 'fasta'):
+            self.reference_sequence=record.seq
             self.ref += list(record.seq)
+        ### Pad with Ns for SNPs at the end of the reference
+        self.ref.extend(["N"]*self.kmer)            
         self.ref_length = len(self.ref)
 
     def create(self, v, context=[]):
@@ -77,7 +82,39 @@ class AlleleGenerator(object):
         references = self._generate_alternates_on_all_backgrounds(
             null_variant, context)
         alternates = self._generate_alternates_on_all_backgrounds(v, context)
+        ## The alternates shouldn't contain kmers in the reference
+        if v.is_indel:
+            alternates=self.trim_uninformative_kmers(alternates, references)   
         return Panel(v, references, v.start, alternates)
+
+    def trim_uninformative_kmers(self, alternates, references=[]):
+        new_alternates=[]
+        for ref, alt in zip(references, alternates):
+            alt="".join(alt)
+            ref="".join(ref)
+            informative_kmers=[]
+            for i,k in enumerate(seq_to_kmers(alt, self.kmer)):
+                if not k in ref:
+                    informative_kmers.append(i)
+            if informative_kmers:
+                trim=(min(informative_kmers), max(informative_kmers))
+                alt=alt[trim[0]:trim[1]+self.kmer]
+            assert alt
+
+            informative_kmers=[]
+            for i,k in enumerate(seq_to_kmers(alt, self.kmer)):
+                if not k in self.reference_sequence:
+                    informative_kmers.append(i)
+            if informative_kmers:
+                trim=(min(informative_kmers), max(informative_kmers))
+                alt=alt[trim[0]:trim[1]+self.kmer]
+            assert alt   
+                     
+            new_alternates.append(alt)
+        return new_alternates
+
+
+
 
     def _check_valid_variant(self, v):
         index = v.start - 1
@@ -125,9 +162,7 @@ class AlleleGenerator(object):
         return copy(self.ref[start_index:end_index])
 
     def _get_alternate_reference_segment(self, v, context):
-        ref_segment_length_delta = self._calculate_length_delta_from_indels(
-            v,
-            context)
+        ref_segment_length_delta = self._calculate_length_delta_from_indels(v,            context)
         i, start_index, end_index = self._get_start_end(
             v, delta=ref_segment_length_delta)
         return self._get_reference_segment(start_index, end_index)
@@ -138,8 +173,7 @@ class AlleleGenerator(object):
         # For each context, create the background and alternate
         alternates = []
         for context_combo in context_combinations:
-            ref_segment_length_delta = self._calculate_length_delta_from_indels(
-                v, context_combo)
+            ref_segment_length_delta = self._calculate_length_delta_from_indels(v, context_combo)
             i, start_index, end_index = self._get_start_end(
                 v, delta=ref_segment_length_delta)
             alternate_reference_segment = self._get_reference_segment(
@@ -302,22 +336,20 @@ class AlleleGenerator(object):
         start_delta = int(math.floor(float(delta) / 2))
         end_delta = int(math.ceil(float(delta) / 2))
         start_index = pos - kmer - start_delta
-        end_index = pos + kmer + end_delta + 1
+        end_index = pos + kmer + end_delta-1            
+        min_probe_length=(2 * kmer) - 1
         i = kmer - 1 + start_delta
+        ### Is the variant at the start of the sequence? This is a special case.
         if start_index < 0:
             diff = abs(start_index)
             start_index = 0
             end_index += diff
             i -= diff
-        elif end_index > self.ref_length:
-            diff = abs(end_index - self.ref_length)
-            end_index = self.ref_length
-            start_index -= diff
-            i += diff
         start_index += shift
         end_index += shift
         i -= shift
-        if (end_index - start_index) >= (2 * kmer) + 1:
+        # print(start_index, end_index)
+        if (end_index - start_index) >= min_probe_length:
             return (i, start_index, end_index)
         else:
             return self._get_start_end(v, delta=0)

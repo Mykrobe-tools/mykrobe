@@ -99,7 +99,11 @@ genotyping_mixin = argparse.ArgumentParser(add_help=False)
 genotyping_mixin.add_argument(
     '--ont',
     action='store_true',
-    help='Set default for ONT data')
+    help='Set default for ONT data. Sets expected_error_rate to 0.15 and ploidy to haploid')
+genotyping_mixin.add_argument(
+    '--ignore_minor_calls',
+    action='store_true',
+    help='Ignore minor calls when running resistance prediction')
 genotyping_mixin.add_argument(
     '--ignore_filtered',
     help="don't include filtered genotypes",
@@ -109,13 +113,20 @@ genotyping_mixin.add_argument(
     metavar='model',
     choices=['median_depth', 'kmer_count'],
     type=str,
-    help='Genotype model used, default median_depth. Options kmer_count, median_depth',
+    help='Genotype model used, default kmer_count. Options kmer_count, median_depth',
     default='kmer_count')
+genotyping_mixin.add_argument(
+    '--ploidy',
+    metavar='ploidy',
+    choices=['diploid', 'haploid'],
+    type=str,
+    help='Use a diploid (includes 0/1 calls) or haploid genotyping model',
+    default='diploid')
 genotyping_mixin.add_argument(
     '--filters',
     help="don't include filtered genotypes",
     nargs='+',
-    default=["MISSING_WT", "LOW_PERCENT_COVERAGE", "LOW_GT_CONF"],
+    default=["MISSING_WT", "LOW_PERCENT_COVERAGE", "LOW_GT_CONF", "LOW_TOTAL_DEPTH"],
     required=False)
 genotyping_mixin.add_argument(
     '--report_all_calls',
@@ -129,12 +140,21 @@ genotyping_mixin.add_argument(
 genotyping_mixin.add_argument(
     "--min_variant_conf",
     help="minimum genotype confidence for variant genotyping",
-    default=100, type=int)
+    default=150, type=int)
 genotyping_mixin.add_argument(
     "--min_gene_conf",
     help="minimum genotype confidence for gene genotyping",
     default=1, type=int)
 genotyping_mixin.add_argument(
+    "--min_proportion_expected_depth",
+    help="minimum depth required on the sum of both alleles. Default 0.3 (30%)",
+    default=0.3, type=float)
+genotyping_mixin.add_argument(
     "--min_gene_percent_covg_threshold",
     help="all genes alleles found above this percent coverage will be reported (default 100 (only best alleles reported))",
     default=100, type=int)
+genotyping_mixin.add_argument(
+    '--output',
+    type=str,
+    help='File path to save output json file as. Default is to stdout.',
+    default='')

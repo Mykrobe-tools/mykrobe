@@ -1,7 +1,7 @@
 Biopython
 pyvcf
 mongoengine
-
+cython
 ## Testing
 detox
 tox

@@ -184,7 +184,7 @@ class McCortexGenoRunner(McCortexRunner):
             self._run_cortex()
         else:
             logger.warning('Not running mccortex. '
-                           'Force flag is false or coverage temp file exists')
+                           'Force flag is false and coverage temp file exists')
 
     def _check_panels(self):
         # If panel does not exists then build it

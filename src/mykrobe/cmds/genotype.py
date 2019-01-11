@@ -65,8 +65,16 @@ def run_main(parser, args):
         variant_confidence_threshold=args.min_variant_conf,
         sequence_confidence_threshold=args.min_gene_conf,
         min_gene_percent_covg_threshold=args.min_gene_percent_covg_threshold,
-        kmer_size=args.kmer)
+        kmer_size=args.kmer,
+        min_proportion_expected_depth=args.min_proportion_expected_depth,
+        ploidy=args.ploidy,
+
+        )
     gt.run()
+    if args.output:
+        with open(args.output, 'w') as outfile:
+            json.dump(gt.out_json, outfile, indent=4)
+                
     if not args.keep_tmp:
         cp.remove_temporary_files()
     return gt.out_json

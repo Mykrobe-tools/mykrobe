@@ -1,4 +1,3 @@
-MIN_CONF = -99999999
 MIN_LLK = -99999999
 DEFAULT_ERROR_RATE = 0.05
 DEFAULT_MINOR_FREQ = 0.2
@@ -27,11 +26,11 @@ class Typer(object):
     def type(self, l):
         raise NotImplemented("Implemented in sub class")
 
-    def likelihoods_to_genotype(self, likelihoods, min_conf=MIN_CONF):
+    def likelihoods_to_genotype(self, likelihoods, min_like=MIN_LLK):
         ml = max(likelihoods)
         i = likelihoods.index(ml)
         if i == 0:
-            if ml <= min_conf:
+            if ml <= min_like:
                 gt = "-/-"
             else:
                 gt = "0/0"

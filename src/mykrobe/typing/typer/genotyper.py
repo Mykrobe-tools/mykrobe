@@ -91,10 +91,9 @@ class CoverageParser(object):
 
     def estimate_depth(self):
         depth = []
-        for variant_coverages in self.variant_covgs.values():
-            for variant_covg in variant_coverages:
-                if variant_covg.reference_coverage.median_depth > 0:
-                    depth.append(variant_covg.reference_coverage.median_depth)
+        for variant_covg in self.variant_covgs.values():
+            if variant_covg.reference_coverage.median_depth > 0:
+                depth.append(variant_covg.reference_coverage.median_depth)
         for spcs in self.gene_presence_covgs.values():
             __median_depth = median(
                 [spc.median_depth for spc in spcs.values()])
@@ -194,67 +193,34 @@ class CoverageParser(object):
                     self.covgs[panel_type][name]["median"] = []
 
     def _parse_variant_panel(self, row):
-        allele, median_depth, min_depth, percent_coverage, k_count, klen = self._parse_summary_covgs_row(
-            row)
-        params = get_params(allele)
+        probe, median_depth, min_depth, percent_coverage, k_count, klen = self._parse_summary_covgs_row(row)
+        params = get_params(probe)
+        probe_type=probe.split('-')[0]
         if 'var_name' in params:
-            var_name = params.get('var_name')
+            var_name = params.get('gene')+"_"+params.get('mut')+"-"+params.get('var_name')
         else:
             var_name = allele.split('?')[0].split('-')[1]
-
-        num_alts = int(params.get("num_alts", 0))
-        reference_coverages = [ProbeCoverage(
-            percent_coverage=percent_coverage,
-            median_depth=median_depth,
-            min_depth=min_depth,
-            k_count=k_count,
-            klen=klen)]
-        alt_or_ref = 'ref'
-        alternate_coverages = []
-        for i in range(num_alts-1):
-            row = next(self.reader)
-            ref_allele, median_depth, min_depth, percent_coverage, k_count, klen = self._parse_summary_covgs_row(
-                row)
-            if ref_allele.split('-')[0] != 'ref':
-                logger.warning(
-                    "Fewer ref alleles than alt alleles for %s" % ref_allele)
-                alternate_coverages.append(ProbeCoverage(
-                    min_depth=min_depth,
-                    k_count=k_count,
-                    percent_coverage=percent_coverage,
-                    median_depth=median_depth,
-                    klen=klen))
-                num_alts -= 1
-                break
-
-            assert ref_allele.split('-')[0] == 'ref'
-            reference_coverages.append(ProbeCoverage(
-                percent_coverage=percent_coverage,
-                median_depth=median_depth,
-                min_depth=min_depth,
-                k_count=k_count,
-                klen=klen))
-        for i in range(num_alts):
-            row = next(self.reader)
-            alt_allele, median_depth, min_depth, percent_coverage, k_count, klen = self._parse_summary_covgs_row(
-                row)
-            assert alt_allele.split('-')[0] == 'alt'
-            alternate_coverages.append(
-                ProbeCoverage(
-                    min_depth=min_depth,
-                    k_count=k_count,
-                    percent_coverage=percent_coverage,
-                    median_depth=median_depth,
-                    klen=klen))
-        variant_probe_coverage = VariantProbeCoverage(
-            reference_coverages=reference_coverages,
-            alternate_coverages=alternate_coverages,
-            var_name=var_name,
-            params=params)
-        try:
-            self.variant_covgs[allele].append(variant_probe_coverage)
-        except KeyError:
-            self.variant_covgs[allele] = [variant_probe_coverage]
+        if not var_name in self.variant_covgs:
+            variant_probe_coverage=VariantProbeCoverage(
+                        reference_coverages=[],
+                        alternate_coverages=[],
+                        var_name=probe,
+                        params=params)
+            self.variant_covgs[var_name] = variant_probe_coverage
+        probe_coverage=ProbeCoverage(
+                        min_depth=min_depth,
+                        k_count=k_count,
+                        percent_coverage=percent_coverage,
+                        median_depth=median_depth,
+                        klen=klen)
+        if probe_type=="ref":
+            self.variant_covgs[var_name].reference_coverages.append(probe_coverage)
+            self.variant_covgs[var_name].best_reference_coverage=self.variant_covgs[var_name]._choose_best_reference_coverage()
+        elif probe_type=="alt":
+            self.variant_covgs[var_name].alternate_coverages.append(probe_coverage)
+            self.variant_covgs[var_name].best_alternate_coverage=self.variant_covgs[var_name]._choose_best_alternate_coverage()                
+        else:
+            raise ValueError("probe_type must be ref or alt")
 
 
 class Genotyper(object):
@@ -277,8 +243,10 @@ class Genotyper(object):
             variant_confidence_threshold=1,
             sequence_confidence_threshold=0,
             min_gene_percent_covg_threshold=100,
-            model="median_depth", 
-            kmer_size=31):
+            model="median_depth",
+            kmer_size=31,
+            min_proportion_expected_depth=0.3,
+            ploidy="diploid"):
         self.sample = sample
         self.variant_covgs = variant_covgs
         self.gene_presence_covgs = gene_presence_covgs
@@ -302,6 +270,8 @@ class Genotyper(object):
         self.sequence_confidence_threshold = sequence_confidence_threshold
         self.min_gene_percent_covg_threshold = min_gene_percent_covg_threshold
         self.kmer_size = kmer_size
+        self.min_proportion_expected_depth = min_proportion_expected_depth
+        self.ploidy = ploidy
 
     def run(self):
         self._type()
@@ -335,18 +305,22 @@ class Genotyper(object):
             confidence_threshold=self.variant_confidence_threshold,
             filters=self.filters,
             model=self.model,
-            kmer_size=self.kmer_size
+            kmer_size=self.kmer_size,
+            min_proportion_expected_depth=self.min_proportion_expected_depth,
+            ploidy=self.ploidy,
+
         )
         genotypes = []
         filters = []
-        for probe_name, probe_coverages in self.variant_covgs.items():
-            probe_id = self._name_to_id(probe_name)
+        for probe_id, probe_coverages in self.variant_covgs.items():
+            probe_name = self._name_to_id(probe_coverages.var_name)
+
             variant = None
 
             call = gt.type(probe_coverages, variant=probe_name)
 
             genotypes.append(sum(call["genotype"]))
-            filters.append(int(call["info"]["filter"] == "PASS"))
+            filters.append(int(call["info"]["filter"] == []))
             if sum(call["genotype"]) > 0 or not call[
                     "genotype"] or self.report_all_calls:
                 self.variant_calls[probe_name] = call
@@ -385,3 +359,42 @@ class Genotyper(object):
                 info=params)
         except AttributeError:
             return None
+
+
+    def estimate_kmer_count_error_rate_and_incorrect_kmer_to_percent_cov(self):
+        '''Returns error rate of kmer counts, as a float in the interval [0,1],
+        and dict of incorrect kmer count to mean observed percent allele coverage'''
+        correct_kmer_count = 0
+        incorrect_kmer_count = 0
+        incorrect_kmer_to_pc_cov = {}
+
+        for probe_id, variant_call in self.variant_calls_dict.items():
+            try:
+                genotype = variant_call["genotype"]
+                cov_dict = variant_call["info"]["coverage"]
+            except:
+                continue
+
+            if genotype == [0, 0]:
+                correct_kmer_count += cov_dict["reference"]["kmer_count"]
+                incorrect_kmer = cov_dict["alternate"]["kmer_count"]
+                pc_cov = cov_dict["alternate"]["percent_coverage"]
+            elif genotype == [1, 1]:
+                correct_kmer_count += cov_dict["alternate"]["kmer_count"]
+                incorrect_kmer = cov_dict["reference"]["kmer_count"]
+                pc_cov = cov_dict["reference"]["percent_coverage"]
+            else:
+                continue
+
+            incorrect_kmer_count += incorrect_kmer
+            if incorrect_kmer not in incorrect_kmer_to_pc_cov:
+                incorrect_kmer_to_pc_cov[incorrect_kmer] = []
+            incorrect_kmer_to_pc_cov[incorrect_kmer].append(pc_cov)
+
+        for incorrect_kmer, cov_list in incorrect_kmer_to_pc_cov.items():
+            incorrect_kmer_to_pc_cov[incorrect_kmer] = sum(cov_list) / len(cov_list)
+
+        incorrect_kmer_to_pc_cov[0] = 0
+        error_rate = incorrect_kmer_count / (incorrect_kmer_count + correct_kmer_count)
+        return error_rate, incorrect_kmer_to_pc_cov
+

@@ -11,14 +11,18 @@ def percent_coverage_from_expected_coverage(coverage):
     return 1 - exp(-coverage)
 
 
-def log_lik_probability_of_N_gaps(depth, percent_coverage):
-    L = 32
+def log_lik_probability_of_N_gaps(depth, percent_coverage, L):
     percent_coverage = float(percent_coverage)/100
     n_gaps = int(round(L-(L*percent_coverage)))
-
     expected_n_gaps = exp(-depth) * L
-
-    return log_poisson_prob(expected_n_gaps, n_gaps)
+    try:
+        log_like= log_poisson_prob(expected_n_gaps, n_gaps)
+    except ValueError:
+        ## For very high coverage samples, expected_n_gaps goes to 0.0 breaking math.log
+        if expected_n_gaps<=0:
+            expected_n_gaps=1e-308        
+        log_like= log_poisson_prob(expected_n_gaps, n_gaps)
+    return log_like
 
 
 def log_poisson_prob(lam, k):
@@ -52,10 +56,6 @@ def log_lik_R_S_coverage(observed_alternate_depth,
         lam=expected_reference_depth,
         k=observed_reference_depth)
     return lne + le
-
-
-def depth_to_expected_kmer_count(depth):
-    return 32*depth+0.01
 
 
 def log_lik_R_S_kmer_count(observed_reference_kmer_count,

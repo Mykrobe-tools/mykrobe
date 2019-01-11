@@ -4,10 +4,18 @@ logger = logging.getLogger(__name__)
 
 from pprint import pprint
 import json
+
+import numpy as np
 import os
+import random
+import time
+from mykrobe.mformat import json_to_csv
 from mykrobe.utils import check_args
 from mykrobe.typing import CoverageParser
 from mykrobe.typing import Genotyper
+from mykrobe.typing.models.base import ProbeCoverage
+from mykrobe.typing.models.variant import VariantProbeCoverage
+from mykrobe.typing.typer.variant import VariantTyper
 from mykrobe.predict import TBPredictor
 from mykrobe.predict import StaphPredictor
 from mykrobe.predict import MykrobePredictorSusceptibilityResult
@@ -29,6 +37,95 @@ GN_PANELS = [
     "data/panels/Escherichia_coli",
     "data/panels/Klebsiella_pneumoniae",
     "data/panels/gn-amr-genes-extended"]
+
+
+random.seed(42)
+
+class ConfThresholder:
+    def __init__(self, error_rate, mean_depth, kmer_length, incorrect_kmer_to_pc_cov, iterations=10000):
+        self.error_rate = error_rate
+        self.mean_depth = mean_depth
+        self.iterations = iterations
+        self.incorrect_kmer_to_pc_cov = incorrect_kmer_to_pc_cov
+        self.kmer_length = kmer_length
+
+        # For now, store the coverage as well, in case we need to debug.
+        # In future, could just store the confidences, as that's all we
+        # need to decide on the cutoff
+        self.log_conf_and_covg = []
+
+
+    @classmethod
+    def _simulate_percent_coverage(cls, kmers_to_sample, kmers_in_allele):
+        '''Simulates sampling kmers, returning the percent coverage.
+        This means the % of kmers that are found by the simulation'''
+        found_kmers = set()
+
+        for _ in range(kmers_to_sample):
+            j = random.randint(1, kmers_in_allele)
+            found_kmers.add(j)
+            if len(found_kmers) == kmers_in_allele:
+                return 100.0
+
+        return 100 * len(found_kmers) / kmers_in_allele
+
+
+    @classmethod
+    def _get_incorrect_kmer_percent_cov(cls, k_count, incorrect_kmer_to_pc_cov):
+        i = k_count
+        while i >= 0:
+            if i in incorrect_kmer_to_pc_cov:
+                return incorrect_kmer_to_pc_cov[i]
+            i -= 1
+
+        return 0
+
+
+    def _simulate_snps(self):
+        correct_covg = np.random.poisson(lam=self.mean_depth, size=self.iterations)
+        incorrect_covg = np.random.binomial(self.mean_depth, self.error_rate, size=self.iterations)
+        #f = open('test.simulate_snps_data.tsv', 'w')
+        #print('Correct_cov', 'Incorrect_cov', 'correct_k_count', 'incorrect_k_count', 'correct_percent_coverage', 'incorrect_percent_coverage', 'Cov', 'Conf', sep='\t', file=f)
+        probe_coverage_list = []
+        vtyper = VariantTyper([self.mean_depth], error_rate=self.error_rate, kmer_size=self.kmer_length)
+
+        for i in range(self.iterations):
+            if correct_covg[i] + incorrect_covg[i] == 0:
+                continue
+
+            min_depth = 1 # not used?
+            # Check what allele_length means in depth_to_expected_kmer_coun()! Probably need to change next two lines...
+            correct_k_count = (self.kmer_length * correct_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
+            incorrect_k_count = (self.kmer_length * incorrect_covg[i]) + 0.01 # see KmerCountGenotypeModel.depth_to_expected_kmer_count()
+
+            #correct_percent_coverage = ConfThresholder._simulate_percent_coverage(int(correct_k_count), 2 + self.kmer_length)
+            #incorrect_percent_coverage = ConfThresholder._simulate_percent_coverage(int(incorrect_k_count), 2 + self.kmer_length)
+            correct_percent_coverage = 100
+            incorrect_percent_coverage = ConfThresholder._get_incorrect_kmer_percent_cov(int(incorrect_k_count), self.incorrect_kmer_to_pc_cov)
+            correct_probe_coverage = ProbeCoverage(correct_percent_coverage, self.mean_depth, min_depth, correct_k_count, self.kmer_length)
+            incorrect_probe_coverage = ProbeCoverage(incorrect_percent_coverage, self.mean_depth, min_depth, incorrect_k_count, self.kmer_length)
+            vpc = VariantProbeCoverage([correct_probe_coverage], [incorrect_probe_coverage])
+            call = vtyper.type(vpc)
+
+            cov = np.log10(correct_covg[i] + incorrect_covg[i])
+            conf = call['info']['conf']
+            self.log_conf_and_covg.append((conf, cov))
+            #print(correct_covg[i], incorrect_covg[i], correct_k_count, incorrect_k_count, correct_percent_coverage, incorrect_percent_coverage, cov, conf, sep='\t', file=f)
+
+        #f.close()
+        self.log_conf_and_covg.sort(reverse=True)
+
+
+    def get_conf_threshold(self, percent_to_keep=95):
+        '''percent_to_keep determines the confidence cutoff in terms of
+        simulatead confience scores. Should be in (0,100]. eg default of 95
+        means that we choose a cutoff that would keep 95% of the data'''
+        if len(self.log_conf_and_covg) == 0:
+            self._simulate_snps()
+
+        conf_cutoff_index = min(int(0.01 * percent_to_keep * len(self.log_conf_and_covg)), len(self.log_conf_and_covg) - 1)
+        return self.log_conf_and_covg[conf_cutoff_index][0]
+
 
 
 class MykrobePredictorResult(object):
@@ -65,20 +162,48 @@ class MykrobePredictorResult(object):
     # variant_calls = DictField()
     # sequence_calls = DictField()
 
+def describe_panels(parser, args):
+    all_panels={"tb":
+                {"bradley-2015":"AMR panel described in Bradley, P et al. Rapid antibiotic-resistance predictions from genome sequence data for Staphylococcus aureus and Mycobacterium tuberculosis. Nat. Commun. 6:10063 doi: 10.1038/ncomms10063 (2015).",
+                 "walker-2015":"AMR panel described in Walker, Timothy M et al. Whole-genome sequencing for prediction of Mycobacterium tuberculosis drug susceptibility and resistance: a retrospective cohort study. The Lancet Infectious Diseases , Volume 15 , Issue 10 , 1193 - 1202",
+                  "201901":"AMR panel based on first line drugs from NEJM-2018 variants (DOI 10.1056/NEJMoa1800474), and second line drugs from Walker 2015 panel."},
+            "staph":{"default":"AMR panel described in Bradley, P et al. Rapid antibiotic-resistance predictions from genome sequence data for Staphylococcus aureus and Mycobacterium tuberculosis. Nat. Commun. 6:10063 doi: 10.1038/ncomms10063 (2015)."}}
+    print("\t".join(["species", "panel-name", "description"]))            
+    for species, panels in all_panels.items():
+        for panel_name, description in panels.items():
+            print("\t".join([species, panel_name, description]))            
+
+        
 
 def run(parser, args):
     base_json = {args.sample: {}}
     args = parser.parse_args()
     hierarchy_json_file = None
     if args.panel is not None:
-        if args.panel == "bradley-2015":
+        variant_to_resistance_json_fp=None
+        if args.species == "tb" and args.panel == "bradley-2015":
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
-                "data/panels/tb-bradley-probe-set-feb-09-2017.fasta.gz"]
-        elif args.panel == "walker-2015":
+                "data/panels/tb-bradley-probe-set-jan-2019.fasta.gz"]
+        elif args.species == "tb" and  args.panel == "walker-2015":
             TB_PANELS = [
                 "data/panels/tb-species-170421.fasta.gz",
-                "data/panels/tb-walker-probe-set-feb-09-2017.fasta.gz"]
+                "data/panels/tb-walker-probe-set-jan-2019.fasta.gz"]
+        elif args.species == "tb" and  args.panel == "201901":
+            TB_PANELS = [
+                "data/panels/tb-species-170421.fasta.gz",
+                "data/panels/tb-hunt-probe-set-jan-03-2019.fasta.gz"]                
+            data_dir = os.path.abspath(
+                        os.path.join(
+                        os.path.dirname(__file__),
+                        '../data/predict/tb/'))
+            variant_to_resistance_json_fp=os.path.join(data_dir,
+                "variant_to_resistance_drug-jan-03-2019.json")                
+        elif args.species == "tb" and args.panel == "atlas":
+            TB_PANELS = [
+                "data/panels/tb-species-170421.fasta.gz",
+                "data/panels/tb-walker-probe-set-jan-2019.fasta.gz",
+                "data/panels/tb-k21-probe-set-feb-09-2017.fasta.gz"]
         elif args.panel == "custom":
             if not args.custom_probe_set_path:
                 raise ValueError("Custom panel requires custom_probe_set_path")
@@ -86,6 +211,7 @@ def run(parser, args):
                 args.custom_probe_set_path,
                 "data/panels/tb-species-170421.fasta.gz"
             ]
+            variant_to_resistance_json_fp=args.custom_variant_to_resistance_json
     Predictor = None
     if not args.species:
         panels = TB_PANELS + GN_PANELS + STAPH_PANELS
@@ -93,6 +219,7 @@ def run(parser, args):
         panels = STAPH_PANELS
         Predictor = StaphPredictor
         args.kmer = 15  # Forced
+        variant_to_resistance_json_fp=None
     elif args.species == "tb":
         panels = TB_PANELS
         hierarchy_json_file = "data/phylo/mtbc_hierarchy.json"
@@ -116,10 +243,19 @@ def run(parser, args):
                 hierarchy_json_file))
     if args.ont:
         args.expected_error_rate = 0.15
-        logger.debug("Setting expected error rate to %s (--ont)" %
+        args.ploidy = "haploid"
+        args.ignore_minor_calls = True
+        logger.warning("Setting ploidy to haploid")
+        logger.warning("Setting ignore_minor_calls to True")
+        logger.warning("Setting expected error rate to %s (--ont)" %
                      args.expected_error_rate)
-        args.filters = ["LOW_GT_CONF"]
         args.model = "kmer_count"
+
+    # If the user didn't specify the conf_percent_cutoff, then set it
+    # depending on whether or not the --ont flag was used
+    if args.conf_percent_cutoff == -1:
+        args.conf_percent_cutoff = 90 if args.ont else 100
+
     # Run Cortex
     cp = CoverageParser(
         sample=args.sample,
@@ -184,9 +320,45 @@ def run(parser, args):
                        variant_confidence_threshold=args.min_variant_conf,
                        sequence_confidence_threshold=args.min_gene_conf,
                        model=args.model,
-                       kmer_size=args.kmer
+                       kmer_size=args.kmer,
+                       min_proportion_expected_depth=args.min_proportion_expected_depth,
+                       ploidy=args.ploidy
                        )
         gt.run()
+
+        # conf_percent_cutoff == 100 means that we want to keep all variant calls,
+        # in which case there is no need to run the simulations
+        if args.conf_percent_cutoff < 100:
+            kmer_count_error_rate, incorrect_kmer_to_pc_cov = gt.estimate_kmer_count_error_rate_and_incorrect_kmer_to_percent_cov()
+            logger.info("Estimated error rate for kmer count model: " + str(round(100 * kmer_count_error_rate, 2)) + "%")
+            logger.info("Expected depth: " + str(depths[0]))
+            conf_thresholder = ConfThresholder(kmer_count_error_rate, depths[0], args.kmer, incorrect_kmer_to_pc_cov)
+            time_start = time.time()
+            conf_threshold = conf_thresholder.get_conf_threshold(percent_to_keep=args.conf_percent_cutoff)
+            time_end = time.time()
+            time_to_sim = time_end - time_start
+            logger.info('Simulation time: ' + str(time_to_sim))
+            logger.info("Confidence cutoff (using percent cutoff " + str(args.conf_percent_cutoff) + "%): " + str(conf_threshold))
+            gt = Genotyper(sample=args.sample,
+                           expected_depths=depths,
+                           expected_error_rate=kmer_count_error_rate,
+                           #expected_error_rate=args.expected_error_rate,
+                           variant_covgs=cp.variant_covgs,
+                           gene_presence_covgs=cp.covgs["presence"],
+                           base_json=base_json,
+                           contamination_depths=[],
+                           report_all_calls=True,
+                           ignore_filtered=True,
+                           filters=args.filters,
+                           variant_confidence_threshold=conf_threshold,
+                           sequence_confidence_threshold=args.min_gene_conf,
+                           model=args.model,
+                           kmer_size=args.kmer,
+                           min_proportion_expected_depth=args.min_proportion_expected_depth,
+                           ploidy=args.ploidy
+                           )
+            gt.run()
+
         variant_calls_dict = gt.variant_calls_dict
         sequence_calls_dict = gt.sequence_calls_dict
     else:
@@ -199,8 +371,8 @@ def run(parser, args):
                               base_json=base_json[args.sample],
                               depth_threshold=args.min_depth,
                               ignore_filtered=True,
-                              ignore_minor_calls=args.ont,
-                              variant_to_resistance_json_fp=args.custom_variant_to_resistance_json)
+                              ignore_minor_calls=args.ignore_minor_calls,
+                              variant_to_resistance_json_fp=variant_to_resistance_json_fp)
         mykrobe_predictor_susceptibility_result = predictor.run()
     base_json[
         args.sample] = MykrobePredictorResult(
@@ -217,8 +389,17 @@ def run(parser, args):
         cp.remove_temporary_files()
 
     # write to file is specified by user, otherwise send to stdout
+    if args.output_format == "csv":
+        output=json_to_csv(base_json)
+    else:
+        ## Verbose json output requires --report_all_calls
+        if not args.report_all_calls:
+            del base_json[args.sample]["variant_calls"]
+            del base_json[args.sample]["sequence_calls"]        
+        output=json.dumps(base_json, indent=4)
+
     if args.output:
         with open(args.output, 'w') as outfile:
-            json.dump(base_json, outfile, indent=4)
+            outfile.write(output)
     else:
-        print(json.dumps(base_json, indent=4))
+        print(output)

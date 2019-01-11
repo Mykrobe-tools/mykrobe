@@ -277,7 +277,7 @@ class TestVariantTyperWithLowMinimum(TestCase):
 
         call = self.vt2_no_contaim.type(v1)
         assert call['genotype'] == [1, 1]
-        assert call["info"]["conf"] < 100
+        assert call["info"]["conf"] < 150
 
     def test_4(self):
         vt = VariantTyper(
