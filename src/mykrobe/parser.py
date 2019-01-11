@@ -116,6 +116,13 @@ parser_amr.add_argument(
     type=float,
     help='Number between 0 and 100. Determines --min_variant_conf, by simulating variants and choosing the cutoff that would keep x% of the variants. Default is 90 if --ont, otherwise --min_variant_conf is used as the cutoff',
     default=-1)
+parser_amr.add_argument(
+    '--format',
+    dest='output_format',
+    type=str,
+    help='Choose output format. Default: csv.',
+    choices=['json', 'csv'],
+    default='csv')
 parser_amr.set_defaults(func=run_subtool)
 
 # ##################
