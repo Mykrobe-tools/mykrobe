@@ -99,7 +99,11 @@ genotyping_mixin = argparse.ArgumentParser(add_help=False)
 genotyping_mixin.add_argument(
     '--ont',
     action='store_true',
-    help='Set default for ONT data. Sets expected_error_rate to 0.15 and ploidy to haploid')
+    help='Set default for ONT data. Sets expected_error_rate to 0.15 and to haploid')
+genotyping_mixin.add_argument(
+    '--guess_sequence_method',
+    action='store_true', 
+    help="Guess if ONT or Illumia based on error rate. If error rate is > 10%, ploidy is set to haploid and a confidence threshold is used ")
 genotyping_mixin.add_argument(
     '--ignore_minor_calls',
     action='store_true',
