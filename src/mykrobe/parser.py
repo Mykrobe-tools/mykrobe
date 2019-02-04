@@ -57,7 +57,7 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("--version", help="mykrobe-atlas version",
                     action="version",
-                    version="%(prog)s " + str(__version__))
+                    version="%%(prog)s " + str(__version__))
 subparsers = parser.add_subparsers(
     title='[sub-commands]',
     dest='command',
@@ -91,7 +91,7 @@ parser_amr.add_argument(
     '--panel',
     metavar='panel',
     type=str,
-    help='variant panel (default:walker-2015). custom requires custom_probe_set_path and custom_variant_to_resistance_json to be set',
+    help='variant panel (default:201901). custom requires custom_probe_set_path and custom_variant_to_resistance_json to be set',
     choices=['bradley-2015', 'walker-2015', '201901', 'atlas', 'custom'],
     default='201901')
 parser_amr.add_argument(
@@ -116,7 +116,7 @@ parser_amr.add_argument(
     '--conf_percent_cutoff',
     metavar='conf_percent_cutoff',
     type=float,
-    help='Number between 0 and 100. Determines --min_variant_conf, by simulating variants and choosing the cutoff that would keep x% of the variants. Default is 90 if --ont, otherwise --min_variant_conf is used as the cutoff',
+    help='Number between 0 and 100. Determines --min_variant_conf, by simulating variants and choosing the cutoff that would keep x%% of the variants. Default is 90 if --ont, otherwise --min_variant_conf is used as the cutoff',
     default=-1)
 parser_amr.add_argument(
     '--format',
