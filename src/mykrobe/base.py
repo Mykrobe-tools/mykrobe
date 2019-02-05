@@ -103,7 +103,7 @@ genotyping_mixin.add_argument(
 genotyping_mixin.add_argument(
     '--guess_sequence_method',
     action='store_true', 
-    help="Guess if ONT or Illumia based on error rate. If error rate is > 10%, ploidy is set to haploid and a confidence threshold is used ")
+    help="Guess if ONT or Illumia based on error rate. If error rate is > 10%%, ploidy is set to haploid and a confidence threshold is used ")
 genotyping_mixin.add_argument(
     '--ignore_minor_calls',
     action='store_true',
@@ -151,7 +151,7 @@ genotyping_mixin.add_argument(
     default=1, type=int)
 genotyping_mixin.add_argument(
     "--min_proportion_expected_depth",
-    help="minimum depth required on the sum of both alleles. Default 0.3 (30%)",
+    help="minimum depth required on the sum of both alleles. Default 0.3 (30%%)",
     default=0.3, type=float)
 genotyping_mixin.add_argument(
     "--min_gene_percent_covg_threshold",
