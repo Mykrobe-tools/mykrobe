@@ -395,6 +395,9 @@ class Genotyper(object):
             incorrect_kmer_to_pc_cov[incorrect_kmer] = sum(cov_list) / len(cov_list)
 
         incorrect_kmer_to_pc_cov[0] = 0
-        error_rate = incorrect_kmer_count / (incorrect_kmer_count + correct_kmer_count)
+        if (incorrect_kmer_count+correct_kmer_count)==0:
+            error_rate= self.expected_error_rate
+        else:
+            error_rate = incorrect_kmer_count / (incorrect_kmer_count + correct_kmer_count)
         return error_rate, incorrect_kmer_to_pc_cov
 
