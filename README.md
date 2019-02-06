@@ -502,9 +502,18 @@ Please cite us if you use Mykrobe predictor in a publication
 
 # Tests
 To run tests:
-    
-    pip install tox
-    tox
+
+Requires `mongod`. [Download](https://www.mongodb.com/download-center/community).
+```
+mongod
+```
+
+and in another window. 
+
+```
+  pip install tox
+  tox
+```
 
 To run tests for a particular python version run, e.g. python 3.6:
 
