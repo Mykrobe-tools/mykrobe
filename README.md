@@ -21,6 +21,14 @@ Tested on python 2.7, 3.4, 3.5, and 3.6.
     pip install .
     
 
+To install this package with conda run one of the following:
+```
+conda install -c bioconda mykrobe 
+conda install -c bioconda/label/cf201901 mykrobe 
+```
+Thanks to [@mbhall98](https://github.com/mbhall88) for his conda recipe. https://anaconda.org/bioconda/mykrobe
+
+
 This will install two executables: mykrobe and mccortex31 (a fork of [mccortex](https://github.com/mcveanlab/mccortex)).
 
 ## Usage
