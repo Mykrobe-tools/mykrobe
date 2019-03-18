@@ -50,7 +50,7 @@ This will install two executables: mykrobe and mccortex31 (a fork of [mccortex](
 ### AMR prediction (Mykrobe predictor)
 
     mykrobe predict --help
-    usage: mykrobe-atlas predict [-h] [-k kmer] [--tmp TMP] [--keep_tmp]
+    usage: mykrobe predict [-h] [-k kmer] [--tmp TMP] [--keep_tmp]
                              [--skeleton_dir SKELETON_DIR]
                              [--mccortex31_path MCCORTEX31_PATH] [-t THREADS]
                              [-m MEMORY] [--expected_depth EXPECTED_DEPTH]
@@ -382,7 +382,7 @@ If you use one of the following panels please cite the relevant publications:
 
 This is optional but will make any probe sets built more robust to variation in within k-1 bases of the key variants. This will require [mongoDB](https://www.mongodb.com/) > 3.0 running in the background.
 
-    usage: mykrobe-atlas variants add [-h] [--db_name db_name] [-f] [-q]
+    usage: mykrobe variants add [-h] [--db_name db_name] [-f] [-q]
                                       [-m METHOD]
                                       vcf reference_set
     
