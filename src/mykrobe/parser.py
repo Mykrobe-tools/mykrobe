@@ -58,7 +58,7 @@ class ArgumentParserWithDefaults(argparse.ArgumentParser):
 # create the top-level parser
 #########################################
 parser = argparse.ArgumentParser(
-    prog="mykrobe-atlas", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    prog="mykrobe", formatter_class=argparse.ArgumentDefaultsHelpFormatter
 )
 parser.add_argument(
     "--version",
