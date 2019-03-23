@@ -32,41 +32,51 @@ This will install two executables: mykrobe and mccortex31 (a fork of [mccortex](
 ## Usage
 
     mykrobe --help
-    usage: mykrobe [-h] [--version] {predict,variants,vars,genotype} ...
+    usage: mykrobe-atlas [-h] [--version]
+                         {predict,panels,variants,vars,genotype} ...
 
     optional arguments:
       -h, --help            show this help message and exit
       --version             mykrobe-atlas version
 
     [sub-commands]:
-      {predict,variants,vars,genotype}
+      {predict,panels,variants,vars,genotype}
         predict             predict the sample's drug susceptibility
+        panels              A description of the AMR panels available within
+                            Mykrobe predict
         variants (vars)     build variant probes
         genotype            genotype a sample using a probe set
 
 ### AMR prediction (Mykrobe predictor)
 
     mykrobe predict --help
-    usage: mykrobe-atlas predict [-h] [-k kmer] [--tmp TMP] [--keep_tmp]
+    usage: mykrobe predict [-h] [-k kmer] [--tmp TMP] [--keep_tmp]
                              [--skeleton_dir SKELETON_DIR]
                              [--mccortex31_path MCCORTEX31_PATH] [-t THREADS]
                              [-m MEMORY] [--expected_depth EXPECTED_DEPTH]
                              [-1 seq [seq ...]] [-c ctx] [-f] [--ont]
+                             [--guess_sequence_method] [--ignore_minor_calls]
                              [--ignore_filtered IGNORE_FILTERED]
-                             [--model model] [--filters FILTERS [FILTERS ...]]
+                             [--model model] [--ploidy ploidy]
+                             [--filters FILTERS [FILTERS ...]]
                              [--report_all_calls]
                              [--expected_error_rate EXPECTED_ERROR_RATE]
                              [--min_variant_conf MIN_VARIANT_CONF]
                              [--min_gene_conf MIN_GENE_CONF]
+                             [--min_proportion_expected_depth MIN_PROPORTION_EXPECTED_DEPTH]
                              [--min_gene_percent_covg_threshold MIN_GENE_PERCENT_COVG_THRESHOLD]
-                             [-q] [--panel panel] [--min_depth min_depth]
-                             [--output OUTPUT]
+                             [--output OUTPUT] [-q] [--panel panel]
+                             [--custom_probe_set_path custom_probe_set_path]
+                             [--custom_variant_to_resistance_json custom_variant_to_resistance_json]
+                             [--min_depth min_depth]
+                             [--conf_percent_cutoff conf_percent_cutoff]
+                             [--format {json,csv}]
                              sample species
 
     positional arguments:
       sample                sample id
       species               species
-    
+
     optional arguments:
       -h, --help            show this help message and exit
       -k kmer, --kmer kmer  kmer length (default:21)
@@ -86,11 +96,19 @@ This will install two executables: mykrobe and mccortex31 (a fork of [mccortex](
                             sequence files (fasta,fastq,bam)
       -c ctx, --ctx ctx     cortex graph binary
       -f, --force           force
-      --ont                 Set default for ONT data
+      --ont                 Set default for ONT data. Sets expected_error_rate to
+                            0.15 and to haploid
+      --guess_sequence_method
+                            Guess if ONT or Illumia based on error rate. If error
+                            rate is > 10%, ploidy is set to haploid and a
+                            confidence threshold is used
+      --ignore_minor_calls  Ignore minor calls when running resistance prediction
       --ignore_filtered IGNORE_FILTERED
                             don't include filtered genotypes
-      --model model         Genotype model used, default median_depth. Options
+      --model model         Genotype model used, default kmer_count. Options
                             kmer_count, median_depth
+      --ploidy ploidy       Use a diploid (includes 0/1 calls) or haploid
+                            genotyping model
       --filters FILTERS [FILTERS ...]
                             don't include filtered genotypes
       --report_all_calls    report all calls
@@ -101,34 +119,49 @@ This will install two executables: mykrobe and mccortex31 (a fork of [mccortex](
                             minimum genotype confidence for variant genotyping
       --min_gene_conf MIN_GENE_CONF
                             minimum genotype confidence for gene genotyping
+      --min_proportion_expected_depth MIN_PROPORTION_EXPECTED_DEPTH
+                            minimum depth required on the sum of both alleles.
+                            Default 0.3 (30%)
       --min_gene_percent_covg_threshold MIN_GENE_PERCENT_COVG_THRESHOLD
                             all genes alleles found above this percent coverage
                             will be reported (default 100 (only best alleles
                             reported))
-      -q, --quiet           do not output warnings to stderr
-      --panel panel         variant panel (default:walker-2015)
-      --min_depth min_depth
-                            min_depth
       --output OUTPUT       File path to save output json file as. Default is to
                             stdout.
+      -q, --quiet           do not output warnings to stderr
+      --panel panel         variant panel (default:201901). custom requires
+                            custom_probe_set_path and
+                            custom_variant_to_resistance_json to be set
+      --custom_probe_set_path custom_probe_set_path
+                            For use with `--panel custom`. File path to fasta file
+                            from `mykrobe make-probes`.
+      --custom_variant_to_resistance_json custom_variant_to_resistance_json
+                            For use with `--panel custom`. File path to JSON with
+                            key,value pairs of variant names and induced drug
+                            resistance.
+      --min_depth min_depth
+                            min_depth
+      --conf_percent_cutoff conf_percent_cutoff
+                            Number between 0 and 100. Determines
+                            --min_variant_conf, by simulating variants and
+                            choosing the cutoff that would keep x% of the
+                            variants. Default is 90 if --ont, otherwise
+                            --min_variant_conf is used as the cutoff
+      --format {json,csv}   Choose output format. Default: csv.
 
 #### Examples
 
 ```bash
-mykrobe predict tb_sample_id tb -1 tb_sequence.bam/fq --output results.json
+mykrobe predict tb_sample_id tb -1 tb_sequence.bam/fq --format json --output results.json
 # send output to stdout instead
-mykrobe predict staph_sample_id staph -1 staph_sequence.bam/fq
+mykrobe predict staph_sample_id staph -1 staph_sequence.bam/fq > result.csv
 ```
     
 
-
-e.g.
-
-    mykrobe predict ERR117639 /download/ena/ERR117639*.gz tb
     
 ### Output
 
-Output is in JSON format. To convert to a less verbose tabular format use [json_to_tsv](scripts/json_to_tsv.py).
+Output is in CSV by default. For a more detailed output use the JSON format with `--format json`.
 
     {
         "sample_id": {
@@ -204,26 +237,28 @@ If you use one of the following panels please cite the relevant publications:
 ### Genotyping a pre-built probe set
 
     mykrobe genotype --help
-    usage: mykrobe genotype [-h] [-k kmer] [--tmp TMP] [--keep_tmp]
+    usage: mykrobe-atlas genotype [-h] [-k kmer] [--tmp TMP] [--keep_tmp]
                                   [--skeleton_dir SKELETON_DIR]
                                   [--mccortex31_path MCCORTEX31_PATH] [-t THREADS]
                                   [-m MEMORY] [--expected_depth EXPECTED_DEPTH]
                                   [-1 seq [seq ...]] [-c ctx] [-f] [--ont]
+                                  [--guess_sequence_method] [--ignore_minor_calls]
                                   [--ignore_filtered IGNORE_FILTERED]
-                                  [--model model]
+                                  [--model model] [--ploidy ploidy]
                                   [--filters FILTERS [FILTERS ...]]
                                   [--report_all_calls]
                                   [--expected_error_rate EXPECTED_ERROR_RATE]
                                   [--min_variant_conf MIN_VARIANT_CONF]
                                   [--min_gene_conf MIN_GENE_CONF]
+                                  [--min_proportion_expected_depth MIN_PROPORTION_EXPECTED_DEPTH]
                                   [--min_gene_percent_covg_threshold MIN_GENE_PERCENT_COVG_THRESHOLD]
-                                  [-q]
+                                  [--output OUTPUT] [-q]
                                   sample probe_set
-    
+
     positional arguments:
       sample                sample id
       probe_set             probe_set
-    
+
     optional arguments:
       -h, --help            show this help message and exit
       -k kmer, --kmer kmer  kmer length (default:21)
@@ -243,11 +278,19 @@ If you use one of the following panels please cite the relevant publications:
                             sequence files (fasta,fastq,bam)
       -c ctx, --ctx ctx     cortex graph binary
       -f, --force           force
-      --ont                 Set default for ONT data
+      --ont                 Set default for ONT data. Sets expected_error_rate to
+                            0.15 and to haploid
+      --guess_sequence_method
+                            Guess if ONT or Illumia based on error rate. If error
+                            rate is > 10%, ploidy is set to haploid and a
+                            confidence threshold is used
+      --ignore_minor_calls  Ignore minor calls when running resistance prediction
       --ignore_filtered IGNORE_FILTERED
                             don't include filtered genotypes
-      --model model         Genotype model used, default median_depth. Options
+      --model model         Genotype model used, default kmer_count. Options
                             kmer_count, median_depth
+      --ploidy ploidy       Use a diploid (includes 0/1 calls) or haploid
+                            genotyping model
       --filters FILTERS [FILTERS ...]
                             don't include filtered genotypes
       --report_all_calls    report all calls
@@ -258,10 +301,15 @@ If you use one of the following panels please cite the relevant publications:
                             minimum genotype confidence for variant genotyping
       --min_gene_conf MIN_GENE_CONF
                             minimum genotype confidence for gene genotyping
+      --min_proportion_expected_depth MIN_PROPORTION_EXPECTED_DEPTH
+                            minimum depth required on the sum of both alleles.
+                            Default 0.3 (30%)
       --min_gene_percent_covg_threshold MIN_GENE_PERCENT_COVG_THRESHOLD
                             all genes alleles found above this percent coverage
                             will be reported (default 100 (only best alleles
                             reported))
+      --output OUTPUT       File path to save output json file as. Default is to
+                            stdout.
       -q, --quiet           do not output warnings to stderr
       
 #### Examples
@@ -334,7 +382,7 @@ If you use one of the following panels please cite the relevant publications:
 
 This is optional but will make any probe sets built more robust to variation in within k-1 bases of the key variants. This will require [mongoDB](https://www.mongodb.com/) > 3.0 running in the background.
 
-    usage: mykrobe-atlas variants add [-h] [--db_name db_name] [-f] [-q]
+    usage: mykrobe variants add [-h] [--db_name db_name] [-f] [-q]
                                       [-m METHOD]
                                       vcf reference_set
     
