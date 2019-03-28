@@ -12,7 +12,7 @@ Tested on python 2.7, 3.4, 3.5, and 3.6.
 
 ## Installation
 
-    git clone https://github.com/Mykrobe-tools/mykrobe-atlas-cli.git mykrobe
+    git clone https://github.com/Mykrobe-tools/mykrobe.git mykrobe
     cd mykrobe
     
     ## Download pre-built probesets
