@@ -45,7 +45,7 @@ setup(
     name='mykrobe',
     version='0.6.1',
     license='MIT',
-    description='Mykrobe atlas',
+    description='Antibiotic resistance prediction in minutes',
     # long_description='%s\n%s' % (
     #     re.compile('^.. start-badges.*^.. end-badges',
     #                re.M | re.S).sub('', read('README.md')),
@@ -53,7 +53,7 @@ setup(
     # ),
     author='Phelim Bradley',
     author_email='wave@phel.im',
-    url='https://github.com/phelimb/mykrobe-atlas-cli',
+    url='https://github.com/Mykrobe-tools/mykrobe',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(path))[0] for path in glob(
