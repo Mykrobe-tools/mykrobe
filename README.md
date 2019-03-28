@@ -32,7 +32,7 @@ This will install two executables: mykrobe and mccortex31 (a fork of [mccortex](
 ## Usage
 
     mykrobe --help
-    usage: mykrobe-atlas [-h] [--version]
+    usage: mykrobe [-h] [--version]
                          {predict,panels,variants,vars,genotype} ...
 
     optional arguments:
