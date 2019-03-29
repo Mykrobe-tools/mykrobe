@@ -32,12 +32,12 @@ This will install two executables: mykrobe and mccortex31 (a fork of [mccortex](
 ## Usage
 
     mykrobe --help
-    usage: mykrobe-atlas [-h] [--version]
+    usage: mykrobe [-h] [--version]
                          {predict,panels,variants,vars,genotype} ...
 
     optional arguments:
       -h, --help            show this help message and exit
-      --version             mykrobe-atlas version
+      --version             mykrobe version
 
     [sub-commands]:
       {predict,panels,variants,vars,genotype}
@@ -237,7 +237,7 @@ If you use one of the following panels please cite the relevant publications:
 ### Genotyping a pre-built probe set
 
     mykrobe genotype --help
-    usage: mykrobe-atlas genotype [-h] [-k kmer] [--tmp TMP] [--keep_tmp]
+    usage: mykrobe genotype [-h] [-k kmer] [--tmp TMP] [--keep_tmp]
                                   [--skeleton_dir SKELETON_DIR]
                                   [--mccortex31_path MCCORTEX31_PATH] [-t THREADS]
                                   [-m MEMORY] [--expected_depth EXPECTED_DEPTH]
