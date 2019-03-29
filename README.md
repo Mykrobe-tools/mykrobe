@@ -194,7 +194,7 @@ Output is in CSV by default. For a more detailed output use the JSON format with
                             "alternate": {
                                 "percent_coverage": 47.62,
                                 "median_depth": 0.0,
-                                "min_depth": 47.0
+                                "min_depth": 0
                             },
                             "reference": {
                                 "percent_coverage": 100.0,
