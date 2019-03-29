@@ -2,11 +2,9 @@ Master: [![Build Status](https://travis-ci.org/Phelimb/mykrobe-atlas-cli.svg?bra
 
 Dev: [![Build Status](https://travis-ci.org/Phelimb/mykrobe-atlas-cli.svg?branch=dev)](https://travis-ci.org/Phelimb/mykrobe-atlas-cli)
 
-Tested on python 2.7, 3.4, 3.5, and 3.6.
-
 ## Requirements
 
-* python 2.7, python > 3.4
+* python > 3.4
 * [mongodb](https://www.mongodb.com/) > 3.0 (optional)
 
 
