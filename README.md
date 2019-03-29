@@ -1,6 +1,6 @@
-Master: [![Build Status](https://travis-ci.org/Phelimb/mykrobe-atlas-cli.svg?branch=master)](https://travis-ci.org/Phelimb/mykrobe-atlas-cli)
+# Mykrobe 
 
-Dev: [![Build Status](https://travis-ci.org/Phelimb/mykrobe-atlas-cli.svg?branch=dev)](https://travis-ci.org/Phelimb/mykrobe-atlas-cli)
+http://www.mykrobe.com
 
 ## Requirements
 
@@ -16,7 +16,7 @@ Dev: [![Build Status](https://travis-ci.org/Phelimb/mykrobe-atlas-cli.svg?branch
     ## Download pre-built probesets
     wget -O mykrobe-data.tar.gz https://bit.ly/2H9HKTU && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data
     
-    pip install .
+    pip3 install .
     
 
 To install this package with conda run one of the following:
