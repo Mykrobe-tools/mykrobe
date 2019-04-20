@@ -217,7 +217,7 @@ parser_make_probes.add_argument(
 )
 parser_make_probes.add_argument(
     "-v",
-    "--variant",
+    "--variants",
     type=str,
     action="append",
     help="Variant in DNA positions e.g. A1234T",
