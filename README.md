@@ -18,6 +18,9 @@ wget -O mykrobe-data.tar.gz https://bit.ly/2H9HKTU && tar -zxvf mykrobe-data.tar
 
 pip3 install .
 ```
+**Note:** It is recommended you install inside a virtual environment. If you choose not to, you will need to run the `pip3 install` command with `sudo`. This is because it attempts to put some binaries inside `/usr/local/bin` if the installation is not being run from inside a [virtual environment][venv].
+
+[venv]: https://docs.python-guide.org/dev/virtualenvs/
 
 To install [this package][bioconda] with conda run one of the following:
 
