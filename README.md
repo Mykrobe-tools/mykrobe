@@ -1,3 +1,36 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Mykrobe](#mykrobe)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+    - [pipenv (virtual environment)](#pipenv-virtual-environment)
+    - [Bioconda](#bioconda)
+    - [Containers](#containers)
+    - [pip](#pip)
+  - [Usage](#usage)
+    - [AMR prediction (Mykrobe predictor)](#amr-prediction-mykrobe-predictor)
+    - [Examples](#examples)
+    - [Output](#output)
+  - [Citing](#citing)
+  - [Genotyping a pre-built probe set](#genotyping-a-pre-built-probe-set)
+    - [Examples](#examples-1)
+    - [Make a custom probe set (for use with `mykrobe genotype`)](#make-a-custom-probe-set-for-use-with-mykrobe-genotype)
+    - [Add variants to the database (for background/context)](#add-variants-to-the-database-for-backgroundcontext)
+    - [Make probes and dump-probes](#make-probes-and-dump-probes)
+    - [Examples](#examples-2)
+      - [1 Simple case - building a probe without using backgrounds](#1-simple-case---building-a-probe-without-using-backgrounds)
+      - [2. 'Dumping' the Variant database](#2-dumping-the-variant-database)
+      - [3. Building a custom probe set](#3-building-a-custom-probe-set)
+        - [Build a variant probe set defined based on reference co-ordinates (1-based)](#build-a-variant-probe-set-defined-based-on-reference-co-ordinates-1-based)
+        - [Build a variant probe set defined based on gene co-ordinates (1-based)](#build-a-variant-probe-set-defined-based-on-gene-co-ordinates-1-based)
+- [Citation](#citation)
+- [Tests](#tests)
+- [Release](#release)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Mykrobe
 
 <http://www.mykrobe.com>
@@ -28,7 +61,8 @@ mykrobe --help  # mykrobe should now be available on path
 
 [pipenv]: https://pipenv.readthedocs.io/en/latest/
 
-### Bioconda [![conda badge](https://anaconda.org/bioconda/mykrobe/badges/installer/conda.svg)][bioconda]
+### Bioconda
+[![conda badge](https://anaconda.org/bioconda/mykrobe/badges/installer/conda.svg)][bioconda]
 
 Before attempting to install with bioconda, please ensure you have your channels set up
 as specified in the [documentation][bioconda-channels]. If you don't, you may run into
