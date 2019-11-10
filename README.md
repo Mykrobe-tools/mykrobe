@@ -9,6 +9,61 @@
 
 ## Installation
 
+### pipenv (virtual environment)
+
+To install `mykrobe` into a virtual environment (recommended) with [`pipenv`][pipenv],
+run the following
+
+```sh
+git clone https://github.com/Mykrobe-tools/mykrobe.git mykrobe
+cd mykrobe
+
+## Download pre-built probesets
+wget -O mykrobe-data.tar.gz https://bit.ly/2H9HKTU && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data
+
+pipenv install -e .  # install mykrobe in a new virtual environment
+pipenv shell  # enter the virtual environment
+mykrobe --help  # mykrobe should now be available on path
+```
+
+[pipenv]: https://pipenv.readthedocs.io/en/latest/
+
+### Bioconda [![conda badge](https://anaconda.org/bioconda/mykrobe/badges/installer/conda.svg)][bioconda]
+
+Before attempting to install with bioconda, please ensure you have your channels set up
+as specified in the [documentation][bioconda-channels]. If you don't, you may run into
+issues with an older version of `mykrobe` being installed.
+
+To install [this package][bioconda] with `conda` in a dedicated environment:
+
+```sh
+conda install -c bioconda mykrobe
+```
+
+[bioconda]: https://anaconda.org/bioconda/mykrobe
+[bioconda-channels]: https://bioconda.github.io/user/install.html#set-up-channels
+
+### Containers
+
+[biocontainers]: https://biocontainers.pro/#/
+[container]: https://quay.io/repository/biocontainers/mykrobe?tab=tags
+
+[Biocontainers][biocontainers] maintain images for all bioconda recipes. The container
+and all tags for `mykrobe` can be found [here][container]. To use a specific version,
+just select your required version/tag and use the URI as follows.
+
+```sh
+tag="0.7.0--py37h2666aa9_0"
+uri="quay.io/biocontainers/mykrobe:${tag}"
+
+# using Singularity
+singularity exec docker://"$uri" mykrobe --help
+# using docker
+docker pull "$uri"
+```
+
+### pip
+
 ```sh
 git clone https://github.com/Mykrobe-tools/mykrobe.git mykrobe
 cd mykrobe
@@ -22,16 +77,6 @@ pip3 install .
 
 [venv]: https://docs.python-guide.org/dev/virtualenvs/
 
-To install [this package][bioconda] with conda run one of the following:
-
-[bioconda]: https://anaconda.org/bioconda/mykrobe
-
-```sh
-conda install -c bioconda mykrobe
-```
-
-
-This will install two executables: `mykrobe` and `mccortex31` (a fork of [`mccortex`](https://github.com/mcveanlab/mccortex)).
 
 ## Usage
 
@@ -53,24 +98,6 @@ This will install two executables: `mykrobe` and `mccortex31` (a fork of [`mccor
         genotype            genotype a sample using a probe set
 ```
 
-### Containers
-
-[biocontainers]: https://biocontainers.pro/#/
-[container]: https://quay.io/repository/biocontainers/mykrobe?tab=tags
-
-[Biocontainer][biocontainers] maintain images for all bioconda recipes. The container
-and all tags for `mykrobe` can be found [here][container]. To use a specific version,
-just select your required version/tag and use the URI as follows.
-
-```sh
-tag="0.7.0--py37h2666aa9_0"
-uri="quay.io/biocontainers/mykrobe:${tag}"
-
-# using Singularity
-singularity exec docker://"$uri" mykrobe --help
-# using docker
-docker pull "$uri"
-```
 
 ### AMR prediction (Mykrobe predictor)
 
