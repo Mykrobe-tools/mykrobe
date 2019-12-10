@@ -21,6 +21,7 @@ jobs:
     - brew tap mongodb/brew
     - brew update
     - brew install mongodb-community
+    - mongod --quiet &
     before_deploy:
     - pip3 install pyinstaller
     - git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
