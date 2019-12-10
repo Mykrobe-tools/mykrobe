@@ -17,10 +17,11 @@ jobs:
     env:
     - TOXENV=py3
     before_install:
+    - brew update
     - brew tap mongodb/brew
+    - brew update
     - brew install mongodb-community
     before_deploy:
-    - pip3 install .
     - pip3 install pyinstaller
     - cd mccortex
     - make
@@ -40,7 +41,6 @@ jobs:
     - PATH=/c/Python38:/c/Python38/Scripts:$PATH
     - TOXENV=py38
     before_deploy:
-    - pip3 install .
     - pip3 install pypiwin32
     - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz
     - python ci/windows_xxhsum_fix.py
