@@ -23,7 +23,7 @@ jobs:
     - brew install mongodb-community
     - sudo mkdir -p /data/db
     - sudo chown -R `id -un` /data/db
-    - mongod --quiet &
+    - mongod --quiet &>/dev/null &
     before_deploy:
     - pip3 install pyinstaller
     - git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
