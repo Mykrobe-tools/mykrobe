@@ -21,7 +21,7 @@ jobs:
     - brew tap mongodb/brew
     - brew update
     - brew install mongodb-community
-    - mkdir -p /data/db
+    - sudo mkdir -p /data/db
     - sudo chown -R `id -un` /data/db
     - mongod --quiet &
     before_deploy:
