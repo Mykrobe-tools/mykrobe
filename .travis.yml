@@ -23,6 +23,7 @@ jobs:
     - brew install mongodb-community
     before_deploy:
     - pip3 install pyinstaller
+    - git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
     - cd mccortex
     - make
     - cd ../dist
@@ -43,6 +44,7 @@ jobs:
     before_deploy:
     - pip3 install pypiwin32
     - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz
+    - git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
     - python ci/windows_xxhsum_fix.py
     - cd mccortex
     - make
