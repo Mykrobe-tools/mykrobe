@@ -43,6 +43,7 @@ jobs:
     - pip3 install .
     - pip3 install pypiwin32
     - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz
+    - python ci/windows_xxhsum_fix.py
     - cd mccortex
     - make
     - cd ../dist
