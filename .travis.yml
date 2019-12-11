@@ -47,6 +47,7 @@ jobs:
     env:
     - PATH=/c/Python38:/c/Python38/Scripts:$PATH
     - TOXENV=py38
+    - CC=gcc
     before_deploy:
     - echo $PATH
     - which make || echo "make not found"
