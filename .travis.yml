@@ -46,6 +46,11 @@ jobs:
     - PATH=/c/Python38:/c/Python38/Scripts:$PATH
     - TOXENV=py38
     before_deploy:
+    - which make
+    - which cc
+    - which gcc
+    - ls -lh /
+    - ls -lh /mingw*
     - pip3 install pypiwin32
     - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz
     - git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
