@@ -71,7 +71,8 @@ jobs:
     - cd ../../
     # To find bzlib.h, otherwise make fails
     - export C_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$C_INCLUDE_PATH
-    - export CPLUS_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$C_INCLUDE_PATH
+    - export CPLUS_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPLUS_INCLUDE_PATH
+    - export CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH
     - make
     - cd ../dist
     - pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller.spec
