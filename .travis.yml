@@ -64,7 +64,11 @@ jobs:
     - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz
     - git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
     - python ci/windows_xxhsum_fix.py
-    - cd mccortex
+    - cd mccortex/libs/htslib/
+    # Use older htslib release, which does not include <sys/socket.h>, which
+    # breaks windows because it doesn't exist (windows uses winsock instead)
+    - git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae
+    - cd ../../
     - make
     - cd ../dist
     - pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller.spec
