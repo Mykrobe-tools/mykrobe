@@ -25,6 +25,10 @@ jobs:
     - sudo chown -R `id -un` /data/db
     - mongod --quiet &>/dev/null &
     before_deploy:
+    # We need to install mykrobe, including the data, so that when we run
+    # pyinstaller later, it includes the data and the python module
+    # dependencies
+    - wget -O mykrobe-data.tar.gz https://bit.ly/2H9HKTU && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data
     - pip3 install .
     - pip3 install pyinstaller
     - git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
