@@ -25,6 +25,7 @@ jobs:
     - sudo chown -R `id -un` /data/db
     - mongod --quiet &>/dev/null &
     before_deploy:
+    - pip3 install .
     - pip3 install pyinstaller
     - git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
     - cd mccortex
