@@ -47,7 +47,6 @@ jobs:
     - choco install python --version 3.8.0
     - choco install make
     - choco install mongodb
-    - CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH cpp -v
     #- git config --global core.autocrlf true
     #- choco install cygwin
     #- ls -lh /c/tools/cygwin/
@@ -95,14 +94,20 @@ jobs:
     - git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae
     #- autoreconf
     #- ./configure --disable-bz2
-    - CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
+    - export C_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$C_INCLUDE_PATH
+    - export CPLUS_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPLUS_INCLUDE_PATH
+    - export CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH
+    - echo $CPATH
+    - ls -lh $CPATH
+    - make
     #- powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
     - cd ../../
     # To find bzlib.h, otherwise make fails
-    #- export C_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$C_INCLUDE_PATH
-    #- export CPLUS_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPLUS_INCLUDE_PATH
-    #- export CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH
-    #- echo $CPATH
+    - export C_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$C_INCLUDE_PATH
+    - export CPLUS_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPLUS_INCLUDE_PATH
+    - export CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH
+    - echo $CPATH
+    - ls -lh $CPATH
     #- CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
     - make
     - cd ../dist
