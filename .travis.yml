@@ -74,25 +74,27 @@ jobs:
     - TOXENV=py38
     - CC=gcc
     before_deploy:
+    - original_dir=$PWD
     - pip3 install pypiwin32
     - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz
     - git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
     - python ci/windows_xxhsum_fix.py
-    - cd mccortex/libs/htslib/
+    #- cd mccortex/libs/htslib/
     # Use older htslib release, which does not include <sys/socket.h>, which
     # breaks windows because it doesn't exist (windows uses winsock instead)
-    - git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae
+    #- git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae
+    #- cd $original_dir
     #- autoreconf
     #- ./configure --disable-bz2
     #- CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
-    - powershell -Command "make";
-    - cd ../../
+    powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
+    #- cd ../../
     # To find bzlib.h, otherwise make fails
-    - export C_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$C_INCLUDE_PATH
-    - export CPLUS_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPLUS_INCLUDE_PATH
-    - export CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH
-    - echo $CPATH
-    - CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
+    #- export C_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$C_INCLUDE_PATH
+    #- export CPLUS_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPLUS_INCLUDE_PATH
+    #- export CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH
+    #- echo $CPATH
+    #- CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
     - cd ../dist
     - pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller.spec
     - cd pyinstaller_build
