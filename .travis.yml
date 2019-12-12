@@ -79,7 +79,8 @@ jobs:
     # Use older htslib release, which does not include <sys/socket.h>, which
     # breaks windows because it doesn't exist (windows uses winsock instead)
     - git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae
-    #- ./configure --disable-bz2
+    - autoreconf
+    - ./configure --disable-bz2
     - CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
     - cd ../../
     # To find bzlib.h, otherwise make fails
