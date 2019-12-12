@@ -44,12 +44,12 @@ jobs:
     os: windows
     language: shell
     before_install:
-    - find / -name cygwinsetup.exe
-    - git config --global core.autocrlf true
-    - choco install cygwin
-    - ls -lh /c/tools/cygwin/
+    #- git config --global core.autocrlf true
+    #- choco install cygwin
+    #- ls -lh /c/tools/cygwin/
     #- C:\\tools\\cygwin\\cygwinsetup.exe -q -P make,unzip,automake,autoconf,zip,bzip2,xz
     #- powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
+    - Cygwin.exe -P make,unzip,automake,autoconf,zip,bzip2,xz
     - echo $PATH
     - which bash || echo "bash not found"
     - which make || echo "make not found"
@@ -98,6 +98,8 @@ jobs:
     #- export CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH
     #- echo $CPATH
     #- CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
+    - cd mccortex
+    - make
     - cd ../dist
     - pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller.spec
     - cd pyinstaller_build
