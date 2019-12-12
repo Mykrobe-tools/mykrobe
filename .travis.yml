@@ -53,6 +53,7 @@ jobs:
     - TOXENV=py38
     - CC=gcc
     before_deploy:
+    - setup-x86_64.exe -P xz
     - echo $PATH
     - which make || echo "make not found"
     - which cc || echo "cc not found"
