@@ -44,6 +44,9 @@ jobs:
     os: windows
     language: shell
     before_install:
+    - choco install python --version 3.8.0
+    - choco install make
+    - choco install mongodb
     #- git config --global core.autocrlf true
     #- choco install cygwin
     #- ls -lh /c/tools/cygwin/
@@ -60,21 +63,21 @@ jobs:
     - which gcc || echo "gcc not found"
     - ls -lh /bin/
     - ls -lh /c
-    - choco install python --version 3.8.0
+    - ls -lh /tmp
+    - ls -lh /c/ProgramData
+    - ls -lh /c/*
     - python -m pip install --upgrade pip
-    - choco install mongodb
-    #- choco install make
     #- choco install bzip2
     - find /c/ProgramData/chocolatey/ | sort
-    #- p=$PWD
-    #- cd ..
-    #- mkdir xz
-    #- cd xz
-    #- wget https://tukaani.org/xz/xz-5.2.4-windows.zip
-    #- unzip xz-5.2.4-windows.zip
-    #- cp -rp include/* /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/include/
-    #- cp bin_x86-64/liblzma.a /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/lib/
-    #- cd $p
+    - p=$PWD
+    - cd ..
+    - mkdir xz
+    - cd xz
+    - wget https://tukaani.org/xz/xz-5.2.4-windows.zip
+    - unzip xz-5.2.4-windows.zip
+    - cp -rp include/* /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/include/
+    - cp bin_x86-64/liblzma.a /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/lib/
+    - cd $p
     env:
     - PATH=/c/Python38:/c/Python38/Scripts:$PATH
     - TOXENV=py38
@@ -85,23 +88,21 @@ jobs:
     - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz
     - git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
     - python ci/windows_xxhsum_fix.py
-    #- cd mccortex/libs/htslib/
+    - cd mccortex/libs/htslib/
     # Use older htslib release, which does not include <sys/socket.h>, which
     # breaks windows because it doesn't exist (windows uses winsock instead)
-    #- git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae
-    #- cd $original_dir
+    - git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae
     #- autoreconf
     #- ./configure --disable-bz2
-    #- CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
+    - CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
     #- powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
-    #- cd ../../
+    - cd ../../
     # To find bzlib.h, otherwise make fails
     #- export C_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$C_INCLUDE_PATH
     #- export CPLUS_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPLUS_INCLUDE_PATH
     #- export CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH
     #- echo $CPATH
     #- CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
-    - cd mccortex
     - make
     - cd ../dist
     - pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller.spec
