@@ -78,11 +78,13 @@ jobs:
     - cp -rp include/* /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/include/
     - cp bin_x86-64/liblzma.a /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/lib/
     - cd ..
-    - wget https://downloads.sourceforge.net/project/gnuwin32/bzip2/1.0.5/bzip2-1.0.5-lib.zip
-    - unzip bzip2-1.0.5-lib.zip
-    - cp lib/libbz2.a /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/lib/
-    - cp include/bzlib.h /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/include/
-    - cd ..
+    - wget https://sourceforge.net/projects/bzip2/files/bzip2-1.0.6.tar.gz
+    - tar xf bzip2-1.0.6.tar.gz
+    - cd bzip2-1.0.6
+    - make
+    - ls -lh
+    - cp bzlib.h /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/include/
+    - cp libbz2.a /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/lib/
     - cd $p
     env:
     - PATH=/c/Python38:/c/Python38/Scripts:$PATH
