@@ -77,6 +77,12 @@ jobs:
     - unzip xz-5.2.4-windows.zip
     - cp -rp include/* /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/include/
     - cp bin_x86-64/liblzma.a /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/lib/
+    - cd ..
+    - wget https://downloads.sourceforge.net/project/gnuwin32/bzip2/1.0.5/bzip2-1.0.5-lib.zip
+    - unzip bzip2-1.0.5-lib.zip
+    - cp lib/libbz2.a /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/lib/
+    - cp include/bzlib.h /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/include/
+    - cd ..
     - cd $p
     env:
     - PATH=/c/Python38:/c/Python38/Scripts:$PATH
@@ -98,7 +104,7 @@ jobs:
     - export CPLUS_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPLUS_INCLUDE_PATH
     - export CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH
     - echo $CPATH
-    - ln -s /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/bzlib.h
+    #- ln -s /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/bzlib.h
     - make
     #- powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
     - cd ../../
