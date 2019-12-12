@@ -51,15 +51,13 @@ jobs:
     - which gcc || echo "gcc not found"
     - ls -lh /bin/
     - ls -lh /c
-    - choco install cyg-get
-    - cyg-get xz
     - choco install python --version 3.8.0
     - python -m pip install --upgrade pip
     - choco install mongodb
     - choco install make
     - find /c/ProgramData/chocolatey/ | sort
     env:
-    - PATH=/c/Python38:/c/Python38/Scripts:/c/ProgramData/chocolatey/lib/cyg-get/tools:$PATH
+    - PATH=/c/Python38:/c/Python38/Scripts:$PATH
     - TOXENV=py38
     - CC=gcc
     before_deploy:
