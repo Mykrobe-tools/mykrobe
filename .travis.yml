@@ -53,12 +53,15 @@ jobs:
     - TOXENV=py38
     - CC=gcc
     before_deploy:
-    - setup-x86.exe -P xz
     - echo $PATH
+    - which bash || echo "bash not found"
     - which make || echo "make not found"
     - which cc || echo "cc not found"
     - which gcc || echo "gcc not found"
     - ls -lh /c
+    - ls -lh /c/tools/
+    - ls -lh /c/tools/cygwin/
+    - ls -lh /c/tools/cygwin/bin
     - ls -lh /c/ProgramData/chocolatey/
     - find /c/ProgramData/chocolatey/ | sort
     - pip3 install pypiwin32
