@@ -49,10 +49,10 @@ jobs:
     #- ls -lh /c/tools/cygwin/
     #- C:\\tools\\cygwin\\cygwinsetup.exe -q -P make,unzip,automake,autoconf,zip,bzip2,xz
     #- powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
-    - cygcheck --sysinfo
+    - cygcheck --sysinfo -v
     - cygwin-console-helper.exe -P make,unzip,automake,autoconf,zip,bzip2,xz
-    - find / -depth 2 || echo "find finished"
-    - cygwin-console-helper.exe -h
+    - ls -lh /
+    - cygwin-console-helper.exe
     - echo $PATH
     - which bash || echo "bash not found"
     - which make || echo "make not found"
@@ -125,3 +125,6 @@ deploy:
     tags: true
     condition: $TRAVIS_OS_NAME = osx || $TRAVIS_OS_NAME = windows
     repo: martinghunt/mykrobe
+
+notifications:
+  email: false
