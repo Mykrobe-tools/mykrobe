@@ -94,6 +94,7 @@ jobs:
     - git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae
     #- autoreconf
     #- ./configure --disable-bz2
+    - CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH cpp -v
     - CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
     #- powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
     - cd ../../
