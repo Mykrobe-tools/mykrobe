@@ -85,7 +85,7 @@ jobs:
     #- autoreconf
     #- ./configure --disable-bz2
     #- CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
-    powershell -Command "C:\tools\cygwin\bin\bash.exe -c 'make'";
+    - powershell -Command "C:\tools\cygwin\bin\bash.exe -c 'make'";
     - cd ../../
     # To find bzlib.h, otherwise make fails
     - export C_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$C_INCLUDE_PATH
