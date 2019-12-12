@@ -52,8 +52,8 @@ jobs:
     - cygcheck --sysinfo -v
     - cygwin-console-helper.exe -P make,unzip,automake,autoconf,zip,bzip2,xz
     - ls -lh /
-    - cygwin-console-helper.exe
     - echo $PATH
+    - which autoconf || echo "autoconf not found"
     - which bash || echo "bash not found"
     - which make || echo "make not found"
     - which cc || echo "cc not found"
