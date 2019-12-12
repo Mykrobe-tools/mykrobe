@@ -44,26 +44,23 @@ jobs:
     os: windows
     language: shell
     before_install:
-    - choco install python --version 3.8.0
-    - python -m pip install --upgrade pip
-    - choco install mongodb
-    - choco install make
-    env:
-    - PATH=/c/Python38:/c/Python38/Scripts:$PATH
-    - TOXENV=py38
-    - CC=gcc
-    before_deploy:
     - echo $PATH
     - which bash || echo "bash not found"
     - which make || echo "make not found"
     - which cc || echo "cc not found"
     - which gcc || echo "gcc not found"
+    - ls -lh /bin/
     - ls -lh /c
-    - ls -lh /c/tools/
-    - ls -lh /c/tools/cygwin/
-    - ls -lh /c/tools/cygwin/bin
-    - ls -lh /c/ProgramData/chocolatey/
+    - choco install python --version 3.8.0
+    - python -m pip install --upgrade pip
+    - choco install mongodb
+    - choco install make
     - find /c/ProgramData/chocolatey/ | sort
+    env:
+    - PATH=/c/Python38:/c/Python38/Scripts:$PATH
+    - TOXENV=py38
+    - CC=gcc
+    before_deploy:
     - pip3 install pypiwin32
     - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz
     - git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
