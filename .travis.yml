@@ -47,13 +47,14 @@ jobs:
     - choco install python --version 3.8.0
     - choco install make
     - choco install mongodb
+    - CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH cpp -v
     #- git config --global core.autocrlf true
     #- choco install cygwin
     #- ls -lh /c/tools/cygwin/
     #- C:\\tools\\cygwin\\cygwinsetup.exe -q -P make,unzip,automake,autoconf,zip,bzip2,xz
     #- powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
     - cygcheck --sysinfo -v
-    - cygwin-console-helper.exe -P make,unzip,automake,autoconf,zip,bzip2,xz
+    #- cygwin-console-helper.exe -P make,unzip,automake,autoconf,zip,bzip2,xz
     - ls -lh /
     - echo $PATH
     - which autoconf || echo "autoconf not found"
@@ -94,7 +95,6 @@ jobs:
     - git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae
     #- autoreconf
     #- ./configure --disable-bz2
-    - CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH cpp -v
     - CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
     #- powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
     - cd ../../
