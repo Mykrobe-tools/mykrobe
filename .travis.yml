@@ -56,7 +56,6 @@ jobs:
     - choco install mongodb
     - choco install make
     - choco install bzip2
-    - choco install gnuwin
     - find /c/ProgramData/chocolatey/ | sort
     - p=$PWD
     - cd ..
