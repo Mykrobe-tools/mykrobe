@@ -56,6 +56,15 @@ jobs:
     - choco install mongodb
     - choco install make
     - find /c/ProgramData/chocolatey/ | sort
+    - p=$PWD
+    - cd ..
+    - mkdir xz
+    - cd xz
+    - wget https://tukaani.org/xz/xz-5.2.4-windows.zip
+    - unzip xz-5.2.4-windows.zip
+    - cp -rp include/* /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/include/
+    - cp bin_x86-64/liblzma.a /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/lib/
+    - cd $p
     env:
     - PATH=/c/Python38:/c/Python38/Scripts:$PATH
     - TOXENV=py38
