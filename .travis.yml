@@ -44,6 +44,11 @@ jobs:
     os: windows
     language: shell
     before_install:
+    - git config --global core.autocrlf true
+    - choco install cygwin
+    - ls -lh /c/tools/cygwin/
+    - C:\\tools\\cygwin\\cygwinsetup.exe -q -P make,unzip,automake,autoconf,zip,bzip2,xz
+    - powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
     - echo $PATH
     - which bash || echo "bash not found"
     - which make || echo "make not found"
@@ -51,9 +56,6 @@ jobs:
     - which gcc || echo "gcc not found"
     - ls -lh /bin/
     - ls -lh /c
-    - choco install cygwin
-    - ls -lh /c/tools/cygwin/
-    - C:\\tools\\cygwin\\cygwinsetup.exe -q -P make,unzip,automake,autoconf,zip,bzip2,xz
     - choco install python --version 3.8.0
     - python -m pip install --upgrade pip
     - choco install mongodb
@@ -87,7 +89,7 @@ jobs:
     #- autoreconf
     #- ./configure --disable-bz2
     #- CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
-    - powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
+    #- powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
     #- cd ../../
     # To find bzlib.h, otherwise make fails
     #- export C_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$C_INCLUDE_PATH
