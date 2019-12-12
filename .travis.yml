@@ -51,7 +51,7 @@ jobs:
     #- powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
     - cygcheck --sysinfo
     - cygwin-console-helper.exe -P make,unzip,automake,autoconf,zip,bzip2,xz
-    - find /cygdrive
+    - find / -depth 2 || echo "find finished"
     - cygwin-console-helper.exe -h
     - echo $PATH
     - which bash || echo "bash not found"
