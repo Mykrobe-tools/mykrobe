@@ -55,6 +55,7 @@ jobs:
     - python -m pip install --upgrade pip
     - choco install mongodb
     - choco install make
+    - choco install 7zip.install
     - find /c/ProgramData/chocolatey/ | sort
     env:
     - PATH=/c/Python38:/c/Python38/Scripts:$PATH
