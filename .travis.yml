@@ -79,14 +79,13 @@ jobs:
     # breaks windows because it doesn't exist (windows uses winsock instead)
     - git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae
     - ./configure --disable-bz2
-    - make
+    - CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
     - cd ../../
     # To find bzlib.h, otherwise make fails
     - export C_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$C_INCLUDE_PATH
     - export CPLUS_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPLUS_INCLUDE_PATH
     - export CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH
     - echo $CPATH
-    - make clean
     - CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
     - cd ../dist
     - pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller.spec
