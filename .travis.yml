@@ -49,7 +49,8 @@ jobs:
     #- ls -lh /c/tools/cygwin/
     #- C:\\tools\\cygwin\\cygwinsetup.exe -q -P make,unzip,automake,autoconf,zip,bzip2,xz
     #- powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
-    - Cygwin.exe -P make,unzip,automake,autoconf,zip,bzip2,xz
+    - cygcheck --sysinfo
+    - cygwin-console-helper.exe -P make,unzip,automake,autoconf,zip,bzip2,xz
     - echo $PATH
     - which bash || echo "bash not found"
     - which make || echo "make not found"
