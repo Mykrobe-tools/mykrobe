@@ -13,10 +13,6 @@ install:
 
 
 build_script:
-  - cmd: C:\cygwin64\bin\bash -l -c "python --version"
-  - cmd: C:\cygwin64\bin\bash -l -c "python3 --version"
-  - "sh -c \"python --version\""
-  - "sh -c \"python3 --version\""
   #- set HOME=.
   #- set MSYSTEM=MINGW64
   #- set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
@@ -28,7 +24,7 @@ build_script:
   #- "sh -c \"env | sort\""
     #- "sh -c \"find / -name zlib.h\"" # finds these: /mingw32/include/zlib.h /mingw64/include/zlib.h
   - "sh -c \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
-  - "sh -c \"python3 ci/windows_xxhsum_fix.py\""
+  - cmd: C:\cygwin64\bin\bash -l -c "python3 ci/windows_xxhsum_fix.py"
   - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex && make all"
   #- "sh -c \"cd mccortex/libs/sort_r && make\""
   #- "sh -c \"cd mccortex/libs/seq-align/libs/sort_r && make\""
