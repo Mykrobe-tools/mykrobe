@@ -51,3 +51,9 @@ to_replace = {
 }
 fix_file(filename, to_replace)
 
+
+filename = os.path.join("mccortex", "libs", "seq_file", "seq_file.h")
+to_replace = {
+    "#include <stdlib.h>\n", "#include <stdlib.h>\n#include <stdint.h>\n",
+}
+fix_file(filename, to_replace)
