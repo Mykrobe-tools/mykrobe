@@ -7,7 +7,7 @@ install:
   - set MSYSTEM=MINGW64
   - set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
   - set MINGWPREFIX=x86_64-w64-mingw32
-  - "sh -lc \"pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-zlib mingw-w64-x86_64-bzip2 mingw-w64-x86_64-xz mingw-w64-x86_64-curl mingw-w64-x86_64-libc++\""
+  - "sh -lc \"pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-zlib mingw-w64-x86_64-bzip2 mingw-w64-x86_64-xz mingw-w64-x86_64-curl\""
 
 
 
@@ -21,7 +21,7 @@ build_script:
   - "sh -lc \"python ci/windows_xxhsum_fix.py\""
   - cmd: dir
   - cmd: chdir
-  - "sh -lc \"cd mccortex/libs/sort_r && make\""
+  - "sh -c \"cd mccortex/libs/sort_r && make\""
   - "sh -lc \"cd mccortex/libs/htslib && git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae && aclocal && autoheader && autoconf && ./configure && make && make install\""
   - cmd: dir
   - "sh -lc \"cd mccortex && make all\""
