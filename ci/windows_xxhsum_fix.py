@@ -54,8 +54,13 @@ to_replace = {
 fix_file(filename, to_replace)
 
 
-filename = os.path.join("mccortex", "libs", "seq_file", "seq_file.h")
 to_replace = {
     "#include <stdlib.h>\n": "#include <stdlib.h>\n#include <stdint.h>\n",
 }
-fix_file(filename, to_replace)
+filenames = [
+  os.path.join("mccortex", "libs", "seq_file", "seq_file.h"),
+  os.path.join("mccortex", "libs", "seq-align", "libs", "seq_file", "seq_file.h"),
+  os.path.join("mccortex", "libs", "readsim", "seq_file.h"),
+]
+for filename in filenames:
+    fix_file(filename, to_replace)
