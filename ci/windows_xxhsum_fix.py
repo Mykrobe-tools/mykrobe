@@ -38,7 +38,7 @@ to_replace = {
 }
 fix_file(filename, to_replace)
 
-filename = os.path.join("mccortex", "libs", "seq_file", "benchmark", "Makefile")
+filename = os.path.join("mccortex", "libs", "seq_file", "benchmarks", "Makefile")
 to_replace = {
     "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz\n": "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz -lws2_32 -lhts -lz -llzma -lcurl -lssl -lcrypto -lbz2\n",
 }
