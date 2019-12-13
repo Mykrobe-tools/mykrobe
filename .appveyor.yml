@@ -15,12 +15,12 @@ build_script:
   - set HOME=.
   - set MSYSTEM=MINGW64
   - set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
-  - set CC=gcc
+  #- set CC=gcc
   - "sh -lc \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
   - cmd: dir
   - cmd: chdir
   #- "sh -lc \"cd mccortex/libs/htslib && git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae && aclocal && autoheader && autoconf && ./configure CFLAGS='-g -O3' && make -j2\""
-  - "sh -lc \"cd mccortex/libs/htslib && git checkout 0f298ce22c5c825c506129bf242348a31630c382\""
+  - "sh -lc \"cd mccortex/libs/htslib && git checkout 746549da5371c7689ebd81f693c9bd10aa984623\""
   - cmd: dir
   - "sh -lc \"python ci/windows_xxhsum_fix.py\""
   - "sh -lc \"cd mccortex && make all\""
