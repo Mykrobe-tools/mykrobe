@@ -18,7 +18,7 @@ build_script:
   - set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
   - set MINGWPREFIX=x86_64-w64-mingw32
   - set LD_LIBRARY_PATH=/mingw64/lib/
-    #- set CC=gcc
+  - set CC=gcc
   - "sh -c \"ls $LD_LIBRARY_PATH/\""
   - "sh -lc \"env | sort\""
   - "sh -c \"env | sort\""
