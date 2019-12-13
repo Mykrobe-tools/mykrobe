@@ -20,8 +20,6 @@ build_script:
   - cmd: dir
   - cmd: chdir
     #- "sh -lc \"cd mccortex/libs/htslib && git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae && aclocal && autoheader && autoconf && ./configure CFLAGS='-g -O3' && make -j2\""
-  - "sh -lc \"cd mccortex/libs/htslib && git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae && make\""
-    #- "sh -lc \"cd mccortex/libs/htslib && git checkout 746549da5371c7689ebd81f693c9bd10aa984623\""
   - cmd: dir
   - "sh -lc \"python ci/windows_xxhsum_fix.py\""
   - "sh -lc \"cd mccortex && make all\""
