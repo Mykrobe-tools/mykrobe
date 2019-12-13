@@ -19,6 +19,7 @@ build_script:
   - set MINGWPREFIX=x86_64-w64-mingw32
   - set LD_LIBRARY_PATH=/mingw64/lib/
     #- set CC=gcc
+  - "sh -c \"ls $LD_LIBRARY_PATH/\""
   - "sh -lc \"env | sort\""
   - "sh -c \"env | sort\""
     #- "sh -c \"find / -name zlib.h\"" # finds these: /mingw32/include/zlib.h /mingw64/include/zlib.h
