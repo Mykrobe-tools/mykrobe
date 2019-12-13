@@ -13,6 +13,8 @@ install:
 
 
 build_script:
+  - cmd: C:\cygwin64\bin\bash -l -c "python --version"
+  - cmd: C:\cygwin64\bin\bash -l -c "python3 --version"
   - "sh -c \"python --version\""
   - "sh -c \"python3 --version\""
   #- set HOME=.
