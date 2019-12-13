@@ -17,6 +17,8 @@ build_script:
   - set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
   - set MINGWPREFIX=x86_64-w64-mingw32
     #- set CC=gcc
+  - "sh -lc \"env\""
+  - "sh -c \"env\""
   - "sh -c \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
   - "sh -c \"python ci/windows_xxhsum_fix.py\""
   - cmd: dir
@@ -25,7 +27,7 @@ build_script:
   - "sh -c \"cd mccortex/libs/seq-align/libs/sort_r && make\""
   - "sh -lc \"cd mccortex/libs/seq-align/libs/string_buffer && make\""
   - "sh -lc \"cd mccortex/libs/seq-align/libs/seq_file && make\""
-  - "sh -c \"cd mccortex/libs/seq-align/ && make\""
+  - "sh -c \"cd mccortex/libs/seq-align/ && make\""  # with sh -lc, gives undefined reference to `qsort_r error
   #- "sh -c \"cd mccortex/libs/seq-align/libs && make\""
   - "sh -lc \"cd mccortex/libs/htslib && git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae && aclocal && autoheader && autoconf && ./configure && make && make install\""
   - "sh -lc \"cd mccortex/libs/seq_file && make\""
