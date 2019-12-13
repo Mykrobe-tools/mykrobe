@@ -21,7 +21,6 @@ build_script:
   - "sh -lc \"env | sort\""
   - "sh -c \"env | sort\""
     #- "sh -c \"find / -name zlib.h\"" # finds these: /mingw32/include/zlib.h /mingw64/include/zlib.h
-  - "sh -c \"find /mingw64 | sort\""
   - "sh -c \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
   - "sh -c \"python ci/windows_xxhsum_fix.py\""
   - "sh -c \"cd mccortex/libs/sort_r && make\""
