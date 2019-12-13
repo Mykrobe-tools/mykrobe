@@ -28,7 +28,7 @@ build_script:
   - "sh -c \"cd mccortex/libs/seq-align/libs/sort_r && make\""
   - "sh -lc \"cd mccortex/libs/seq-align/libs/string_buffer && make\""
   - "sh -lc \"cd mccortex/libs/seq-align/libs/seq_file && make\""
-  - "sh -c \"cd mccortex/libs/seq-align/ && CPATH=/mingw64/include/:$CPATH make\""  # without -l, get error: libs/string_buffer/string_buffer.h:14:10: fatal error: zlib.h: No such file or directory
+  - "sh -c \"cd mccortex/libs/seq-align/ && LD_LIBRARY_PATH=/mingw64/lib/ CPATH=/mingw64/include/:$CPATH make\""  # without -l, get error: libs/string_buffer/string_buffer.h:14:10: fatal error: zlib.h: No such file or directory
   - "sh -cl \"cd mccortex/libs/seq-align/ && make\""  # with -l, gives error: undefined reference to qsort_r
   - "sh -lc \"cd mccortex/libs/htslib && git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae && aclocal && autoheader && autoconf && ./configure && make && make install\""
   - "sh -lc \"cd mccortex/libs/seq_file && make\""
