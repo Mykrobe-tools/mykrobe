@@ -25,6 +25,7 @@ build_script:
   - "sh -c \"cd mccortex/libs/seq-align/libs/sort_r && make\""
   - "sh -lc \"cd mccortex/libs/seq-align/libs/string_buffer && make\""
   - "sh -lc \"cd mccortex/libs/seq-align/libs/seq_file && make\""
+  - "sh -c \"cd mccortex/libs/seq-align/src/ && make\""
   #- "sh -c \"cd mccortex/libs/seq-align/libs && make\""
   - "sh -lc \"cd mccortex/libs/htslib && git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae && aclocal && autoheader && autoconf && ./configure && make && make install\""
   - "sh -lc \"cd mccortex/libs/seq_file && make\""
