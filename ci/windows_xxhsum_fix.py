@@ -23,11 +23,11 @@ to_replace = {
 fix_file(filename, to_replace)
 
 
-filename = os.path.join("mccortex", "libs", "bcftools", "Makefile")
-to_replace = {
-    "\t$(CC) -rdynamic $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm -ldl $(GSL_LIBS) $(LIBS)\n": "\t$(CC) $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm $(GSL_LIBS) $(LIBS)\n",
-}
-fix_file(filename, to_replace)
+#filename = os.path.join("mccortex", "libs", "bcftools", "Makefile")
+#to_replace = {
+#    "\t$(CC) -rdynamic $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm -ldl $(GSL_LIBS) $(LIBS)\n": "\t$(CC) $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm $(GSL_LIBS) $(LIBS)\n",
+#}
+#fix_file(filename, to_replace)
 
 
 #filename = os.path.join("mccortex", "libs", "bit_array", "bit_array.c")
