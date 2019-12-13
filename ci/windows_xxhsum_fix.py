@@ -50,3 +50,9 @@ to_replace = {
         "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz\n": "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz -lws2_32 -lhts -lz -llzma -lcurl -lssl -lcrypto -lbz2\n",
 }
 fix_file(filename, to_replace)
+
+filename = os.path.join("mccortex", "libs", "sort_r", "Makefile")
+to_replace = {
+        "\t$(CC) $(CFLAGS) $(ARGS) -o example_sort example.c\n", "\t$(CC) $(CFLAGS) $(ARGS) -lc -o example_sort example.c\n",
+}
+fix_file(filename, to_replace)

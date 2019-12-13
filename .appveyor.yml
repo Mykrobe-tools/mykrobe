@@ -18,12 +18,12 @@ build_script:
   - set MINGWPREFIX=x86_64-w64-mingw32
     #- set CC=gcc
   - "sh -lc \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
+  - "sh -lc \"python ci/windows_xxhsum_fix.py\""
   - cmd: dir
   - cmd: chdir
   - "sh -lc \"cd mccortex/libs/sort_r && make\""
   - "sh -lc \"cd mccortex/libs/htslib && git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae && aclocal && autoheader && autoconf && ./configure && make && make install\""
   - cmd: dir
-  - "sh -lc \"python ci/windows_xxhsum_fix.py\""
   - "sh -lc \"cd mccortex && make all\""
 
 #build_script:
