@@ -1,0 +1,25 @@
+image:
+  - Visual Studio 2019
+
+
+install:
+  - set HOME=.
+  - set MSYSTEM=MINGW64
+  - set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
+  - set MINGWPREFIX=x86_64-w64-mingw32
+  - "sh -lc \"pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-zlib mingw-w64-x86_64-bzip2 mingw-w64-x86_64-xz mingw-w64-x86_64-curl\""
+  - "sh -lc \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
+
+
+
+build_script:
+  - set HOME=.
+  - set MSYSTEM=MINGW64
+  - set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
+  - "sh -lc \"cd mccortex/htslib && aclocal && autoheader && autoconf && ./configure --enable-werror CFLAGS='-g -O3' && make -j2\""
+
+#build_script:
+#  - make
+
+#test_script:
+#- "sh -lc \"make test-shlib-exports && make test\""
