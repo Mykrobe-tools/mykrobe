@@ -23,8 +23,10 @@ build_script:
   #- "sh -lc \"env | sort\""
   #- "sh -c \"env | sort\""
     #- "sh -c \"find / -name zlib.h\"" # finds these: /mingw32/include/zlib.h /mingw64/include/zlib.h
+  - cmd: C:\cygwin64\bin\bash -l -c "pwd"
+  - cmd: C:\cygwin64\bin\bash -l -c "ls -lh"
   - "sh -c \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
-  - cmd: C:\cygwin64\bin\bash -l -c "python3 ci/windows_xxhsum_fix.py"
+  - cmd: C:\cygwin64\bin\bash -l -c "python3 ./ci/windows_xxhsum_fix.py"
   - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex && make all"
   #- "sh -c \"cd mccortex/libs/sort_r && make\""
   #- "sh -c \"cd mccortex/libs/seq-align/libs/sort_r && make\""
