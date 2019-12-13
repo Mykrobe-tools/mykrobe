@@ -29,6 +29,8 @@ build_script:
   - "sh -c \"ls -lh\""
   - "sh -c \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
   - cmd: C:\cygwin64\bin\bash -l -c "ls -lh"
+  - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs/bcftools && git checkout 7d99bc1a047688dcee8ae1240c1bfaa8acbab9da"
+  - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs/htslib && git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae"
   - cmd: C:\cygwin64\bin\bash -l -c "python3 ./ci/windows_xxhsum_fix.py"
   - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex && make all"
   #- "sh -c \"cd mccortex/libs/sort_r && make\""
