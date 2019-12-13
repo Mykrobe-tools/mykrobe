@@ -22,6 +22,7 @@ build_script:
   - cmd: dir
   - cmd: chdir
   - "sh -c \"cd mccortex/libs/sort_r && make\""
+  - "sh -c \"cd mccortex/libs/seq-align/libs/sort_r && make\""
   - "sh -lc \"cd mccortex/libs/seq-align/libs/string_buffer && make\""
   - "sh -lc \"cd mccortex/libs/seq-align/libs/seq_file && make\""
   #- "sh -c \"cd mccortex/libs/seq-align/libs && make\""
