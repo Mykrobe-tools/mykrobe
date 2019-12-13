@@ -3,7 +3,7 @@ image:
 
 
 install:
-  #- set HOME=.
+  - set HOME=.
   #- set MSYSTEM=MINGW64
   #- set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
   #- set MINGWPREFIX=x86_64-w64-mingw32
@@ -13,7 +13,7 @@ install:
 
 
 build_script:
-  #- set HOME=.
+  - set HOME=.
   #- set MSYSTEM=MINGW64
   #- set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
   #- set MINGWPREFIX=x86_64-w64-mingw32
