@@ -30,6 +30,8 @@ to_replace = {
     "static word_t __inline windows_popcount(word_t w)\n": "static word_t __inline windows_popcountl(word_t w)\n",
 }
 fix_file(filename, to_replace)
+filename = os.path.join("mccortex", "libs", "seq-align", "libs", "bit_array", "bit_array.c")
+fix_file(filename, to_replace)
 
 
 filename = os.path.join("mccortex", "libs", "seq_file", "Makefile")
