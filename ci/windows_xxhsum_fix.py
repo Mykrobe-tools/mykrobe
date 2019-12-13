@@ -20,13 +20,16 @@ with open(filename, "w") as f:
 
 filename = os.path.join("mccortex", "libs", "bit_array", "bit_array.c")
 lines = []
-to_replace = "  c = (word_t)(w * ((word_t)~(word_t)0/255)) >> (sizeof(word_t) - 1) * 8;\n"
-replace_with = "  return (word_t)(w * ((word_t)~(word_t)0/255)) >> (sizeof(word_t) - 1) * 8;\n"
+to_replace = {
+        "  c = (word_t)(w * ((word_t)~(word_t)0/255)) >> (sizeof(word_t) - 1) * 8;\n": "  return (word_t)(w * ((word_t)~(word_t)0/255)) >> (sizeof(word_t) - 1) * 8;\n",
+        "static word_t __inline windows_popcount(word_t w)\n": "static word_t __inline windows_popcountl(word_t w)\n",
+}
 
 with open(filename) as f:
     for line in f:
-        if line == to_replace:
-            line = replace_with
+        if line in to_replace:
+            print("Replacing", line)
+            line = to_replace[line]
         lines.append(line)
 
 
