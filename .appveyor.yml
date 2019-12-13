@@ -19,7 +19,7 @@ build_script:
     #- set CC=gcc
   - "sh -lc \"env | sort\""
   - "sh -c \"env | sort\""
-    "sh -c \"find / -name zlib.h\""
+  - "sh -c \"find / -name zlib.h\""
   - "sh -c \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
   - "sh -c \"python ci/windows_xxhsum_fix.py\""
   - cmd: dir
