@@ -24,6 +24,7 @@ build_script:
     #- "sh -c \"find / -name zlib.h\"" # finds these: /mingw32/include/zlib.h /mingw64/include/zlib.h
   - "sh -c \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
   - "sh -c \"python ci/windows_xxhsum_fix.py\""
+  - cmd: C:\cygwin\bin\bash -l -c "cd mccortex && make all"
   - "sh -c \"cd mccortex/libs/sort_r && make\""
   - "sh -c \"cd mccortex/libs/seq-align/libs/sort_r && make\""
   - "sh -lc \"cd mccortex/libs/seq-align/libs/string_buffer && make\""
