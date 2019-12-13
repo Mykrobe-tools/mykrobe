@@ -18,7 +18,8 @@ build_script:
   - "sh -lc \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
   - cmd: dir
   - cmd: chdir
-  - "sh -lc \"cd mccortex/htslib && aclocal && autoheader && autoconf && ./configure --enable-werror CFLAGS='-g -O3' && make -j2\""
+  - "sh -lc \"cd mccortex/libs/htslib && aclocal && autoheader && autoconf && ./configure --enable-werror CFLAGS='-g -O3' && make -j2\""
+  - cmd: dir
 
 #build_script:
 #  - make
