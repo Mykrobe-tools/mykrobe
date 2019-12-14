@@ -31,7 +31,7 @@ build_script:
   - "sh -c \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
   - "sh -c \"cd mccortex/libs && rm -rf bcftools samtools htslib\""
   - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs && wget https://github.com/samtools/htslib/releases/download/1.10/htslib-1.10.tar.bz2 && tar xf htslib-1.10.tar.bz2 && mv htslib-1.10 htslib"
-  - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs/htslib && ./configure && make"
+  - cmd: C:\cygwin64\bin\bash -c "cd mccortex/libs/htslib && ./configure && make"
   #- cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs && git clone https://github.com/samtools/htslib.git && git checkout develop && autoreconf && ./configure"
   - "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/samtools.git && git checkout develop && aclocal && autoheader && autoconf && ./configure\""
   - "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/bcftools.git && git checkout develop && aclocal && autoheader && autoconf && ./configure\""
