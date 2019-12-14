@@ -8,7 +8,7 @@ install:
   #- set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
   #- set MINGWPREFIX=x86_64-w64-mingw32
   #- "sh -c \"pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-zlib mingw-w64-x86_64-bzip2 mingw-w64-x86_64-xz mingw-w64-x86_64-curl\""
-  - cmd: C:\cygwin64\setup-x86_64.exe -q -P make,unzip,automake1.16,autoconf2.5,zip,bzip2,xz,zlib,zlib-devel,python3
+  - cmd: C:\cygwin64\setup-x86_64.exe -q -P make,unzip,automake1.16,autoconf2.5,zip,bzip2,xz,zlib,zlib-devel,python3,libtool,automake
 
 
 
