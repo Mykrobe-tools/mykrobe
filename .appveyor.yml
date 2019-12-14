@@ -8,7 +8,7 @@ install:
   #- set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
   #- set MINGWPREFIX=x86_64-w64-mingw32
   #- "sh -c \"pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-zlib mingw-w64-x86_64-bzip2 mingw-w64-x86_64-xz mingw-w64-x86_64-curl\""
-  - cmd: C:\cygwin64\setup-x86_64.exe -q -P make,unzip,automake,automake1.16,autoconf,autoconf2.5,zip,bzip2,xz,zlib,zlib-devel,python3,libtool
+  - cmd: C:\cygwin64\setup-x86_64.exe -q -P make,unzip,automake,automake1.16,autoconf,autoconf2.5,zip,bzip2,xz,zlib,zlib-devel,python3,libtool,wget
 
 
 
@@ -30,7 +30,7 @@ build_script:
   - "sh -c \"git config --global core.autocrlf true\""
   - "sh -c \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
   - "sh -c \"cd mccortex/libs && rm -rf bcftools samtools htslib\""
-  - "sh -c \"cd mccortex/libs && wget https://github.com/samtools/htslib/releases/download/1.10/htslib-1.10.tar.bz2 && tar xf htslib-1.10.tar.bz2 && mv htslib-1.10 htslib\""
+  - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs && wget https://github.com/samtools/htslib/releases/download/1.10/htslib-1.10.tar.bz2 && tar xf htslib-1.10.tar.bz2 && mv htslib-1.10 htslib\""
   - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs/htslib && ./configure && make"
   #- cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs && git clone https://github.com/samtools/htslib.git && git checkout develop && autoreconf && ./configure"
   - "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/samtools.git && git checkout develop && aclocal && autoheader && autoconf && ./configure\""
