@@ -8,7 +8,7 @@ install:
   #- set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
   #- set MINGWPREFIX=x86_64-w64-mingw32
   #- "sh -c \"pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-zlib mingw-w64-x86_64-bzip2 mingw-w64-x86_64-xz mingw-w64-x86_64-curl\""
-  - cmd: C:\cygwin64\setup-x86_64.exe -q -P make,unzip,automake,autoconf,zip,bzip2,xz,zlib,zlib-devel,python3
+  - cmd: C:\cygwin64\setup-x86_64.exe -q -P make,unzip,automake1.16,autoconf2.5,zip,bzip2,xz,zlib,zlib-devel,python3
 
 
 
@@ -29,10 +29,10 @@ build_script:
   - "sh -c \"ls -lh\""
   - "sh -c \"git config --global core.autocrlf true\""
   - "sh -c \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
-  #- "sh -c \"cd mccortex/libs && rm -rf bcftools samtools htslib\""
-  #- "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/htslib.git && git checkout develop\"
-  #- "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/samtools.git && git checkout develop\""
-  #- "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/bcftools.git && git checkout develop\""
+  - "sh -c \"cd mccortex/libs && rm -rf bcftools samtools htslib\""
+  - "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/htslib.git && git checkout develop && aclocal && autoheader && autoconf && ./configure\""
+  - "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/samtools.git && git checkout develop && aclocal && autoheader && autoconf && ./configure\""
+  - "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/bcftools.git && git checkout develop && aclocal && autoheader && autoconf && ./configure\""
   - cmd: C:\cygwin64\bin\bash -l -c "ls -lh"
   #- cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs/bcftools && git checkout -f 7d99bc1a047688dcee8ae1240c1bfaa8acbab9da"
   #- cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs/htslib && git checkout -f 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae && make"
