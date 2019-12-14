@@ -27,6 +27,7 @@ build_script:
   - cmd: C:\cygwin64\bin\bash -l -c "ls -lh"
   - "sh -c \"pwd\""
   - "sh -c \"ls -lh\""
+  - "sh -c \"git config --global core.autocrlf true\""
   - "sh -c \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
   - "sh -c \"cd mccortex/libs && rm -rf bcftools samtools htslib\""
   - "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/htslib.git\""
