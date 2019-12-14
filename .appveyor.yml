@@ -33,7 +33,7 @@ build_script:
   - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs && wget https://github.com/samtools/htslib/releases/download/1.10/htslib-1.10.tar.bz2 && tar xf htslib-1.10.tar.bz2 && mv htslib-1.10 htslib"
   - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs && wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2 && tar xf samtools-1.10.tar.bz2 && mv samtools-1.10 samtools"
   - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs && wget https://github.com/samtools/bcftools/releases/download/1.10/bcftools-1.10.tar.bz2 && tar xf bcftools-1.10.tar.bz2 && mv bcftools-1.10 bcftools"
-  #- cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs/htslib && ./configure && make"
+  - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs/htslib && ./configure && make"
   #- cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs && git clone https://github.com/samtools/htslib.git && git checkout develop && autoreconf && ./configure"
   #- "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/samtools.git && git checkout develop && aclocal && autoheader && autoconf && ./configure\""
   #- "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/bcftools.git && git checkout develop && aclocal && autoheader && autoconf && ./configure\""
