@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-
 import os
-
 
 def fix_file(filename, to_replace):
     lines = []
@@ -28,31 +26,23 @@ to_replace = {
    "DYNAMIC_FLAGS = -rdynamic\n": "DYNAMIC_FLAGS = \n",
    "ALL_LIBS     = -lz -ldl $(LIBS)\n": "ALL_LIBS     = -lz $(LIBS)\n",
    "PLUGINS_ENABLED = yes\n": "PLUGINS_ENABLED = no\n"
-   # "\t$(CC) -rdynamic $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm -ldl $(GSL_LIBS) $(LIBS)\n": "\t$(CC) $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm $(GSL_LIBS) $(LIBS)\n",
 }
 fix_file(filename, to_replace)
 
-#filename = os.path.join("mccortex", "libs", "bit_array", "bit_array.c")
-#to_replace = {
-#    "  c = (word_t)(w * ((word_t)~(word_t)0/255)) >> (sizeof(word_t) - 1) * 8;\n": "  return (word_t)(w * ((word_t)~(word_t)0/255)) >> (sizeof(word_t) - 1) * 8;\n",
-#    "static word_t __inline windows_popcount(word_t w)\n": "static word_t __inline windows_popcountl(word_t w)\n",
-#}
-#fix_file(filename, to_replace)
-#filename = os.path.join("mccortex", "libs", "seq-align", "libs", "bit_array", "bit_array.c")
-#fix_file(filename, to_replace)
-#
-#
+
 filename = os.path.join("mccortex", "libs", "seq_file", "Makefile")
 to_replace = {
    "LINKING=$(HTSARGS) -lpthread -lz\n": "LINKING=$(HTSARGS) -lpthread -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
 fix_file(filename, to_replace)
 
+
 filename = os.path.join("mccortex", "Makefile")
 to_replace = {
    "LINK=-lpthread -lz -lm\n": "LINK=-lpthread -lz -lm -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
 fix_file(filename, to_replace)
+
 
 filename = os.path.join("mccortex", "libs", "seq_file", "benchmarks", "Makefile")
 to_replace = {
@@ -80,15 +70,3 @@ to_replace = {
        "LIBS=-lz -lm -lpthread\n": "LIBS=-lpthread -lz -lm -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
 fix_file(filename, to_replace)
-#
-#
-#to_replace = {
-#    "#include <stdlib.h>\n": "#include <stdlib.h>\n#include <stdint.h>\n",
-#}
-#filenames = [
-#  os.path.join("mccortex", "libs", "seq_file", "seq_file.h"),
-#  os.path.join("mccortex", "libs", "seq-align", "libs", "seq_file", "seq_file.h"),
-#  os.path.join("mccortex", "libs", "readsim", "seq_file.h"),
-#]
-#for filename in filenames:
-#    fix_file(filename, to_replace)
