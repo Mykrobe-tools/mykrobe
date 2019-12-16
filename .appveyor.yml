@@ -26,6 +26,6 @@ install:
 
 build_script:
   - set HOME=.
-  - $env.BASH -lc "git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex"
-  - $env.BASH -lc "python3 ./ci/windows_xxhsum_fix.py"
-  - $env.BASH -lc "cd mccortex && make all"
+  - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex"'
+  - '%BASH%  -lc "python3 ./ci/windows_xxhsum_fix.py"'
+  - '%BASH%  -lc "cd mccortex && make all"'
