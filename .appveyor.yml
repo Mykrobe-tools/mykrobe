@@ -9,7 +9,7 @@ environment:
     CYG_SETUP: setup-x86_64.exe
     BASH: C:\cygwin64\bin\bash
     CC: gcc
-    CFLAGS: -fPIC
+    CFLAGS: "-fPIC"
 
 # Cache Cygwin/MSYS files to speed up build
 cache:
