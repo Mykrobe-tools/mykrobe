@@ -13,6 +13,7 @@ environment:
 # Cache Cygwin/MSYS files to speed up build
 cache:
     - '%CYG_CACHE%'
+clone_depth: 1
 
 init:
   - git config --global core.autocrlf true
@@ -20,7 +21,7 @@ init:
 install:
   - ps: if (Test-Path Env:\CYG_ROOT) { Start-FileDownload "https://cygwin.com/$env:CYG_SETUP" -FileName "$env:CYG_SETUP" }
 #  - C:\cygwin64\bin\bash -lc "%CYG_SETUP% --no-shortcuts --only-site --root \"%CYG_ROOT%\" --site \"%CYG_MIRROR%\" --local-package-dir \"%CYG_CACHE%\" --packages \"%CYG_PACKAGES%\" --upgrade-also"
-  - '%CYG_SETUP% --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
+  - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
 
 
 build_script:
