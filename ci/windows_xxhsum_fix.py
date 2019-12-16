@@ -42,20 +42,20 @@ fix_file(filename, to_replace)
 #
 filename = os.path.join("mccortex", "libs", "seq_file", "Makefile")
 to_replace = {
-   "LINKING=$(HTSARGS) -lpthread -lz\n": "LINKING=$(HTSARGS) -lpthread -lws2_32 -lhts -lz -llzma -lcurl -lssl -lcrypto -lbz2\n",
+   "LINKING=$(HTSARGS) -lpthread -lz\n": "LINKING=$(HTSARGS) -lpthread -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
 fix_file(filename, to_replace)
 
 filename = os.path.join("mccortex", "libs", "seq_file", "benchmarks", "Makefile")
 to_replace = {
-   "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz\n": "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz -lws2_32 -lhts -lz -llzma -lcurl -lssl -lcrypto -lbz2\n",
+   "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz\n": "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
 fix_file(filename, to_replace)
 
 
 filename = os.path.join("mccortex", "libs", "seq_file", "dev", "Makefile")
 to_replace = {
-       "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz\n": "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz -lws2_32 -lhts -lz -llzma -lcurl -lssl -lcrypto -lbz2\n",
+       "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz\n": "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
 fix_file(filename, to_replace)
 #
