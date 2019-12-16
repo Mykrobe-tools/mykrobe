@@ -73,6 +73,13 @@ to_replace = {
        "\tLIBS=-lpthread -lz -lm\n": "\tLIBS=-lpthread -lz -lm -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
 fix_file(filename, to_replace)
+
+
+filename = os.path.join("mccortex", "libs", "vcf-slim", "Makefile")
+to_replace = {
+       "LIBS=-lz -lm -lpthread\n": "LIBS=-lpthread -lz -lm -lws2_32 -lz -llzma -lcurl -lbz2\n",
+}
+fix_file(filename, to_replace)
 #
 #
 #to_replace = {
