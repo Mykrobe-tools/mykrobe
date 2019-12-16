@@ -25,9 +25,9 @@ fix_file(filename, to_replace)
 
 filename = os.path.join("mccortex", "libs", "bcftools", "Makefile")
 to_replace = {
-   "-rdynamic": "",
-   "-ldl": "",
-   "PLUGINS_ENABLED = yes": "PLUGINS_ENABLED = no"
+   "DYNAMIC_FLAGS = -rdynamic\n": "",
+   "ALL_LIBS     = -lz -ldl $(LIBS)\n": "ALL_LIBS     = -lz $(LIBS)\n",
+   "PLUGINS_ENABLED = yes\n": "PLUGINS_ENABLED = no\n"
    # "\t$(CC) -rdynamic $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm -ldl $(GSL_LIBS) $(LIBS)\n": "\t$(CC) $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm $(GSL_LIBS) $(LIBS)\n",
 }
 fix_file(filename, to_replace)
