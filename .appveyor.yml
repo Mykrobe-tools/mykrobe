@@ -9,8 +9,8 @@ environment:
     CYG_SETUP: setup-x86_64.exe
     BASH: C:\cygwin64\bin\bash
     #CC: "gcc -fPIC"
-    CC: gcc
-    LDFLAGS: "-lz -lm -lbz2 -llzma -lcurl -lpthread"
+    CC: "gcc -lz -lm -lbz2 -llzma -lcurl -lpthread"
+
 
 # Cache Cygwin/MSYS files to speed up build
 cache:
