@@ -26,7 +26,8 @@ fix_file(filename, to_replace)
 filename = os.path.join("mccortex", "libs", "bcftools", "Makefile")
 to_replace = {
    "-rdynamic": "",
-   "-ldl": "../htslib/libhts.a"
+   "-ldl": "",
+   "PLUGINS_ENABLED = yes", "PLUGINS_ENABLED = no"
    # "\t$(CC) -rdynamic $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm -ldl $(GSL_LIBS) $(LIBS)\n": "\t$(CC) $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm $(GSL_LIBS) $(LIBS)\n",
 }
 fix_file(filename, to_replace)
@@ -44,20 +45,20 @@ fix_file(filename, to_replace)
 #
 filename = os.path.join("mccortex", "libs", "seq_file", "Makefile")
 to_replace = {
-   "LINKING=$(HTSARGS) -lpthread -lz\n": "LINKING=$(HTSARGS) -lpthread -lws2_64 -lz -llzma -lcurl -lbz2\n",
+   "LINKING=$(HTSARGS) -lpthread -lz\n": "LINKING=$(HTSARGS) -lpthread -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
 fix_file(filename, to_replace)
 
 filename = os.path.join("mccortex", "libs", "seq_file", "benchmarks", "Makefile")
 to_replace = {
-   "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz\n": "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz -lws2_64 -lz -llzma -lcurl -lbz2\n",
+   "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz\n": "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
 fix_file(filename, to_replace)
 
 
 filename = os.path.join("mccortex", "libs", "seq_file", "dev", "Makefile")
 to_replace = {
-       "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz\n": "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz -lws2_64 -lz -llzma -lcurl -lbz2\n",
+       "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz\n": "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
 fix_file(filename, to_replace)
 #
