@@ -52,6 +52,7 @@ filename = os.path.join("mccortex", "Makefile")
 to_replace = {
    "LINK=-lpthread -lz -lm\n": "LINK=-lpthread -lz -lm -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
+fix_file(filename, to_replace)
 
 filename = os.path.join("mccortex", "libs", "seq_file", "benchmarks", "Makefile")
 to_replace = {
