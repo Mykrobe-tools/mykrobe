@@ -25,7 +25,7 @@ fix_file(filename, to_replace)
 
 filename = os.path.join("mccortex", "libs", "bcftools", "Makefile")
 to_replace = {
-   "DYNAMIC_FLAGS = -rdynamic\n": "",
+   "DYNAMIC_FLAGS = -rdynamic\n": "DYNAMIC_FLAGS = \n",
    "ALL_LIBS     = -lz -ldl $(LIBS)\n": "ALL_LIBS     = -lz $(LIBS)\n",
    "PLUGINS_ENABLED = yes\n": "PLUGINS_ENABLED = no\n"
    # "\t$(CC) -rdynamic $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm -ldl $(GSL_LIBS) $(LIBS)\n": "\t$(CC) $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm $(GSL_LIBS) $(LIBS)\n",
@@ -51,6 +51,15 @@ to_replace = {
    "LINKING=$(HTSARGS) -lpthread -lz\n": "LINKING=$(HTSARGS) -lpthread -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
 fix_file(filename, to_replace)
+
+filename = os.path.join("mccortex", "libs", "seq_file", "Makefile")
+to_replace = {
+   "LINK=-lpthread -lz -lm\n": "LINK=-lpthread -lz -lm -lws2_32 -lz -llzma -lcurl -lbz2\n",
+}
+
+
+
+LINK=-lpthread -lz -lm
 
 filename = os.path.join("mccortex", "libs", "seq_file", "benchmarks", "Makefile")
 to_replace = {
