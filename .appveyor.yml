@@ -6,7 +6,7 @@ environment:
     CYG_PACKAGES: make,gcc-core,unzip,automake,autoconf,zip,libbz2-devel,bzip2,xz,zlib,zlib-devel,python3,libtool,wget,liblzma-devel,libcurl-devel
     CYG_ROOT: C:\cygwin64
     CYG_CACHE: C:\cygwin64\var\cache\setup
-    CYG_SETUP: setup-x86-64.exe
+    CYG_SETUP: setup-x86_64.exe
     BASH: C:\cygwin64\bin\bash
     CC: gcc
 
