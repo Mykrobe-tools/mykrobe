@@ -70,7 +70,7 @@ fix_file(filename, to_replace)
 
 filename = os.path.join("mccortex", "libs", "readsim", "Makefile")
 to_replace = {
-       "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz\n": "LINKING=$(HTSARGS) $(SAMLINK) -lpthread -lz -lws2_32 -lz -llzma -lcurl -lbz2\n",
+       "\tLIBS=-lpthread -lz -lm\n": "\tLIBS=-lpthread -lz -lm -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
 fix_file(filename, to_replace)
 #
