@@ -1,59 +1,25 @@
 image:
   - Visual Studio 2019
 
+environment:
+    CYG_MIRROR: http://cygwin.mirror.constant.com
+    CYG_PACKAGES: make,gcc-core,mingw64-i686-gcc-core,mingw64-x86_64-gcc-core,make,unzip,automake,automake1.16,autoconf,autoconf2.5,zip,libbz2-devel,bzip2,xz,zlib,zlib-devel,python3,libtool,wget,liblzma-devel,libcurl-devel
+    matrix:
+        - CYG_ROOT: C:\cygwin64
+          CYG_CACHE: C:\cygwin64\var\cache\setup
+          CYG_SETUP: setup-x86_64.exe
+          BASH: C:\cygwin64\bin\bash
+          CC: gcc
+
+init:
+    - git config --global core.autocrlf true
 
 install:
-  - set HOME=.
-  #- set MSYSTEM=MINGW64
-  #- set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
-  #- set MINGWPREFIX=x86_64-w64-mingw32
-  #- "sh -c \"pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-zlib mingw-w64-x86_64-bzip2 mingw-w64-x86_64-xz mingw-w64-x86_64-curl\""
-  - cmd: C:\cygwin64\setup-x86_64.exe -q -P make,unzip,automake,automake1.16,autoconf,autoconf2.5,zip,libbz2-devel,bzip2,xz,zlib,zlib-devel,python3,libtool,wget,liblzma-devel,libcurl-devel
-
+  - %CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also
 
 
 build_script:
   - set HOME=.
-  #- set MSYSTEM=MINGW64
-  #- set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
-  #- set MINGWPREFIX=x86_64-w64-mingw32
-  #- set LD_LIBRARY_PATH=/mingw64/lib/
-  #- set CC=gcc
-  #- "sh -c \"ls $LD_LIBRARY_PATH/\""
-  #- "sh -lc \"env | sort\""
-  #- "sh -c \"env | sort\""
-    #- "sh -c \"find / -name zlib.h\"" # finds these: /mingw32/include/zlib.h /mingw64/include/zlib.h
-  - cmd: C:\cygwin64\bin\bash -l -c "pwd"
-  - cmd: C:\cygwin64\bin\bash -l -c "ls -lh"
-  - "sh -c \"pwd\""
-  - "sh -c \"ls -lh\""
-  - "sh -c \"git config --global core.autocrlf true\""
-  - "sh -c \"git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex\""
-  #- "sh -c \"cd mccortex/libs && rm -rf bcftools samtools htslib\""
-  #- cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs && wget -q https://github.com/samtools/htslib/releases/download/1.9/htslib-1.9.tar.bz2 && tar xf htslib-1.9.tar.bz2 && mv htslib-1.9 htslib"   #- cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs && wget -q https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2 && tar xf samtools-1.9.tar.bz2 && mv samtools-1.9 samtools"
-  #- cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs && wget -q https://github.com/samtools/bcftools/releases/download/1.9/bcftools-1.9.tar.bz2 && tar xf bcftools-1.9.tar.bz2 && mv bcftools-1.9 bcftools"
-  #- cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs/htslib && ./configure && make"
-  #- cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs && git clone https://github.com/samtools/htslib.git && git checkout develop && autoreconf && ./configure"
-  #- "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/samtools.git && git checkout develop && aclocal && autoheader && autoconf && ./configure\""
-  #- "sh -c \"cd mccortex/libs && git clone https://github.com/samtools/bcftools.git && git checkout develop && aclocal && autoheader && autoconf && ./configure\""
-  - cmd: C:\cygwin64\bin\bash -l -c "ls -lh"
-  #- cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs/bcftools && git checkout -f 7d99bc1a047688dcee8ae1240c1bfaa8acbab9da"
-  #- cmd: C:\cygwin64\bin\bash -l -c "cd mccortex/libs/htslib && git checkout -f 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae && make"
-  - cmd: C:\cygwin64\bin\bash -l -c "python3 ./ci/windows_xxhsum_fix.py"
-  - cmd: C:\cygwin64\bin\bash -l -c "cd mccortex && make all"
-  #- "sh -c \"cd mccortex/libs/sort_r && make\""
-  #- "sh -c \"cd mccortex/libs/seq-align/libs/sort_r && make\""
-  #- "sh -lc \"cd mccortex/libs/seq-align/libs/string_buffer && make\""
-  #- "sh -lc \"cd mccortex/libs/seq-align/libs/seq_file && make\""
-  #- "sh -c \"ls $LD_LIBRARY_PATH/\""
-  #- "sh -lc \"cd mccortex/libs/seq-align/ && make\""  # with -l, gives error: undefined reference to qsort_r
-  #- "sh -c \"cd mccortex/libs/seq-align/ && CPATH=/mingw64/include/:$CPATH make\""  # without -l, get error: libs/string_buffer/string_buffer.h:14:10: fatal error: zlib.h: No such file or directory
-  #- "sh -lc \"cd mccortex/libs/htslib && git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae && aclocal && autoheader && autoconf && ./configure && make && make install\""
-  #- "sh -lc \"cd mccortex/libs/seq_file && make\""
-  #- "sh -lc \"cd mccortex && make all\""
-
-#build_script:
-#  - make
-
-#test_script:
-#- "sh -lc \"make test-shlib-exports && make test\""
+  - %BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex"
+  - %BASH% -lc "python3 ./ci/windows_xxhsum_fix.py"
+  - %BASH% -lc "cd mccortex && make all"
