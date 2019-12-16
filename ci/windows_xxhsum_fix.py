@@ -31,10 +31,6 @@ to_replace = {
    # "\t$(CC) -rdynamic $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm -ldl $(GSL_LIBS) $(LIBS)\n": "\t$(CC) $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm $(GSL_LIBS) $(LIBS)\n",
 }
 fix_file(filename, to_replace)
-with open(filename) as fin:
-    for line in fin:
-        print(line)
-
 
 #filename = os.path.join("mccortex", "libs", "bit_array", "bit_array.c")
 #to_replace = {
@@ -56,10 +52,6 @@ filename = os.path.join("mccortex", "libs", "seq_file", "Makefile")
 to_replace = {
    "LINK=-lpthread -lz -lm\n": "LINK=-lpthread -lz -lm -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
-
-
-
-LINK=-lpthread -lz -lm
 
 filename = os.path.join("mccortex", "libs", "seq_file", "benchmarks", "Makefile")
 to_replace = {
