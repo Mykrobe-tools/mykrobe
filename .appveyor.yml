@@ -27,5 +27,7 @@ install:
 build_script:
   - set HOME=.
   - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex"'
+  - '%BASH% -lc "cd mccortex/libs/htslib && git pull"'
+  - '%BASH% -lc "cd mccortex/libs/bcftools && git pull"'
   - '%BASH%  -lc "python3 ./ci/windows_xxhsum_fix.py"'
   - '%BASH%  -lc "cd mccortex && make all"'
