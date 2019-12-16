@@ -31,4 +31,4 @@ build_script:
   - '%BASH% -lc "cd mccortex/libs/bcftools && git checkout b406a3906b153faa8bec0a53df07b2adf18a3052"'
   - '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
   - '%BASH%  -lc "python3 ./ci/windows_xxhsum_fix.py"'
-  - '%BASH%  -lc "cd mccortex && make all"'
+  - '%BASH%  -lc "cd mccortex && make all && make tests"'
