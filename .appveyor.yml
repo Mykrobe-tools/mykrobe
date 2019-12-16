@@ -3,7 +3,7 @@ image:
 
 environment:
     CYG_MIRROR: http://cygwin.mirror.constant.com
-    CYG_PACKAGES: make,gcc-core,mingw64-i686-gcc-core,mingw64-x86_64-gcc-core,make,unzip,automake,automake1.16,autoconf,autoconf2.5,zip,libbz2-devel,bzip2,xz,zlib,zlib-devel,python3,libtool,wget,liblzma-devel,libcurl-devel
+    CYG_PACKAGES: make,gcc-core,unzip,automake,autoconf,zip,libbz2-devel,bzip2,xz,zlib,zlib-devel,python3,libtool,wget,liblzma-devel,libcurl-devel
     CYG_ROOT: C:\cygwin64
     CYG_CACHE: C:\cygwin64\var\cache\setup
     CYG_SETUP: setup-x86_64.exe
