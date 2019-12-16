@@ -27,10 +27,13 @@ filename = os.path.join("mccortex", "libs", "bcftools", "Makefile")
 to_replace = {
    "-rdynamic": "",
    "-ldl": "",
-   "PLUGINS_ENABLED = yes", "PLUGINS_ENABLED = no"
+   "PLUGINS_ENABLED = yes": "PLUGINS_ENABLED = no"
    # "\t$(CC) -rdynamic $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm -ldl $(GSL_LIBS) $(LIBS)\n": "\t$(CC) $(LDFLAGS) -o $@ $(OBJS) $(HTSLIB) -lpthread -lz -lm $(GSL_LIBS) $(LIBS)\n",
 }
 fix_file(filename, to_replace)
+with open(filename) as fin:
+    for line in fin:
+        print(line)
 
 
 #filename = os.path.join("mccortex", "libs", "bit_array", "bit_array.c")
