@@ -23,8 +23,8 @@ install:
   - set HOME=.
   - ps: if (Test-Path Env:\CYG_ROOT) { Start-FileDownload "https://cygwin.com/$env:CYG_SETUP" -FileName "$env:CYG_SETUP" }
   - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
-  - '%BASH% -lc "python3 -m pip install --upgrade pip"'
   - '%BASH% -lc "which pip"'
+  - '%BASH% -lc "python3 -m pip install --upgrade pip"'
   - '%BASH% -lc "pip3 install cython tox"'
   - '%BASH% -lc "ls -lh"'
   - '%BASH% -lc "mongod --quiet &>/dev/null &"'
