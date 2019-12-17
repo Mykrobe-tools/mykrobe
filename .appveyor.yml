@@ -46,8 +46,9 @@ test_script:
 after_test:
   - set HOME=.
   - '%BASH% -lc "python3 --version"'
-  - '%BASH% -lc "wget https://github.com/mhammond/pywin32/releases/download/b227/pywin32-227.win-amd64-py3.6.exe"'
-  - '%BASH% -lc "./pywin32-227.win-amd64-py3.6.exe"'
+  - '%BASH% -lc "wget https://github.com/mhammond/pywin32/archive/b227.tar.gz"'
+  - '%BASH% -lc "tar xf b227.tar.gz"'
+  - '%BASH% -lc "cd pywin32-b227 && python3 setup.py install"'
   - '%BASH% -lc "git clone -b develop https://github.com/pyinstaller/pyinstaller.git"'
   - '%BASH% -lc "cd pyinstaller/bootloader && python3 ./waf all && cd .. && pip3 install ."' 
   #- '%BASH% -lc "pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz"'
