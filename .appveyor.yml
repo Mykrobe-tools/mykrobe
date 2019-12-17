@@ -34,11 +34,11 @@ install:
   - '%BASH% -lc "ls -lh"'
 
 
-test_script:
+script:
   - set HOME=.
   - '%BASH% -lc "tox -e py3"'
 
-# This should be after_deploy, once there's a deploy setion added. Like this for now for testing
+# This should be before_deploy, once there's a deploy setion added. Like this for now for testing
 after_test:
   - set HOME=.
   - '%BASH% -lc "pip3 install pyinstaller"'
