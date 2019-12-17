@@ -33,6 +33,7 @@ install:
   - '%BASH% -lc "pip3 install tox"'
   - '%BASH% -lc "ls -lh"'
 
+build: off
 
 test_script:
   - set HOME=.
