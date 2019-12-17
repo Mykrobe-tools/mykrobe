@@ -44,7 +44,9 @@ test_script:
 # This should be before_deploy, once there's a deploy setion added. Like this for now for testing
 after_test:
   - set HOME=.
-  - '%BASH% -lc "pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz"'
+  - '%BASH% -lc "git clone -b develop https://github.com/pyinstaller/pyinstaller.git"'
+  - '%BASH% -lc "cd pyinstaller/bootlaoder && python3 ./waf all && cd .. && pip3 install ."' 
+  #- '%BASH% -lc "pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz"'
   - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex"'
   - '%BASH% -lc "cd mccortex/libs/htslib && git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc"'
   - '%BASH% -lc "cd mccortex/libs/bcftools && git checkout b406a3906b153faa8bec0a53df07b2adf18a3052"'
