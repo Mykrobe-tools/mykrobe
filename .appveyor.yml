@@ -25,7 +25,7 @@ install:
   - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
   - '%BASH% -lc "pip install cython tox"'
   - '%BASH% -lc "ls -lh"'
-  = '%BASH% -lc "mongod --quiet &>/dev/null &"'
+  - '%BASH% -lc "mongod --quiet &>/dev/null &"'
   - '%BASH% -lc "tox -e py3"'
 
 
