@@ -1,6 +1,9 @@
 image:
   - Visual Studio 2019
 
+services:
+  - mongodb
+
 environment:
     CYG_MIRROR: http://cygwin.mirror.constant.com
     CYG_PACKAGES: make,unzip,automake,automake1.16,autoconf,autoconf2.5,zip,libbz2-devel,bzip2,xz,zlib,zlib-devel,python3,libtool,wget,liblzma-devel,libcurl-devel,R,libncurses-devel,python3-cython,python3-devel
@@ -29,7 +32,7 @@ install:
   - '%BASH% -lc "which pip3"'
   - '%BASH% -lc "pip3 install tox"'
   - '%BASH% -lc "ls -lh"'
-  - '%BASH% -lc "mongod --quiet &>/dev/null &"'
+  #- '%BASH% -lc "mongod --quiet &>/dev/null &"'
   - '%BASH% -lc "tox -e py3"'
 
 
