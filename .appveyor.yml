@@ -32,7 +32,7 @@ install:
   - '%BASH% -lc "which pip3"'
   - '%BASH% -lc "pip3 install tox"'
   - '%BASH% -lc "ls -lh"'
-  #- '%BASH% -lc "mongod --quiet &>/dev/null &"'
+  - '%BASH% -lc "mongod &"'
   - '%BASH% -lc "tox -e py3"'
 
 
