@@ -46,7 +46,7 @@ test_script:
 after_test:
   - set HOME=.
   - '%BASH% -lc "python3 --version"'
-  - '%BASH% -lc "pip3 install https://files.pythonhosted.org/packages/f7/76/29e8e24a4967eb40fdf2f525aae53a1fd6e606382d957aa403f3f12ea235/pywin32-227-cp36-cp36m-win_amd64.whl"'
+  - '%BASH% -lc "pip3 install https://files.pythonhosted.org/packages/e9/5a/04eaf2ae543fb078f1e6f9be7c29149846e3f054a4111bfdfdd3510b7f58/pywin32-227-cp36-cp36m-win32.whl"'
   - '%BASH% -lc "git clone -b develop https://github.com/pyinstaller/pyinstaller.git"'
   - '%BASH% -lc "cd pyinstaller/bootloader && python3 ./waf all && cd .. && pip3 install ."' 
   #- '%BASH% -lc "pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz"'
