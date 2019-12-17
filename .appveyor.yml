@@ -6,7 +6,7 @@ services:
 
 environment:
     CYG_MIRROR: http://cygwin.mirror.constant.com
-    CYG_PACKAGES: make,unzip,automake,automake1.16,autoconf,autoconf2.5,zip,libbz2-devel,bzip2,xz,zlib,zlib-devel,python38,libtool,wget,liblzma-devel,libcurl-devel,R,libncurses-devel,python38-cython,python38-devel
+    CYG_PACKAGES: make,unzip,automake,automake1.16,autoconf,autoconf2.5,zip,libbz2-devel,bzip2,xz,zlib,zlib-devel,python3,libtool,wget,liblzma-devel,libcurl-devel,R,libncurses-devel,python3-cython,python3-devel
     CYG_ROOT: C:\cygwin64
     CYG_CACHE: C:\cygwin64\var\cache\setup
     CYG_SETUP: setup-x86_64.exe
@@ -46,7 +46,7 @@ test_script:
 after_test:
   - set HOME=.
   - '%BASH% -lc "python3 --version"'
-  - '%BASH% -lc "pip3 install pywin32==227"'
+  - '%BASH% -lc "pip3 install https://files.pythonhosted.org/packages/f7/76/29e8e24a4967eb40fdf2f525aae53a1fd6e606382d957aa403f3f12ea235/pywin32-227-cp36-cp36m-win_amd64.whl"'
   - '%BASH% -lc "git clone -b develop https://github.com/pyinstaller/pyinstaller.git"'
   - '%BASH% -lc "cd pyinstaller/bootloader && python3 ./waf all && cd .. && pip3 install ."' 
   #- '%BASH% -lc "pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz"'
