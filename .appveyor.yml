@@ -34,7 +34,7 @@ install:
   - '%BASH% -lc "ls -lh"'
 
 
-test:
+test_script:
   - set HOME=.
   - '%BASH% -lc "tox -e py3"'
 
