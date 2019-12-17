@@ -45,7 +45,8 @@ test_script:
 # This should be before_deploy, once there's a deploy setion added. Like this for now for testing
 after_test:
   - set HOME=.
-  - '%BASH% -lc "pip3 install pypiwin32"'
+  - '%BASH% -lc "python3 --version"'
+  - '%BASH% -lc "pip3 install pywin32==227"'
   - '%BASH% -lc "git clone -b develop https://github.com/pyinstaller/pyinstaller.git"'
   - '%BASH% -lc "cd pyinstaller/bootloader && python3 ./waf all && cd .. && pip3 install ."' 
   #- '%BASH% -lc "pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz"'
