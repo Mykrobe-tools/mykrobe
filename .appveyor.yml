@@ -34,12 +34,20 @@ install:
   - '%BASH% -lc "ls -lh"'
 
 
-build_script:
+test_script:
   - set HOME=.
   - '%BASH% -lc "tox -e py3"'
+
+# This should be after_deploy, once there's a deploy setion added. Like this for now for testing
+after_test:
+  - set HOME=.
+  - '%BASH% -lc "pip3 install pyinstaller"'
   - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex"'
   - '%BASH% -lc "cd mccortex/libs/htslib && git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc"'
   - '%BASH% -lc "cd mccortex/libs/bcftools && git checkout b406a3906b153faa8bec0a53df07b2adf18a3052"'
   - '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
   - '%BASH%  -lc "python3 ./ci/windows_xxhsum_fix.py"'
   - '%BASH%  -lc "cd mccortex && make all && make tests"'
+  - '%BASH%  -lc "cd dist && pyinstaller --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller.spec"'
+
+
