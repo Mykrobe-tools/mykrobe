@@ -28,6 +28,7 @@ install:
   - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
   - '%BASH% -lc "which pip"'
   - '%BASH% -lc "python3 -m ensurepip"'
+  - '%BASH% -lc "pip3 install --upgrade pip3"'
   - '%BASH% -lc "which pip"'
   - '%BASH% -lc "which pip3"'
   - '%BASH% -lc "pip3 install tox"'
