@@ -6,7 +6,7 @@ services:
 
 environment:
     CYG_MIRROR: http://cygwin.mirror.constant.com
-    CYG_PACKAGES: make,unzip,automake,automake1.16,autoconf,autoconf2.5,zip,libbz2-devel,bzip2,xz,zlib,zlib-devel,python3,libtool,wget,liblzma-devel,libcurl-devel,R,libncurses-devel,python3-cython,python3-devel
+    CYG_PACKAGES: make,unzip,automake,automake1.16,autoconf,autoconf2.5,zip,libbz2-devel,bzip2,xz,zlib,zlib-devel,python38,libtool,wget,liblzma-devel,libcurl-devel,R,libncurses-devel,python38-cython,python38-devel
     CYG_ROOT: C:\cygwin64
     CYG_CACHE: C:\cygwin64\var\cache\setup
     CYG_SETUP: setup-x86_64.exe
@@ -45,7 +45,7 @@ test_script:
 # This should be before_deploy, once there's a deploy setion added. Like this for now for testing
 after_test:
   - set HOME=.
-  - '%BASH% -lc "pip3 install pywin32"'
+  - '%BASH% -lc "pip3 install pypiwin32"'
   - '%BASH% -lc "git clone -b develop https://github.com/pyinstaller/pyinstaller.git"'
   - '%BASH% -lc "cd pyinstaller/bootloader && python3 ./waf all && cd .. && pip3 install ."' 
   #- '%BASH% -lc "pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz"'
