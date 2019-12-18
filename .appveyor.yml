@@ -57,6 +57,9 @@ before_deploy:
   #- cd ..
   #- '%BASH% -lc "ls -lh dist/pyinstaller_build/mykrobe_atlas/"'
   #- '%BASH% -lc "cd dist/pyinstaller_build && tar cvfz ../../mykrobe.command_line.windows.tar.gz mykrobe_atlas/"'
+
+
+build_success:
   - '%BASH% -lc "echo TESTING123 > test.windows_deploy.txt"'
 
 artifacts:
