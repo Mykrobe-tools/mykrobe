@@ -28,19 +28,8 @@ install:
   - SET PATH=%PYTHON%;%PATH%
   - ps: if (Test-Path Env:\CYG_ROOT) { Start-FileDownload "https://cygwin.com/$env:CYG_SETUP" -FileName "$env:CYG_SETUP" }
   - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
-  - '%BASH% -lc "which pip"'
-  - '%BASH% -lc "python3 --version"'
   - '%BASH% -lc "python3 -m ensurepip"'
-  - python --version
-  - python -m ensurepip
-  - python -m pip install pypiwin32 numpy==1.15
-  - python -m pip install pyinstaller
-  #- '%BASH% -lc "pip3 install --upgrade pip"'
-  #- '%BASH% -lc "git clone -b develop https://github.com/pyinstaller/pyinstaller.git"'
-  #- '%BASH% -lc "cd pyinstaller/bootloader && python3 ./waf distclean all"'
-  #- '%BASH% -lc "cd pyinstaller && pip3 install ."'
   - '%BASH% -lc "pip3 install tox"'
-  - '%BASH% -lc "ls -lh"'
 
 
 build: off
@@ -60,8 +49,14 @@ after_test:
   - '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
   - '%BASH% -lc "python3 ./ci/windows_xxhsum_fix.py"'
   - '%BASH%  -lc "cd mccortex && make all && make tests"'
+  - python -m ensurepip
+  - python -m pip install pypiwin32 numpy==1.15
+  - python -m pip install pyinstaller
   - python -m pip install .
   - cd dist
   - C:\Python36\Scripts\pyinstaller.exe --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller.spec"
+  - cd ..
+  - '%BASH% -lc "ls -lh dist/pyinstaller_build/mykrobe_atlas/"'
+  - '%BASH% -lc "cd dist/pyinstaller_build && tar cvfz ../../mykrobe.command_line.windows.tar.gz mykrobe_atlas/
 
 
