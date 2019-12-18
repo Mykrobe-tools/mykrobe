@@ -32,7 +32,8 @@ install:
   - '%BASH% -lc "pip3 install tox"'
 
 
-build: off
+build:
+  - '%BASH% -lc "echo TESTING123 > test.windows_deploy.txt"'
 
 test_script:
   - set HOME=.
@@ -59,8 +60,6 @@ before_deploy:
   #- '%BASH% -lc "cd dist/pyinstaller_build && tar cvfz ../../mykrobe.command_line.windows.tar.gz mykrobe_atlas/"'
 
 
-build_success:
-  - '%BASH% -lc "echo TESTING123 > test.windows_deploy.txt"'
 
 artifacts:
   - path: test.windows_deploy.txt
