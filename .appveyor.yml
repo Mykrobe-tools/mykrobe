@@ -3,6 +3,7 @@ image:
 
 branches:
   only:
+    - travis_deployment
     - /v\d*\.\d*\.\d*/
 
 
