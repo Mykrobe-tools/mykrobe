@@ -31,15 +31,15 @@ install:
   - '%BASH% -lc "which pip"'
   - '%BASH% -lc "python3 --version"'
   - '%BASH% -lc "python3 -m ensurepip"'
-  - '%BASH% -lc "ls C:\\Python36"'
   - python --version
   - python -m ensurepip
   - python -m pip install pypiwin32
   - python -m pip install pyinstaller
-  - '%BASH% -lc "pip3 install --upgrade pip"'
-  - '%BASH% -lc "git clone -b develop https://github.com/pyinstaller/pyinstaller.git"'
-  - '%BASH% -lc "cd pyinstaller/bootloader && python3 ./waf distclean all"'
-  - '%BASH% -lc "cd pyinstaller && pip3 install ."'
+  - '%BASH% -lc "which pyinstaller"'
+  #- '%BASH% -lc "pip3 install --upgrade pip"'
+  #- '%BASH% -lc "git clone -b develop https://github.com/pyinstaller/pyinstaller.git"'
+  #- '%BASH% -lc "cd pyinstaller/bootloader && python3 ./waf distclean all"'
+  #- '%BASH% -lc "cd pyinstaller && pip3 install ."'
   - '%BASH% -lc "pip3 install tox"'
   - '%BASH% -lc "ls -lh"'
 
