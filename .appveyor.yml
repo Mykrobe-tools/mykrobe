@@ -1,6 +1,11 @@
 image:
   - Visual Studio 2019
 
+branches:
+  only:
+    - /v\d*\.\d*\.\d*/
+
+
 services:
   - mongodb
 
@@ -40,39 +45,37 @@ test_script:
   - '%BASH% -lc "echo skip tests to save time while testing pyinstaller"'
 
 after_test:
-  - '%BASH% -lc "echo TESTING123 > test.windows_deploy.txt"'
-
-
-before_deploy:
   - set HOME=.
   - SET PATH=%PYTHON%;%PATH%
-  #- '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex"'
-  #- '%BASH% -lc "cd mccortex/libs/htslib && git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc"'
-  #- '%BASH% -lc "cd mccortex/libs/bcftools && git checkout b406a3906b153faa8bec0a53df07b2adf18a3052"'
-  #- '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
-  #- '%BASH% -lc "python3 ./ci/windows_xxhsum_fix.py"'
-  #- '%BASH%  -lc "cd mccortex && make all && make tests"'
-  #- python -m ensurepip
-  #- python -m pip install pypiwin32 numpy==1.15
-  #- python -m pip install pyinstaller
-  #- python -m pip install .
-  #- cd dist
-  #- C:\Python36\Scripts\pyinstaller.exe --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller.spec"
-  #- cd ..
-  #- '%BASH% -lc "ls -lh dist/pyinstaller_build/mykrobe_atlas/"'
-  #- '%BASH% -lc "cd dist/pyinstaller_build && tar cvfz ../../mykrobe.command_line.windows.tar.gz mykrobe_atlas/"'
-
+  - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex"'
+  - '%BASH% -lc "cd mccortex/libs/htslib && git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc"'
+  - '%BASH% -lc "cd mccortex/libs/bcftools && git checkout b406a3906b153faa8bec0a53df07b2adf18a3052"'
+  - '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
+  - '%BASH% -lc "python3 ./ci/windows_xxhsum_fix.py"'
+  - '%BASH%  -lc "cd mccortex && make all && make tests"'
+  - python -m ensurepip
+  - python -m pip install pypiwin32 numpy==1.15
+  - python -m pip install pyinstaller
+  - python -m pip install .
+  - cd dist
+  - C:\Python36\Scripts\pyinstaller.exe --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller.spec"
+  - '%BASH% -lc "ls -lh pyinstaller_build/mykrobe_atlas"'
+  - ./pyinstaller_build/mykrobe_atlas/mykrobe_atlas.exe
+  - cd ..
+  - '%BASH% -lc "ls -lh dist/pyinstaller_build/mykrobe_atlas/"'
+  - '%BASH% -lc "cd dist/pyinstaller_build && tar cvfz ../../mykrobe.command_line.windows.tar.gz mykrobe_atlas/"'
 
 
 artifacts:
-  - path: test.windows_deploy.txt
+  - path: mykrobe.command_line.windows.tar.gz
     type: File
+
 
 deploy:
   provider: GitHub
   auth_token:
       secure: 3DyaU0V4K58oeRoR6XM2eHP8CGzDhY6qlB9b6CHOApbHfGvi8e85/d9BUvoVm4tR
-  artifact: test.windows_deploy.txt
+  artifact: mykrobe.command_line.windows.tar.gz
   draft: false
   prerelease: false
   on:
