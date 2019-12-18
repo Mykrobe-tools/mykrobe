@@ -30,7 +30,6 @@ install:
   - '%BASH% -lc "python3 --version"'
   - '%BASH% -lc "python3 -m ensurepip"'
   - python --version
-  - python3 --version
   - C:\Python36 -m ensurepip
   - C:\Python36 -m pip install --upgrade pip
   - C:\Python36 -m pip install pypiwin32
