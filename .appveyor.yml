@@ -33,7 +33,7 @@ install:
   - '%BASH% -lc "python3 -m ensurepip"'
   - python --version
   - python -m ensurepip
-  - python -m pip install pypiwin32
+  - python -m pip install pypiwin32 numpy==1.15
   - python -m pip install pyinstaller
   - '%BASH% -lc "ls -lh /cygdrive/c/"'
   - '%BASH% -lc "/cygdrive/c/Python36/Scripts/pyinstaller --help"'
