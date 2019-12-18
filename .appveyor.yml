@@ -49,13 +49,13 @@ build: off
 
 test_script:
   - set HOME=.
-  - SET PATH=%PYTHON%;%PATH%
   #- '%BASH% -lc "tox -e py3"'
   - '%BASH% -lc "echo skip tests to save time while testing pyinstaller"'
 
 # This should be before_deploy, once there's a deploy setion added. Like this for now for testing
 after_test:
   - set HOME=.
+  - SET PATH=%PYTHON%;%PATH%
   - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex"'
   - '%BASH% -lc "cd mccortex/libs/htslib && git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc"'
   - '%BASH% -lc "cd mccortex/libs/bcftools && git checkout b406a3906b153faa8bec0a53df07b2adf18a3052"'
