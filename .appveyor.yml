@@ -35,6 +35,7 @@ install:
   - python -m ensurepip
   - python -m pip install pypiwin32
   - python -m pip install pyinstaller
+  - '%BASH% -lc "ls -lh /cygdrive/c/"'
   - '%BASH% -lc "/cygdrive/c/Python36/Scripts/pyinstaller --help"'
   #- '%BASH% -lc "pip3 install --upgrade pip"'
   #- '%BASH% -lc "git clone -b develop https://github.com/pyinstaller/pyinstaller.git"'
