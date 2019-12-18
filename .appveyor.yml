@@ -61,7 +61,7 @@ after_test:
   - cd dist
   - C:\Python36\Scripts\pyinstaller.exe --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller.spec"
   - '%BASH% -lc "ls -lh pyinstaller_build/mykrobe_atlas"'
-  - cmd: ./pyinstaller_build/mykrobe_atlas/mykrobe_atlas.exe
+  - '%BASH% -lc "./pyinstaller_build/mykrobe_atlas/mykrobe_atlas.exe"'
   - cd ..
   - '%BASH% -lc "ls -lh dist/pyinstaller_build/mykrobe_atlas/"'
   - '%BASH% -lc "cd dist/pyinstaller_build && tar cvfz ../../mykrobe.command_line.windows.tar.gz mykrobe_atlas/"'
