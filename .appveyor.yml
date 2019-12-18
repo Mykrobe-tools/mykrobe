@@ -42,7 +42,7 @@ build: off
 
 test_script:
   - set HOME=.
-  #- '%BASH% -lc "tox -e py3"'
+  - '%BASH% -lc "tox -e py3"'
   - '%BASH% -lc "echo skip tests to save time while testing pyinstaller"'
 
 after_test:
@@ -60,9 +60,8 @@ after_test:
   - python -m pip install .
   - cd dist
   - C:\Python36\Scripts\pyinstaller.exe --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller.spec"
-  - '%BASH% -lc "ls -lh pyinstaller_build/mykrobe_atlas"'
-  - '%BASH% -lc "./pyinstaller_build/mykrobe_atlas/mykrobe_atlas.exe"'
   - cd ..
+  - '%BASH% -lc "./pyinstaller_build/mykrobe_atlas/mykrobe_atlas.exe"'
   - '%BASH% -lc "ls -lh dist/pyinstaller_build/mykrobe_atlas/"'
   - '%BASH% -lc "cd dist/pyinstaller_build && tar cvfz ../../mykrobe.command_line.windows.tar.gz mykrobe_atlas/"'
 
