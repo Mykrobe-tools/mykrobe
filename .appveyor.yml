@@ -49,6 +49,7 @@ build: off
 
 test_script:
   - set HOME=.
+  - SET PATH=%PYTHON%;%PATH%
   #- '%BASH% -lc "tox -e py3"'
   - '%BASH% -lc "echo skip tests to save time while testing pyinstaller"'
 
@@ -60,8 +61,11 @@ after_test:
   - '%BASH% -lc "cd mccortex/libs/bcftools && git checkout b406a3906b153faa8bec0a53df07b2adf18a3052"'
   - '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
   - '%BASH% -lc "python3 ./ci/windows_xxhsum_fix.py"'
-  - '%BASH%  -lc "cd mccortex && make all && make tests"'
-  - '%BASH% -lc "pip3 install ."'
+  #- '%BASH%  -lc "cd mccortex && make all && make tests"'
+  #- '%BASH% -lc "pip3 install ."'
+  - python -m pip install .
+  - cd dist
+  - C:\Python36\Scripts\pyinstaller.exe --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller.spec"
   - '%BASH%  -lc "cd dist && /cygdrive/c/Python36/Scripts/pyinstaller --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller.spec"'
 
 
