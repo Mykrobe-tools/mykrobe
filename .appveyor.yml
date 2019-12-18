@@ -30,9 +30,9 @@ install:
   - '%BASH% -lc "which pip"'
   - '%BASH% -lc "python3 --version"'
   - '%BASH% -lc "python3 -m ensurepip"'
-  - python --version
-  - python -m ensurepip
-  - python -m pip install pypiwin32
+  - '%PYTHON% --version'
+  - '%PYTHON% -m ensurepip'
+  - '%PYTHON% -m pip install pypiwin32'
   - '%BASH% -lc "pip3 install --upgrade pip"'
   - '%BASH% -lc "git clone -b develop https://github.com/pyinstaller/pyinstaller.git"'
   - '%BASH% -lc "cd pyinstaller/bootloader && python3 ./waf distclean all"'
