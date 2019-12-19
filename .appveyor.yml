@@ -61,7 +61,7 @@ after_test:
   #- cd dist
   #- C:\Python36\Scripts\pyinstaller.exe --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller.spec"
   #- cd ..
-  ' '%BASH% -lc "ls -lh /cygdrive/c/Python36/Scripts/"'
+  - '%BASH% -lc "ls -lh /cygdrive/c/Python36/Scripts/"'
   - '%BASH% -lc "/cygdrive/c/Python36/Scripts/pyinstaller --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller.spec"'
   - '%BASH% -lc "./dist/pyinstaller_build/mykrobe_atlas/mykrobe_atlas.exe"'
   - '%BASH% -lc "ls -lh dist/pyinstaller_build/mykrobe_atlas/"'
