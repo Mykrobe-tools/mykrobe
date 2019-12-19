@@ -40,95 +40,12 @@ jobs:
     - tar cvfz ../../mykrobe.command_line.${TRAVIS_OS_NAME}.${TRAVIS_TAG}.tar.gz mykrobe_atlas/
     - cd ../../
 
-  - name: Windows Python 3.8.0
-    os: windows
-    language: shell
-    before_install:
-    - choco install python --version 3.8.0
-    - choco install make
-    - choco install mongodb
-    #- git config --global core.autocrlf true
-    #- choco install cygwin
-    #- ls -lh /c/tools/cygwin/
-    #- C:\\tools\\cygwin\\cygwinsetup.exe -q -P make,unzip,automake,autoconf,zip,bzip2,xz
-    #- powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
-    - cygcheck --sysinfo -v
-    #- cygwin-console-helper.exe -P make,unzip,automake,autoconf,zip,bzip2,xz
-    - ls -lh /
-    - echo $PATH
-    - which autoconf || echo "autoconf not found"
-    - which bash || echo "bash not found"
-    - which make || echo "make not found"
-    - which cc || echo "cc not found"
-    - which gcc || echo "gcc not found"
-    - ls -lh /bin/
-    - ls -lh /c
-    - ls -lh /tmp
-    - ls -lh /c/ProgramData
-    - ls -lh /c/*
-    - python -m pip install --upgrade pip
-    - choco install bzip2
-    - find /c/ProgramData/chocolatey/ | sort
-    - p=$PWD
-    - cd ..
-    - mkdir xz
-    - cd xz
-    - wget https://tukaani.org/xz/xz-5.2.4-windows.zip
-    - unzip xz-5.2.4-windows.zip
-    - cp -rp include/* /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/include/
-    - cp bin_x86-64/liblzma.a /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/lib/
-    - cd ..
-    - wget https://sourceforge.net/projects/bzip2/files/bzip2-1.0.6.tar.gz
-    - tar xf bzip2-1.0.6.tar.gz
-    - cd bzip2-1.0.6
-    - make
-    - ls -lh
-    - cp bzlib.h /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/include/
-    - cp libbz2.a /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/x86_64-w64-mingw32/lib/
-    - cd $p
-    env:
-    - PATH=/c/Python38:/c/Python38/Scripts:$PATH
-    - TOXENV=py38
-    - CC=gcc
-    before_deploy:
-    - original_dir=$PWD
-    - pip3 install pypiwin32
-    - pip3 install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz
-    - git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
-    - python ci/windows_xxhsum_fix.py
-    - cd mccortex/libs/htslib/
-    # Use older htslib release, which does not include <sys/socket.h>, which
-    # breaks windows because it doesn't exist (windows uses winsock instead)
-    - git checkout 1832d3a1b75133e55fb6abffc3f50f8a6ed5ceae
-    #- autoreconf
-    #- ./configure --disable-bz2
-    - export C_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$C_INCLUDE_PATH
-    - export CPLUS_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPLUS_INCLUDE_PATH
-    - export CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH
-    - echo $CPATH
-    #- ln -s /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/bzlib.h
-    - make
-    #- powershell -Command "C:\tools\cygwin\bin\bash.exe -c './ci/windows_before_install.sh'";
-    - cd ../../
-    # To find bzlib.h, otherwise make fails
-    - export C_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$C_INCLUDE_PATH
-    - export CPLUS_INCLUDE_PATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPLUS_INCLUDE_PATH
-    - export CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH
-    - echo $CPATH
-    - ls -lh $CPATH
-    #- CPATH=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/include/:$CPATH make
-    - make
-    - cd ../dist
-    - pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller.spec
-    - cd pyinstaller_build
-    - tar cvfz ../../mykrobe.command_line.${TRAVIS_OS_NAME}.${TRAVIS_TAG}.tar.gz mykrobe_atlas/
-    - cd ../../
 
 install:
 - pip install cython
 - travis_retry pip install tox
-#script: tox -e $TOXENV
-script: echo "Skipping tests"
+script: tox -e $TOXENV
+#script: echo "Skipping tests"
 
 deploy:
   provider: releases
@@ -138,7 +55,7 @@ deploy:
   file: mykrobe.command_line.${TRAVIS_OS_NAME}.${TRAVIS_TAG}.tar.gz
   on:
     tags: true
-    condition: $TRAVIS_OS_NAME = osx || $TRAVIS_OS_NAME = windows
+    condition: $TRAVIS_OS_NAME = osx
     repo: martinghunt/mykrobe
 
 notifications:
