@@ -67,6 +67,7 @@ after_test:
   - '%BASH% -lc "cd dist/pyinstaller_build && tar cvfz ../../mykrobe.command_line.windows.tar.gz mykrobe_atlas/"'
 
 
+
 artifacts:
   - path: mykrobe.command_line.windows.tar.gz
     type: File
