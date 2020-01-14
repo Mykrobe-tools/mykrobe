@@ -53,7 +53,7 @@ after_test:
   - '%BASH% -lc "cd mccortex/libs/htslib && git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc"'
   - '%BASH% -lc "cd mccortex/libs/bcftools && git checkout b406a3906b153faa8bec0a53df07b2adf18a3052"'
   - '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
-  - '%BASH% -lc "python3 ./ci/windows_xxhsum_fix.py"'
+  - '%BASH% -lc "python3 ./ci/windows_file_fixes.py"'
   - '%BASH%  -lc "cd mccortex && make all && make tests"'
   - python -m ensurepip
   - python -m pip install pypiwin32 numpy==1.15
