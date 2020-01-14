@@ -47,16 +47,24 @@ class MyInstall(DistutilsInstall):
         os.unlink(tarball_filename)
 
     def _install_mccortex(self):
-        mccortex_dir = os.path.dirname(os.path.realpath(__file__))+"/mccortex"
-        if not os.path.exists(mccortex_dir):
+        dir_of_this_file = os.path.dirname(os.path.realpath(__file__))
+        mccortex_git_dir = os.path.join(dir_of_this_file, "mccortex")
+        if not os.path.exists(mccortex_git_dir):
             subprocess.call(
-                ["git", "clone", "--recursive", "-b", "geno_kmer_count", "https://github.com/phelimb/mccortex", mccortex_dir], cwd=os.path.dirname(os.path.realpath(__file__)))
+                ["git", "clone", "--recursive", "-b", "geno_kmer_count", "https://github.com/phelimb/mccortex", mccortex_git_dir], cwd=dir_of_this_file)
+
+        mccortex_build_binary = os.path.join(mccortex_git_dir, "bin", "mccortex31")
+        if not os.path.exists(mccortex_build_binary):
             subprocess.call(
-                ["make", "clean"], cwd=mccortex_dir)
+                ["make", "clean"], cwd=mccortex_git_dir)
             subprocess.call(
-                ["make"], cwd=mccortex_dir)
-            subprocess.call(
-                ["cp", "bin/mccortex31", "%s/bin/" % os.environ.get('VIRTUAL_ENV', '/usr/local/')], cwd=mccortex_dir)
+                ["make"], cwd=mccortex_git_dir)
+
+        mccortex_install_dir = os.path.join(dir_of_this_file, "src", "mykrobe", "cortex")
+        mccortex_install_binary = os.path.join(mccortex_install_dir, "mccortex31")
+        assert os.path.exists(mccortex_install_dir)
+        shutil.copy(mccortex_build_binary, mccortex_install_binary)
+
         DistutilsInstall.run(self)
 
 
@@ -85,6 +93,7 @@ setup(
     py_modules=[splitext(basename(path))[0] for path in glob(
         'src/*.py')]+[splitext(basename(path))[0] for path in glob('src/*/*.py')]+[splitext(basename(path))[0] for path in glob('src/*/*/*.py')],
     include_package_data=True,
+    package_data={"mykrobe": ["cortex/mccortex31"]},
     zip_safe=False,
     classifiers=[
         'Intended Audience :: Developers',
