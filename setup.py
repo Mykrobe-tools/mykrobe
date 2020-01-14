@@ -3,7 +3,10 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import os
+import requests
+import shutil
 import subprocess
+import tarfile
 import io
 import re
 from glob import glob
@@ -20,7 +23,30 @@ from setuptools.command.install import install as DistutilsInstall
 class MyInstall(DistutilsInstall):
 
     def run(self):
+        self._get_mykrobe_data()
+        self._install_mccortex()
 
+    def _get_mykrobe_data(self):
+        data_tarball_url = "https://bit.ly/2H9HKTU"
+        dir_of_this_file = os.path.dirname(os.path.realpath(__file__))
+        mykrobe_dir = os.path.join(dir_of_this_file, "src", "mykrobe")
+        assert os.path.exists(mykrobe_dir)
+        data_dir = os.path.join(mykrobe_dir, "data")
+        if os.path.exists(data_dir):
+            shutil.rmtree(data_dir)
+        extracted_name = "mykrobe-data"
+        tarball_filename = "mykrobe_data.tar.gz"
+        request = requests.get(data_tarball_url, allow_redirects=True)
+        open(tarball_filename, 'wb').write(request.content)
+        if os.path.exists(extracted_name):
+            shutil.rmtree(extracted_name)
+        t = tarfile.open(tarball_filename, mode="r")
+        t.extractall()
+        assert os.path.exists(extracted_name)
+        os.rename(extracted_name, data_dir)
+        os.unlink(tarball_filename)
+
+    def _install_mccortex(self):
         mccortex_dir = os.path.dirname(os.path.realpath(__file__))+"/mccortex"
         if not os.path.exists(mccortex_dir):
             subprocess.call(
