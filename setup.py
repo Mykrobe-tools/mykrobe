@@ -51,7 +51,7 @@ class MyInstall(DistutilsInstall):
         mccortex_git_dir = os.path.join(dir_of_this_file, "mccortex")
         if not os.path.exists(mccortex_git_dir):
             subprocess.call(
-                ["git", "clone", "--recursive", "-b", "geno_kmer_count", "https://github.com/phelimb/mccortex", mccortex_git_dir], cwd=dir_of_this_file)
+                ["git", "clone", "--recursive", "-b", "geno_kmer_count", "https://github.com/Mykrobe-tools/mccortex", mccortex_git_dir], cwd=dir_of_this_file)
 
         mccortex_build_binary = os.path.join(mccortex_git_dir, "bin", "mccortex31")
         if not os.path.exists(mccortex_build_binary):
