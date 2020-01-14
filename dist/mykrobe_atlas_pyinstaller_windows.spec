@@ -15,7 +15,7 @@ a = Analysis(['../src/mykrobe/cli.py'],
              win_private_assemblies=False,
              cipher=block_cipher)
 
-a.binaries += Tree('../mccortex/bin/', prefix='.')
+a.binaries += Tree('../mccortex/bin/', prefix='mykrobe/cortex/')
 a.datas += Tree('../src/mykrobe/data', prefix='mykrobe/data')
 
 pyz = PYZ(a.pure, a.zipped_data,
