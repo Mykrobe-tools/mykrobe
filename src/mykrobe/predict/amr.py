@@ -86,7 +86,7 @@ class BasePredictor(object):
         self.ignore_minor_calls = ignore_minor_calls
 
     def _create_initial_resistance_prediction(self):
-        self.result = MykrobePredictorSusceptibilityResult(dict(
+        self.result = MykrobePredictorSusceptibilityResult(susceptibility = dict(
             (k, {"predict": "N"}) for k in self.drugs))
         self.resistance_predictions = self.result.susceptibility
 
@@ -104,7 +104,7 @@ class BasePredictor(object):
                 gene = gene[0]
             self._update_resistance_prediction(name, gene)
 
-      
+
 
     def _update_resistance_prediction(self, allele_name, variant_or_gene):
         variant_or_gene_names = self._get_names(allele_name)

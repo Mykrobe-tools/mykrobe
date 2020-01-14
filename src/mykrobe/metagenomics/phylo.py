@@ -62,7 +62,7 @@ class SpeciesPredictor(object):
     def run(self):
         self._load_taxon_thresholds()
         self._aggregate_all()
-        return MykrobePredictorPhylogeneticsResult(self.out_json["phylogenetics"])
+        return MykrobePredictorPhylogeneticsResult(phylogenetics=self.out_json["phylogenetics"])
 
     def _add_unknown_where_empty(self, covgs):
         if not covgs:

@@ -316,7 +316,6 @@ def run(parser, args):
         verbose=False,
         tmp_dir=args.tmp,
         skeleton_dir=args.skeleton_dir,
-        mccortex31_path=args.mccortex31_path,
     )
     cp.run()
     logger.debug("CoverageParser complete")

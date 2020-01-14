@@ -5,9 +5,6 @@ import argparse
 
 DEFAULT_KMER_SIZE = os.environ.get("KMER_SIZE", 21)
 DEFAULT_DB_NAME = os.environ.get("DB_NAME", "mykrobe")
-DEFAULT_MCCORTEX_31 = "mccortex31"
-# os.path.dirname(
-#   os.path.realpath(__file__))+"/../mccortex/bin/mccortex31"
 
 sequence_or_graph_parser_mixin = argparse.ArgumentParser(add_help=False)
 sequence_or_graph_parser_mixin.add_argument(
@@ -33,10 +30,6 @@ sequence_or_graph_parser_mixin.add_argument(
     '--skeleton_dir',
     help='directory for skeleton binaries',
     default="mykrobe/data/skeletons/")
-sequence_or_graph_parser_mixin.add_argument(
-    '--mccortex31_path',
-    help='Path to mccortex31. Default %s' % DEFAULT_MCCORTEX_31,
-    default=DEFAULT_MCCORTEX_31)
 sequence_or_graph_parser_mixin.add_argument(
     '-t',
     '--threads',
@@ -102,7 +95,7 @@ genotyping_mixin.add_argument(
     help='Set default for ONT data. Sets expected_error_rate to 0.15 and to haploid')
 genotyping_mixin.add_argument(
     '--guess_sequence_method',
-    action='store_true', 
+    action='store_true',
     help="Guess if ONT or Illumia based on error rate. If error rate is > 10%%, ploidy is set to haploid and a confidence threshold is used ")
 genotyping_mixin.add_argument(
     '--ignore_minor_calls',
