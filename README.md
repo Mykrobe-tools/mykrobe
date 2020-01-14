@@ -35,31 +35,42 @@
 
 <http://www.mykrobe.com>
 
-## Requirements
-
--   python > 3.4
--   [mongodb](https://www.mongodb.com/) > 3.0 (optional)
 
 ## Installation
 
-### pipenv (virtual environment)
+### From source
 
-To install `mykrobe` into a virtual environment (recommended) with [`pipenv`][pipenv],
-run the following
+Requirements:
 
+-   C++ compiler (to compile mccortex during install)
+-   Python > 3.4
+-   [mongodb](https://www.mongodb.com/) > 3.0 (optional, not needed to run `mykrobe predict`)
+
+Either git clone:
 ```sh
 git clone https://github.com/Mykrobe-tools/mykrobe.git mykrobe
+```
+or download the [latest release](https://github.com/Mykrobe-tools/mykrobe/releases/latest)
+source code archive and extract it.
+
+Then install with:
+```sh
 cd mykrobe
-
-## Download pre-built probesets
-wget -O mykrobe-data.tar.gz https://bit.ly/2H9HKTU && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data
-
-pipenv install -e .  # install mykrobe in a new virtual environment
-pipenv shell  # enter the virtual environment
-mykrobe --help  # mykrobe should now be available on path
+pip3 install .
 ```
 
-[pipenv]: https://pipenv.readthedocs.io/en/latest/
+If you get installation relating to compiling `mccortex`, then it may be helpful
+to debug by trying to compile `mccortex` first. The `mykrobe` install looks for
+the compiled binary file `./mccortex/bin/mccortex31`, and if it finds it then
+it does not try to recompile, and simply copies the file.
+This means you can make this binary before running `pip3`, like this:
+```sh
+git clone --recursive -b geno_kmer_count https://github.com/Mykrobe-tools/mccortex mccortex
+cd mccortex
+make
+```
+and once the `make` runs successfully, `pip3 install .` can be run from the `mykrobe/`
+directory.
 
 ### Bioconda
 [![conda badge](https://anaconda.org/bioconda/mykrobe/badges/installer/conda.svg)][bioconda]
@@ -95,21 +106,6 @@ singularity exec docker://"$uri" mykrobe --help
 # using docker
 docker pull "$uri"
 ```
-
-### pip
-
-```sh
-git clone https://github.com/Mykrobe-tools/mykrobe.git mykrobe
-cd mykrobe
-
-## Download pre-built probesets
-wget -O mykrobe-data.tar.gz https://bit.ly/2H9HKTU && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data
-
-pip3 install .
-```
-**Note:** It is recommended you install inside a virtual environment. If you choose not to, you will need to run the `pip3 install` command with `sudo`. This is because it attempts to put some binaries inside `/usr/local/bin` if the installation is not being run from inside a [virtual environment][venv].
-
-[venv]: https://docs.python-guide.org/dev/virtualenvs/
 
 
 ## Usage
@@ -273,7 +269,7 @@ Output is in CSV by default. For a more detailed output use the JSON format with
                     "median_depth": 53
                 }
             }
-        },  
+        },
         "typed_variants": {
             "rpoB_N438S-AAC761118AGT": {
                 "info": {
@@ -304,8 +300,8 @@ Output is in CSV by default. For a more detailed output use the JSON format with
                     -99999999.0,
                     -99999999.0
                 ]
-            },   ...               
-        },          
+            },   ...
+        },
 ```
 ## Citing
 
@@ -533,10 +529,10 @@ mykrobe genotype sample_id example-data/staph-amr-bradley_2015.fasta -1 seq.fq
                 -349.45246450237215,
                 -10.95808091830304
             ]
-        },                     
+        },
     ....
 }
-}     
+}
 ```
 ### Make a custom probe set (for use with `mykrobe genotype`)
 
@@ -568,7 +564,7 @@ mykrobe variants add --db_name :db_name sample.vcf :reference
 Use the `--method` argument to specify the variant caller or pipeline used (if you'll have multiple Call Sets per sample)
 
 ```sh
-mykrobe variants add --db_name :db_name --method CORTEX sample_cortex.vcf :reference    
+mykrobe variants add --db_name :db_name --method CORTEX sample_cortex.vcf :reference
 ```
 
 ### Make probes and dump-probes
