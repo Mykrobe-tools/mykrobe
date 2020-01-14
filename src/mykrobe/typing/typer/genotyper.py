@@ -44,7 +44,7 @@ class CoverageParser(object):
         verbose=True,
         tmp_dir="tmp/",
         skeleton_dir="atlas/data/skeletons/",
-        mccortex31_path="mccortex31",
+        #mccortex31_path="mccortex31",
     ):
         self.sample = sample
         self.seq = seq
@@ -60,7 +60,7 @@ class CoverageParser(object):
         self.tmp_dir = tmp_dir
         self.panel_file_paths = panel_file_paths
         self.panels = []
-        self.mccortex31_path = mccortex31_path
+        #self.mccortex31_path = mccortex31_path
         self.threads = threads
         self.memory = memory
         for panel_file_path in self.panel_file_paths:
@@ -86,7 +86,7 @@ class CoverageParser(object):
             panel_name=self.panel_name,
             tmp_dir=self.tmp_dir,
             skeleton_dir=self.skeleton_dir,
-            mccortex31_path=self.mccortex31_path,
+            #mccortex31_path=self.mccortex31_path,
         )
         self.mc_cortex_runner.run()
 

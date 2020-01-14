@@ -36,7 +36,7 @@ def run_main(parser, args):
         skeleton_dir=args.skeleton_dir,
         threads=args.threads,
         memory=args.memory,
-        mccortex31_path=args.mccortex31_path)
+    )
     cp.run()
     if args.expected_depth is None:
         args.expected_depth = cp.estimate_depth()
@@ -74,7 +74,7 @@ def run_main(parser, args):
     if args.output:
         with open(args.output, 'w') as outfile:
             json.dump(gt.out_json, outfile, indent=4)
-                
+
     if not args.keep_tmp:
         cp.remove_temporary_files()
     return gt.out_json
