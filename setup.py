@@ -27,7 +27,7 @@ class MyInstall(DistutilsInstall):
         self._install_mccortex()
 
     def _get_mykrobe_data(self):
-        data_tarball_url = "https://bit.ly/2H9HKTU"
+        data_tarball_url = "https://ndownloader.figshare.com/files/20996829"
         dir_of_this_file = os.path.dirname(os.path.realpath(__file__))
         mykrobe_dir = os.path.join(dir_of_this_file, "src", "mykrobe")
         assert os.path.exists(mykrobe_dir)
