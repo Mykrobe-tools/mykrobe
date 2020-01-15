@@ -45,6 +45,7 @@ install:
 - pip3 install cython
 - pip3 install requests
 - travis_retry pip3 install tox
+- ./ci/download_data.sh
 script: tox -e $TOXENV
 #script: echo "Skipping tests"
 
