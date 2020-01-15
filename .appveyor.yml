@@ -35,7 +35,7 @@ install:
   - ps: if (Test-Path Env:\CYG_ROOT) { Start-FileDownload "https://cygwin.com/$env:CYG_SETUP" -FileName "$env:CYG_SETUP" }
   - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
   - '%BASH% -lc "python3 -m ensurepip"'
-  - '%BASH% -lc "python3 -m pip install -v numpy"'
+  - '%BASH% -lc "python3 -m pip install -v numpy==1.15"'
   - ls C:\cygwin64\bin
   - python -m ensurepip
   - python -m pip install requests tox
@@ -66,9 +66,8 @@ after_test:
   - '%BASH% -lc "pwd"'
   - '%BASH% -lc "ls -lh ."'
   - '%BASH% -lc "ls -lh *"'
-  #- python -m pip install -vvv .
-  - '%BASH% -lc "python3 -m pip install -v numpy"'
-  - '%BASH% -lc "python3 -m pip install -vvv ."'
+  - '%BASH% -lc "wget -q -O mykrobe-data.tar.gz https://ndownloader.figshare.com/files/20996829 && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data"'
+  - python -m pip install -v .
   - '%BASH% -lc "ls -lh /cygdrive/c/Python36/Scripts/"'
   - '%BASH% -lc "cd dist && /cygdrive/c/Python36/Scripts/pyinstaller --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller_windows.spec"'
   - '%BASH% -lc "./dist/pyinstaller_build/mykrobe_atlas/mykrobe_atlas.exe"'
