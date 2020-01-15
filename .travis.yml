@@ -43,6 +43,7 @@ jobs:
 
 install:
 - pip install cython
+- pip3 install requests
 - travis_retry pip install tox
 script: tox -e $TOXENV
 #script: echo "Skipping tests"
