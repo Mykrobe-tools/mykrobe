@@ -24,6 +24,7 @@ environment:
 # Cache Cygwin/MSYS files to speed up build
 cache:
     - '%CYG_CACHE%'
+    - mccortex
 clone_depth: 1
 
 init:
