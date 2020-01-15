@@ -107,6 +107,28 @@ singularity exec docker://"$uri" mykrobe --help
 docker pull "$uri"
 ```
 
+## Test on example data
+
+You can test that `mykrobe predict` runs as expected by downloading and running
+on a small toy set of reads, as follows.
+
+```sh
+wget -O test_reads.fq.gz https://ndownloader.figshare.com/files/21059229
+mykrobe predict SAMPLE tb --output out.json --format json --seq test_reads.fq.gz
+```
+
+The test reads are simulated, and perfectly match the reference, except for
+the isoniazid resistant associated variant inhA I21T. You should see a section
+like this in the output file `out.json`:
+
+```json
+"Isoniazid": {
+    "predict": "R",
+    "called_by": {
+        "inhA_I21T-ATC1674262ACT": {
+    ... etc
+```
+
 
 ## Usage
 
