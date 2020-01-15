@@ -37,11 +37,12 @@ class MyInstall(DistutilsInstall):
         extracted_name = "mykrobe-data"
         tarball_filename = "mykrobe_data.tar.gz"
         request = requests.get(data_tarball_url, allow_redirects=True)
-        open(tarball_filename, 'wb').write(request.content)
+        with open(tarball_filename, 'wb') as t:
+            t.write(request.content)
         if os.path.exists(extracted_name):
             shutil.rmtree(extracted_name)
-        t = tarfile.open(tarball_filename, mode="r")
-        t.extractall()
+        with tarfile.open(tarball_filename, mode="r") as t:
+            t.extractall()
         assert os.path.exists(extracted_name)
         os.rename(extracted_name, data_dir)
         os.unlink(tarball_filename)
