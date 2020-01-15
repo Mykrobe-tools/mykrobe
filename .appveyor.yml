@@ -46,7 +46,7 @@ install:
   - '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
   - '%BASH% -lc "python3 ./ci/windows_file_fixes.py"'
   - '%BASH% -lc "cd mccortex && make all && make tests"'
-  - '%BASH% -lc "wget -O mykrobe-data.tar.gz https://bit.ly/2H9HKTU && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data"'
+  - '%BASH% -lc "wget -q -O mykrobe-data.tar.gz https://bit.ly/2H9HKTU && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data"'
 
 
 build: off
