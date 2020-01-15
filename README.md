@@ -3,12 +3,11 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Mykrobe](#mykrobe)
-  - [Requirements](#requirements)
   - [Installation](#installation)
-    - [pipenv (virtual environment)](#pipenv-virtual-environment)
+    - [From source](#from-source)
     - [Bioconda](#bioconda)
     - [Containers](#containers)
-    - [pip](#pip)
+  - [Test on example data](#test-on-example-data)
   - [Usage](#usage)
     - [AMR prediction (Mykrobe predictor)](#amr-prediction-mykrobe-predictor)
     - [Examples](#examples)
