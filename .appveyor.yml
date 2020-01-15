@@ -36,6 +36,7 @@ install:
   - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
   - '%BASH% -lc "python3 -m ensurepip"'
   - ls C:\cygwin64\bin
+  - '%BASH% -lc ./ci/download_data.sh'
   - python -m ensurepip
   - python -m pip install requests
   #- '%BASH% -lc "pip3 install tox"'
@@ -60,7 +61,7 @@ after_test:
   - python -m ensurepip
   - python -m pip install pypiwin32 numpy==1.15
   - python -m pip install pyinstaller
-  - '%BASH% -lc "./ci/download_data.sh'
+  - '%BASH% -lc ./ci/download_data.sh'
   - python -m pip install .
   #- cd dist
   #- C:\Python36\Scripts\pyinstaller.exe --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller_windows.spec"
