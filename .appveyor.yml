@@ -37,8 +37,8 @@ install:
   - '%BASH% -lc "python3 -m ensurepip"'
   - ls C:\cygwin64\bin
   - python -m ensurepip
-  - python -m pip install requests
-  - '%BASH% -lc "pip3 install tox"'
+  - python -m pip install requests tox
+  - '%BASH% -lc "pip3 install tox requests"'
 
 
 build: off
