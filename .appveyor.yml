@@ -59,7 +59,8 @@ after_test:
   - python -m pip install pypiwin32 numpy==1.15 requests
   - python -m pip install pyinstaller
   - '%BASH% -lc "wget -q -O mykrobe-data.tar.gz https://ndownloader.figshare.com/files/20996829 && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data"'
-  - python -m pip install -vvv .
+  - '%BASH% -lc "pip3 install ."'
+  #- python -m pip install -vvv .
   #- cd dist
   #- C:\Python36\Scripts\pyinstaller.exe --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller_windows.spec"
   #- cd ..
