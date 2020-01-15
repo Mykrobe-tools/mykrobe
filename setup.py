@@ -48,7 +48,18 @@ class MyInstall(DistutilsInstall):
 
     def _install_mccortex(self):
         dir_of_this_file = os.path.dirname(os.path.realpath(__file__))
-        mccortex_git_dir = os.path.join(dir_of_this_file, "mccortex")
+
+        # This is for the appveyor testing with tox. Building mccortex required
+        # some hacking, so we can't use the simple call to `make` here.
+        # Tox runs somewhere else, in an isolated dir, which means it doesn't
+        # see the build mccortex31 binary. Use an environment variable to
+        # find the built checkout of mccortex, so it doesn't try to build again,
+        # which will just fail
+        if "TOX_INI_DIR" in os.environ:
+            mccortex_git_dir = os.path.join(os.environ["TOX_INI_DIR"], "mccortex")
+        else:
+            mccortex_git_dir = os.path.join(dir_of_this_file, "mccortex")
+
         if not os.path.exists(mccortex_git_dir):
             subprocess.call(
                 ["git", "clone", "--recursive", "-b", "geno_kmer_count", "https://github.com/Mykrobe-tools/mccortex", mccortex_git_dir], cwd=dir_of_this_file)
