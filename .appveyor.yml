@@ -24,7 +24,6 @@ environment:
 # Cache Cygwin/MSYS files to speed up build
 cache:
     - '%CYG_CACHE%'
-    - mccortex
 clone_depth: 1
 
 init:
@@ -49,8 +48,8 @@ build: off
 
 test_script:
   - set HOME=.
-  #- '%BASH% -lc "tox -e py3"'
-  - '%BASH% -lc "echo skip tests to save time while testing pyinstaller"'
+  - '%BASH% -lc "tox -e py3"'
+  #- '%BASH% -lc "echo skip tests to save time while testing pyinstaller"'
 
 after_test:
   - set HOME=.
