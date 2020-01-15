@@ -39,7 +39,7 @@ install:
   - python -m ensurepip
   - python -m pip install requests tox
   - python -m pip install pypiwin32 numpy==1.15
-    #- '%BASH% -lc "pip3 install tox requests"'
+  - '%BASH% -lc "pip3 install tox requests"'
   - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/Mykrobe-tools/mccortex"'
   - '%BASH% -lc "cd mccortex/libs/htslib && git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc"'
   - '%BASH% -lc "cd mccortex/libs/bcftools && git checkout b406a3906b153faa8bec0a53df07b2adf18a3052"'
