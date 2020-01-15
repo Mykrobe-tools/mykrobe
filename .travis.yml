@@ -35,6 +35,7 @@ jobs:
     #- cd mccortex
     #- make
     #- cd ../dist
+    - cd dist
     - pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller.spec
     - cd pyinstaller_build
     - tar cvfz ../../mykrobe.command_line.${TRAVIS_OS_NAME}.${TRAVIS_TAG}.tar.gz mykrobe_atlas/
