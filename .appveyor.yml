@@ -62,7 +62,11 @@ after_test:
 
     #- python -m ensurepip
   - python -m pip install pyinstaller
-  - python -m pip install -vvv .
+  - '%BASH% -lc "pwd"'
+  - '%BASH% -lc "ls -lh ."'
+  - '%BASH% -lc "ls -lh *"'
+  #- python -m pip install -vvv .
+  - '%BASH% -lc "python3 -m pip install -vvv ."'
   - '%BASH% -lc "ls -lh /cygdrive/c/Python36/Scripts/"'
   - '%BASH% -lc "cd dist && /cygdrive/c/Python36/Scripts/pyinstaller --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller_windows.spec"'
   - '%BASH% -lc "./dist/pyinstaller_build/mykrobe_atlas/mykrobe_atlas.exe"'
