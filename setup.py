@@ -48,25 +48,6 @@ class MyInstall(DistutilsInstall):
         os.rename(extracted_name, data_dir)
         os.unlink(tarball_filename)
 
-    def _get_mykrobe_data_with_wget(self):
-        data_tarball_url = "https://ndownloader.figshare.com/files/20996829"
-        dir_of_this_file = os.path.dirname(os.path.realpath(__file__))
-        mykrobe_dir = os.path.join(dir_of_this_file, "src", "mykrobe")
-        assert os.path.exists(mykrobe_dir)
-        data_dir = os.path.join(mykrobe_dir, "data")
-        if os.path.exists(data_dir):
-            shutil.rmtree(data_dir)
-        extracted_name = "mykrobe-data"
-        tarball_filename = "mykrobe_data.tar.gz"
-        subprocess.check_output(["wget", "-q", "-O", tarball_filename, data_tarball_url])
-        if os.path.exists(extracted_name):
-            shutil.rmtree(extracted_name)
-        subprocess.check_output(["tar", "xf", tarball_filename])
-        assert os.path.exists(extracted_name)
-        os.rename(extracted_name, data_dir)
-        os.unlink(tarball_filename)
-
-
     def _install_mccortex(self):
         dir_of_this_file = os.path.dirname(os.path.realpath(__file__))
 
