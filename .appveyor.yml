@@ -36,7 +36,7 @@ install:
   - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
   - '%BASH% -lc "python3 -m ensurepip"'
   - ls C:\cygwin64\bin
-  - '%BASH% -lc ./ci/download_data.sh'
+  - ./ci/download_data.sh
   - python -m ensurepip
   - python -m pip install requests
   #- '%BASH% -lc "pip3 install tox"'
