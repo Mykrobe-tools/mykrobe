@@ -35,49 +35,44 @@ install:
   - ps: if (Test-Path Env:\CYG_ROOT) { Start-FileDownload "https://cygwin.com/$env:CYG_SETUP" -FileName "$env:CYG_SETUP" }
   - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
   - '%BASH% -lc "python3 -m ensurepip"'
-  - '%BASH% -lc "python3 -m pip install -v numpy==1.15"'
-  - ls C:\cygwin64\bin
-  - python -m ensurepip
-  - python -m pip install requests tox
-  - python -m pip install pypiwin32 numpy==1.15
-  - '%BASH% -lc "pip3 install tox requests"'
-  - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/Mykrobe-tools/mccortex"'
+  - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex"'
   - '%BASH% -lc "cd mccortex/libs/htslib && git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc"'
   - '%BASH% -lc "cd mccortex/libs/bcftools && git checkout b406a3906b153faa8bec0a53df07b2adf18a3052"'
   - '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
-  - '%BASH% -lc "python3 ./ci/windows_file_fixes.py"'
-  - '%BASH% -lc "cd mccortex && make all && make tests"'
-  - '%BASH% -lc "wget -q -O mykrobe-data.tar.gz https://ndownloader.figshare.com/files/20996829 && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data"'
+  - '%BASH% -lc "python3 ./ci/windows_xxhsum_fix.py"'
+  - '%BASH%  -lc "cd mccortex && make all && make tests"'
+  - ls C:\cygwin64\bin
+  #- '%BASH% -lc "pip3 install tox"'
 
 
 build: off
 
 test_script:
   - set HOME=.
-    #- '%BASH% -lc "tox -e py3"'
+  #- '%BASH% -lc "tox -e py3"'
   - '%BASH% -lc "echo skip tests to save time while testing pyinstaller"'
 
 after_test:
   - set HOME=.
   - SET PATH=%PYTHON%;%PATH%
-
-    #- python -m ensurepip
+  - python -m ensurepip
+  - python -m pip install pypiwin32 numpy==1.15
   - python -m pip install pyinstaller
-  - '%BASH% -lc "pwd"'
-  - '%BASH% -lc "ls -lh ."'
-  - '%BASH% -lc "ls -lh *"'
-  - '%BASH% -lc "wget -q -O mykrobe-data.tar.gz https://ndownloader.figshare.com/files/20996829 && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data"'
-  - python -m pip install -v .
+  - '%BASH% -lc "wget -O mykrobe-data.tar.gz https://ndownloader.figshare.com/files/20996829 && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data"'
+  - python -m pip install .
+  #- cd dist
+  #- C:\Python36\Scripts\pyinstaller.exe --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller_windows.spec"
+  #- cd ..
   - '%BASH% -lc "ls -lh /cygdrive/c/Python36/Scripts/"'
   - '%BASH% -lc "cd dist && /cygdrive/c/Python36/Scripts/pyinstaller --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller_windows.spec"'
   - '%BASH% -lc "./dist/pyinstaller_build/mykrobe_atlas/mykrobe_atlas.exe"'
   - '%BASH% -lc "ls -lh dist/pyinstaller_build/mykrobe_atlas/"'
-  - '%BASH% -lc "cd dist/pyinstaller_build && tar cvfz ../../mykrobe.command_line.windows.${APPVEYOR_REPO_TAG_NAME}.tar.gz mykrobe_atlas/"'
+  - '%BASH% -lc "cd dist/pyinstaller_build && tar cvfz ../../mykrobe.command_line.windows.tar.gz mykrobe_atlas/"'
 
 
 
 artifacts:
-  - path: mykrobe.command_line.windows.${APPVEYOR_REPO_TAG_NAME}.tar.gz
+  - path: mykrobe.command_line.windows.tar.gz
     type: File
 
 
@@ -85,7 +80,7 @@ deploy:
   provider: GitHub
   auth_token:
       secure: 3DyaU0V4K58oeRoR6XM2eHP8CGzDhY6qlB9b6CHOApbHfGvi8e85/d9BUvoVm4tR
-  artifact: mykrobe.command_line.windows.${APPVEYOR_REPO_TAG_NAME}.tar.gz
+  artifact: mykrobe.command_line.windows.tar.gz
   draft: false
   prerelease: false
   on:
