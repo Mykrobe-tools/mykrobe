@@ -58,7 +58,7 @@ cd mykrobe
 pip3 install .
 ```
 
-If you get installation relating to compiling `mccortex`, then it may be helpful
+If you get installation problems relating to compiling `mccortex`, then it may be helpful
 to debug by trying to compile `mccortex` first. The `mykrobe` install looks for
 the compiled binary file `./mccortex/bin/mccortex31`, and if it finds it then
 it does not try to recompile, and simply copies the file.
