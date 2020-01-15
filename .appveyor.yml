@@ -42,7 +42,7 @@ install:
   - '%BASH% -lc "python3 ./ci/windows_file_fixes.py"'
   - '%BASH%  -lc "cd mccortex && make all && make tests"'
   - ls C:\cygwin64\bin
-  - '%BASH% -lc "pip3 install tox"'
+  - '%BASH% -lc "pip3 install tox requests numpy==1.15"'
 
 
 build: off
