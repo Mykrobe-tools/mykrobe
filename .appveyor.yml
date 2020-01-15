@@ -38,7 +38,15 @@ install:
   - ls C:\cygwin64\bin
   - python -m ensurepip
   - python -m pip install requests tox
-  - '%BASH% -lc "pip3 install tox requests"'
+  - python -m pip install pypiwin32 numpy==1.15
+    #- '%BASH% -lc "pip3 install tox requests"'
+  - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/Mykrobe-tools/mccortex"'
+  - '%BASH% -lc "cd mccortex/libs/htslib && git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc"'
+  - '%BASH% -lc "cd mccortex/libs/bcftools && git checkout b406a3906b153faa8bec0a53df07b2adf18a3052"'
+  - '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
+  - '%BASH% -lc "python3 ./ci/windows_file_fixes.py"'
+  - '%BASH% -lc "cd mccortex && make all && make tests"'
+  - '%BASH% -lc "wget -O mykrobe-data.tar.gz https://bit.ly/2H9HKTU && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data"'
 
 
 build: off
@@ -51,16 +59,9 @@ test_script:
 after_test:
   - set HOME=.
   - SET PATH=%PYTHON%;%PATH%
-  - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/Mykrobe-tools/mccortex"'
-  - '%BASH% -lc "cd mccortex/libs/htslib && git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc"'
-  - '%BASH% -lc "cd mccortex/libs/bcftools && git checkout b406a3906b153faa8bec0a53df07b2adf18a3052"'
-  - '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
-  - '%BASH% -lc "python3 ./ci/windows_file_fixes.py"'
-  - '%BASH% -lc "cd mccortex && make all && make tests"'
-  - python -m ensurepip
-  - python -m pip install pypiwin32 numpy==1.15
+
+    #- python -m ensurepip
   - python -m pip install pyinstaller
-  - '%BASH% -lc "wget -O mykrobe-data.tar.gz https://bit.ly/2H9HKTU && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data"'
   - python -m pip install .
   - '%BASH% -lc "ls -lh /cygdrive/c/Python36/Scripts/"'
   - '%BASH% -lc "cd dist && /cygdrive/c/Python36/Scripts/pyinstaller --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller_windows.spec"'
