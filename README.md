@@ -121,7 +121,7 @@ The test reads are simulated, and perfectly match the reference, except for
 the isoniazid resistant associated variant inhA I21T. You should see a section
 like this in the output file `out.json`:
 
-```json
+```
 "Isoniazid": {
     "predict": "R",
     "called_by": {
