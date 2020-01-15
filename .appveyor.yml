@@ -42,6 +42,7 @@ install:
   - '%BASH% -lc "python3 ./ci/windows_file_fixes.py"'
   - '%BASH%  -lc "cd mccortex && make all && make tests"'
   - '%BASH% -lc "pip3 install tox requests numpy==1.15"'
+  - '%BASH% -lc "wget -q -O mykrobe-data.tar.gz https://ndownloader.figshare.com/files/20996829 && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data"'
 
 
 build: off
