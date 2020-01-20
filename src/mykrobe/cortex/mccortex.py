@@ -14,10 +14,12 @@ class McCortexRunner(object):
         dir_of_this_file = os.path.dirname(os.path.abspath(__file__))
         self.mccortex31_path = os.path.join(dir_of_this_file, "mccortex31")
         if os.path.exists(self.mccortex31_path):
-            logger.debug(f"Found mccortex31: {self.mccortex31_path}")
+            pass
+        elif os.path.exists(self.mccortex31_path + ".exe"):
+            self.mccortex31_path += ".exe"
         else:
             raise RuntimeError(f"Did not find mccortex31. Expected it to be here: {self.mccortex31_path}. Cannot continue")
-
+        logger.debug(f"Found mccortex31: {self.mccortex31_path}")
 
 class McCortexJoin(McCortexRunner):
 
