@@ -49,7 +49,7 @@ build: off
 
 test_script:
   - set HOME=.
-    #- '%BASH% -lc "tox -e py3"'
+  - '%BASH% -lc "tox -e py3"'
 
 after_test:
   - set HOME=.
