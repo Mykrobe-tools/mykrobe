@@ -31,10 +31,6 @@ jobs:
     - ./ci/download_data.sh
     - pip3 install .
     - pip3 install pyinstaller
-    #- git clone --recursive -b geno_kmer_count https://github.com/Mykrobe-tools/mccortex
-    #- cd mccortex
-    #- make
-    #- cd ../dist
     - cd dist
     - pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller.spec
     - cd pyinstaller_build
@@ -48,7 +44,6 @@ install:
 - travis_retry pip3 install tox
 - ./ci/download_data.sh
 script: tox -e $TOXENV
-#script: echo "Skipping tests"
 
 deploy:
   provider: releases
