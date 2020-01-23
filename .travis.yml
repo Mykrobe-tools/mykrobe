@@ -49,8 +49,7 @@ deploy:
   provider: releases
   skip_cleanup: true
   api_key:
-  user: $GITHUB_USER
-  password: $GITHUB_PWD
+    secure: K0UaMS43pAhHa1Ei/TJ7Y0sL8CVOZNZD5lXwQ/r2AS6apWamrl/C81q+NlJ95Wr9H5qbSGOi0MLCOxikz/RMTWYeOgaC91HKx9bpR4TFYdaNhmjtxw37xIsP06AHS6Bpind4nDxBh94sn/KX6iqMoR+SWjh8KVAplKbVcl+jEZj5kNYO/1wGgDxoLLQ7E75pONxncBJUte8g1wPGmI1c1DAfz9OBWEPClMlTOQ/NSK8Ve030DR9q8LDSkgOmbGx8/gay9S1jqyyqYPZgArhO9Q9/ls0rjxqhNshr5iTljpokxeNT3A3xBsdFZ4QsTgI3PmTGutl4g6d4Pnyz723e+Kwb52wkfH9+lZN5fHGwUAd+gQhZZhrvDRgWzG/N087/2QKxaTgVlRqFS+rG5JyWzQyFUmndnAOxIArDpvq7W3eaPjn0/FSfctOrO+HzJMI+zFWEhu4PjfZnr3GIN15/eisbNdapdM4O1bpyshLrVFVw05fOskSmctQ84qYqQpV3O09RQA4no0pUIXgbP2hig197TMJiCOdlUzCb4Aw3toP9aECvMqXCxG59L2HrZDh8TKSbIdQ0pblrDCXqeKeEs4JviZnJwemYuMoYhHSGbNcrfGgsb6uP1AmG0bfFlG8amKcfkzQrYKhYjfRHA6U34S3OJNz8oz9xGpeaP1AgAdQ=
   file: mykrobe.command_line.${TRAVIS_OS_NAME}.${TRAVIS_TAG}.tar.gz
   on:
     tags: true
