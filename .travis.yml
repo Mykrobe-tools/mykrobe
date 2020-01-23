@@ -54,7 +54,7 @@ deploy:
   on:
     tags: true
     condition: $TRAVIS_OS_NAME = osx
-    repo: mykrobe-tools/mykrobe
+    repo: Mykrobe-tools/mykrobe
 
 notifications:
   email: false
