@@ -54,7 +54,7 @@ deploy:
   on:
     tags: true
     condition: $TRAVIS_OS_NAME = osx
-    repo: martinghunt/mykrobe
+    repo: mykrobe-tools/mykrobe
 
 notifications:
   email: false
