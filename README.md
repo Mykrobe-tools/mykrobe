@@ -3,12 +3,11 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Mykrobe](#mykrobe)
-  - [Requirements](#requirements)
   - [Installation](#installation)
-    - [pipenv (virtual environment)](#pipenv-virtual-environment)
+    - [From source](#from-source)
     - [Bioconda](#bioconda)
     - [Containers](#containers)
-    - [pip](#pip)
+  - [Test on example data](#test-on-example-data)
   - [Usage](#usage)
     - [AMR prediction (Mykrobe predictor)](#amr-prediction-mykrobe-predictor)
     - [Examples](#examples)
@@ -35,31 +34,42 @@
 
 <http://www.mykrobe.com>
 
-## Requirements
-
--   python > 3.4
--   [mongodb](https://www.mongodb.com/) > 3.0 (optional)
 
 ## Installation
 
-### pipenv (virtual environment)
+### From source
 
-To install `mykrobe` into a virtual environment (recommended) with [`pipenv`][pipenv],
-run the following
+Requirements:
 
+-   C++ compiler (to compile mccortex during install)
+-   Python > 3.4
+-   [mongodb](https://www.mongodb.com/) > 3.0 (optional, not needed to run `mykrobe predict`)
+
+Either git clone:
 ```sh
 git clone https://github.com/Mykrobe-tools/mykrobe.git mykrobe
+```
+or download the [latest release](https://github.com/Mykrobe-tools/mykrobe/releases/latest)
+source code archive and extract it.
+
+Then install with:
+```sh
 cd mykrobe
-
-## Download pre-built probesets
-wget -O mykrobe-data.tar.gz https://bit.ly/2H9HKTU && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data
-
-pipenv install -e .  # install mykrobe in a new virtual environment
-pipenv shell  # enter the virtual environment
-mykrobe --help  # mykrobe should now be available on path
+pip3 install .
 ```
 
-[pipenv]: https://pipenv.readthedocs.io/en/latest/
+If you get installation problems relating to compiling `mccortex`, then it may be helpful
+to debug by trying to compile `mccortex` first. The `mykrobe` install looks for
+the compiled binary file `./mccortex/bin/mccortex31`, and if it finds it then
+it does not try to recompile, and simply copies the file.
+This means you can make this binary before running `pip3`, like this:
+```sh
+git clone --recursive -b geno_kmer_count https://github.com/Mykrobe-tools/mccortex mccortex
+cd mccortex
+make
+```
+and once the `make` runs successfully, `pip3 install .` can be run from the `mykrobe/`
+directory.
 
 ### Bioconda
 [![conda badge](https://anaconda.org/bioconda/mykrobe/badges/installer/conda.svg)][bioconda]
@@ -96,20 +106,27 @@ singularity exec docker://"$uri" mykrobe --help
 docker pull "$uri"
 ```
 
-### pip
+## Test on example data
+
+You can test that `mykrobe predict` runs as expected by downloading and running
+on a small toy set of reads, as follows.
 
 ```sh
-git clone https://github.com/Mykrobe-tools/mykrobe.git mykrobe
-cd mykrobe
-
-## Download pre-built probesets
-wget -O mykrobe-data.tar.gz https://bit.ly/2H9HKTU && tar -zxvf mykrobe-data.tar.gz && rm -fr src/mykrobe/data && mv mykrobe-data src/mykrobe/data
-
-pip3 install .
+wget -O test_reads.fq.gz https://ndownloader.figshare.com/files/21059229
+mykrobe predict SAMPLE tb --output out.json --format json --seq test_reads.fq.gz
 ```
-**Note:** It is recommended you install inside a virtual environment. If you choose not to, you will need to run the `pip3 install` command with `sudo`. This is because it attempts to put some binaries inside `/usr/local/bin` if the installation is not being run from inside a [virtual environment][venv].
 
-[venv]: https://docs.python-guide.org/dev/virtualenvs/
+The test reads are simulated, and perfectly match the reference, except for
+the isoniazid resistant associated variant inhA I21T. You should see a section
+like this in the output file `out.json`:
+
+```
+"Isoniazid": {
+    "predict": "R",
+    "called_by": {
+        "inhA_I21T-ATC1674262ACT": {
+    ... etc
+```
 
 
 ## Usage
@@ -138,27 +155,25 @@ pip3 install .
 ```
 mykrobe predict --help
 usage: mykrobe predict [-h] [-k kmer] [--tmp TMP] [--keep_tmp]
-                         [--skeleton_dir SKELETON_DIR]
-                         [--mccortex31_path MCCORTEX31_PATH] [-t THREADS]
-                         [-m MEMORY] [--expected_depth EXPECTED_DEPTH]
-                         [-1 seq [seq ...]] [-c ctx] [-f] [--ont]
-                         [--guess_sequence_method] [--ignore_minor_calls]
-                         [--ignore_filtered IGNORE_FILTERED]
-                         [--model model] [--ploidy ploidy]
-                         [--filters FILTERS [FILTERS ...]]
-                         [--report_all_calls]
-                         [--expected_error_rate EXPECTED_ERROR_RATE]
-                         [--min_variant_conf MIN_VARIANT_CONF]
-                         [--min_gene_conf MIN_GENE_CONF]
-                         [--min_proportion_expected_depth MIN_PROPORTION_EXPECTED_DEPTH]
-                         [--min_gene_percent_covg_threshold MIN_GENE_PERCENT_COVG_THRESHOLD]
-                         [--output OUTPUT] [-q] [--panel panel]
-                         [--custom_probe_set_path custom_probe_set_path]
-                         [--custom_variant_to_resistance_json custom_variant_to_resistance_json]
-                         [--min_depth min_depth]
-                         [--conf_percent_cutoff conf_percent_cutoff]
-                         [--format {json,csv}]
-                         sample species
+                       [--skeleton_dir SKELETON_DIR] [-t THREADS] [-m MEMORY]
+                       [--expected_depth EXPECTED_DEPTH] [-1 seq [seq ...]]
+                       [-c ctx] [-f] [--ont] [--guess_sequence_method]
+                       [--ignore_minor_calls]
+                       [--ignore_filtered IGNORE_FILTERED] [--model model]
+                       [--ploidy ploidy] [--filters FILTERS [FILTERS ...]]
+                       [--report_all_calls]
+                       [--expected_error_rate EXPECTED_ERROR_RATE]
+                       [--min_variant_conf MIN_VARIANT_CONF]
+                       [--min_gene_conf MIN_GENE_CONF]
+                       [--min_proportion_expected_depth MIN_PROPORTION_EXPECTED_DEPTH]
+                       [--min_gene_percent_covg_threshold MIN_GENE_PERCENT_COVG_THRESHOLD]
+                       [--output OUTPUT] [-q] [--panel panel]
+                       [--custom_probe_set_path custom_probe_set_path]
+                       [--custom_variant_to_resistance_json custom_variant_to_resistance_json]
+                       [--min_depth min_depth]
+                       [--conf_percent_cutoff conf_percent_cutoff]
+                       [--format {json,csv}]
+                       sample species
 
 positional arguments:
   sample                sample id
@@ -171,8 +186,6 @@ optional arguments:
   --keep_tmp            Dont remove tmp files
   --skeleton_dir SKELETON_DIR
                         directory for skeleton binaries
-  --mccortex31_path MCCORTEX31_PATH
-                        Path to mccortex31. Default mccortex31
   -t THREADS, --threads THREADS
                         threads
   -m MEMORY, --memory MEMORY
@@ -273,7 +286,7 @@ Output is in CSV by default. For a more detailed output use the JSON format with
                     "median_depth": 53
                 }
             }
-        },  
+        },
         "typed_variants": {
             "rpoB_N438S-AAC761118AGT": {
                 "info": {
@@ -304,8 +317,8 @@ Output is in CSV by default. For a more detailed output use the JSON format with
                     -99999999.0,
                     -99999999.0
                 ]
-            },   ...               
-        },          
+            },   ...
+        },
 ```
 ## Citing
 
@@ -326,22 +339,20 @@ mykrobe predict tb_sample_id  tb --panel bradley-2015 -1 tb_sequence.bam
 ```
 mykrobe genotype --help
 usage: mykrobe genotype [-h] [-k kmer] [--tmp TMP] [--keep_tmp]
-                              [--skeleton_dir SKELETON_DIR]
-                              [--mccortex31_path MCCORTEX31_PATH] [-t THREADS]
-                              [-m MEMORY] [--expected_depth EXPECTED_DEPTH]
-                              [-1 seq [seq ...]] [-c ctx] [-f] [--ont]
-                              [--guess_sequence_method] [--ignore_minor_calls]
-                              [--ignore_filtered IGNORE_FILTERED]
-                              [--model model] [--ploidy ploidy]
-                              [--filters FILTERS [FILTERS ...]]
-                              [--report_all_calls]
-                              [--expected_error_rate EXPECTED_ERROR_RATE]
-                              [--min_variant_conf MIN_VARIANT_CONF]
-                              [--min_gene_conf MIN_GENE_CONF]
-                              [--min_proportion_expected_depth MIN_PROPORTION_EXPECTED_DEPTH]
-                              [--min_gene_percent_covg_threshold MIN_GENE_PERCENT_COVG_THRESHOLD]
-                              [--output OUTPUT] [-q]
-                              sample probe_set
+                        [--skeleton_dir SKELETON_DIR] [-t THREADS] [-m MEMORY]
+                        [--expected_depth EXPECTED_DEPTH] [-1 seq [seq ...]]
+                        [-c ctx] [-f] [--ont] [--guess_sequence_method]
+                        [--ignore_minor_calls]
+                        [--ignore_filtered IGNORE_FILTERED] [--model model]
+                        [--ploidy ploidy] [--filters FILTERS [FILTERS ...]]
+                        [--report_all_calls]
+                        [--expected_error_rate EXPECTED_ERROR_RATE]
+                        [--min_variant_conf MIN_VARIANT_CONF]
+                        [--min_gene_conf MIN_GENE_CONF]
+                        [--min_proportion_expected_depth MIN_PROPORTION_EXPECTED_DEPTH]
+                        [--min_gene_percent_covg_threshold MIN_GENE_PERCENT_COVG_THRESHOLD]
+                        [--output OUTPUT] [-q]
+                        sample probe_set
 
 positional arguments:
   sample                sample id
@@ -354,50 +365,6 @@ optional arguments:
   --keep_tmp            Dont remove tmp files
   --skeleton_dir SKELETON_DIR
                         directory for skeleton binaries
-  --mccortex31_path MCCORTEX31_PATH
-                        Path to mccortex31. Default mccortex31
-  -t THREADS, --threads THREADS
-                        threads
-  -m MEMORY, --memory MEMORY
-                        memory for graph constuction
-  --expected_depth EXPECTED_DEPTH
-                        expected depth
-  -1 seq [seq ...], --seq seq [seq ...]
-                        sequence files (fasta,fastq,bam)
-  -c ctx, --ctx ctx     cortex graph binary
-  -f, --force           force
-  --ont                 Set demykrobe genotype --help
-usage: mykrobe genotype [-h] [-k kmer] [--tmp TMP] [--keep_tmp]
-                              [--skeleton_dir SKELETON_DIR]
-                              [--mccortex31_path MCCORTEX31_PATH] [-t THREADS]
-                              [-m MEMORY] [--expected_depth EXPECTED_DEPTH]
-                              [-1 seq [seq ...]] [-c ctx] [-f] [--ont]
-                              [--guess_sequence_method] [--ignore_minor_calls]
-                              [--ignore_filtered IGNORE_FILTERED]
-                              [--model model] [--ploidy ploidy]
-                              [--filters FILTERS [FILTERS ...]]
-                              [--report_all_calls]
-                              [--expected_error_rate EXPECTED_ERROR_RATE]
-                              [--min_variant_conf MIN_VARIANT_CONF]
-                              [--min_gene_conf MIN_GENE_CONF]
-                              [--min_proportion_expected_depth MIN_PROPORTION_EXPECTED_DEPTH]
-                              [--min_gene_percent_covg_threshold MIN_GENE_PERCENT_COVG_THRESHOLD]
-                              [--output OUTPUT] [-q]
-                              sample probe_set
-
-positional arguments:
-  sample                sample id
-  probe_set             probe_set
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -k kmer, --kmer kmer  kmer length (default:21)
-  --tmp TMP             tmp directory (default: tmp/)
-  --keep_tmp            Dont remove tmp files
-  --skeleton_dir SKELETON_DIR
-                        directory for skeleton binaries
-  --mccortex31_path MCCORTEX31_PATH
-                        Path to mccortex31. Default mccortex31
   -t THREADS, --threads THREADS
                         threads
   -m MEMORY, --memory MEMORY
@@ -409,38 +376,6 @@ optional arguments:
   -c ctx, --ctx ctx     cortex graph binary
   -f, --force           force
   --ont                 Set default for ONT data. Sets expected_error_rate to
-                        0.15 and to haploid
-  --guess_sequence_method
-                        Guess if ONT or Illumia based on error rate. If error
-                        rate is > 10%, ploidy is set to haploid and a
-                        confidence threshold is used
-  --ignore_minor_calls  Ignore minor calls when running resistance prediction
-  --ignore_filtered IGNORE_FILTERED
-                        don't include filtered genotypes
-  --model model         Genotype model used, default kmer_count. Options
-                        kmer_count, median_depth
-  --ploidy ploidy       Use a diploid (includes 0/1 calls) or haploid
-                        genotyping model
-  --filters FILTERS [FILTERS ...]
-                        don't include filtered genotypes
-  --report_all_calls    report all calls
-  --expected_error_rate EXPECTED_ERROR_RATE
-                        Expected sequencing error rate. Set to 0.15 for ONT
-                        genotyping.
-  --min_variant_conf MIN_VARIANT_CONF
-                        minimum genotype confidence for variant genotyping
-  --min_gene_conf MIN_GENE_CONF
-                        minimum genotype confidence for gene genotyping
-  --min_proportion_expected_depth MIN_PROPORTION_EXPECTED_DEPTH
-                        minimum depth required on the sum of both alleles.
-                        Default 0.3 (30%)
-  --min_gene_percent_covg_threshold MIN_GENE_PERCENT_COVG_THRESHOLD
-                        all genes alleles found above this percent coverage
-                        will be reported (default 100 (only best alleles
-                        reported))
-  --output OUTPUT       File path to save output json file as. Default is to
-                        stdout.
-  -q, --quiet           do not output warnings to stderrfault for ONT data. Sets expected_error_rate to
                         0.15 and to haploid
   --guess_sequence_method
                         Guess if ONT or Illumia based on error rate. If error
@@ -533,10 +468,10 @@ mykrobe genotype sample_id example-data/staph-amr-bradley_2015.fasta -1 seq.fq
                 -349.45246450237215,
                 -10.95808091830304
             ]
-        },                     
+        },
     ....
 }
-}     
+}
 ```
 ### Make a custom probe set (for use with `mykrobe genotype`)
 
@@ -568,7 +503,7 @@ mykrobe variants add --db_name :db_name sample.vcf :reference
 Use the `--method` argument to specify the variant caller or pipeline used (if you'll have multiple Call Sets per sample)
 
 ```sh
-mykrobe variants add --db_name :db_name --method CORTEX sample_cortex.vcf :reference    
+mykrobe variants add --db_name :db_name --method CORTEX sample_cortex.vcf :reference
 ```
 
 ### Make probes and dump-probes

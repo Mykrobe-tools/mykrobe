@@ -1,36 +1,60 @@
 language: python
-python: 3.6
 services: mongodb
-cache: pip 
+cache: pip
 sudo: required
-env:
-  global:
-  - COMMIT=${TRAVIS_COMMIT::8}
-matrix:
+
+jobs:
   include:
-  - python: "2.7"
-    env: TOXENV=py27
-  - python: "3.4"
-    env: TOXENV=py34
-  - python: "3.5"
-    env: TOXENV=py35 
-  - python: "3.6"
-    env: TOXENV=py36    
-  # - python: "3.7-dev"
-  #   env: TOXENV=py37           
+  - name: Ubuntu bionic Python 3.6
+    os: linux
+    dist: bionic
+    python: '3.6'
+    env: TOXENV=py36
+
+  - name: OSX Python default version
+    os: osx
+    language: shell
+    env:
+    - TOXENV=py3
+    before_install:
+    - brew update
+    - brew tap mongodb/brew
+    - brew update
+    - brew install mongodb-community
+    - sudo mkdir -p /data/db
+    - sudo chown -R `id -un` /data/db
+    - mongod --quiet &>/dev/null &
+    before_deploy:
+    # We need to install mykrobe, including the data, so that when we run
+    # pyinstaller later, it includes the data and the python module
+    # dependencies
+    - ./ci/download_data.sh
+    - pip3 install .
+    - pip3 install pyinstaller
+    - cd dist
+    - pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller.spec
+    - cd pyinstaller_build
+    - tar cvfz ../../mykrobe.command_line.${TRAVIS_OS_NAME}.${TRAVIS_TAG}.tar.gz mykrobe_atlas/
+    - cd ../../
+
+
 install:
-  - pip install cython
-  - travis_retry pip install tox
+- pip3 install cython
+- pip3 install requests
+- travis_retry pip3 install tox
+- ./ci/download_data.sh
 script: tox -e $TOXENV
-after_success:
-- docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-- travis_wait 30 docker build -t phelimb/mykrobe:$COMMIT .;
-- if [ "$TRAVIS_BRANCH" == "master" ]; then
-    docker tag phelimb/mykrobe:$COMMIT phelimb/mykrobe:$latest;
-    travis_wait 30 docker push phelimb/mykrobe; 
-    travis_wait 30 docker push phelimb/mykrobe:$COMMIT; 
-  else 
-    docker tag phelimb/mykrobe:$COMMIT phelimb/mykrobe:$TRAVIS_BRANCH;  
-    travis_wait 30 docker push phelimb/mykrobe:$COMMIT;
-    travis_wait 30 docker push phelimb/mykrobe:$TRAVIS_BRANCH;
-  fi  
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: NkTX3yLCZiJrSOIUwoGql9VdbTm5YkHoqaPbRytkOaRrr3LVl4jALKqrPopPfjMcHTKwGgJCq9Lr35XsTbnXKxEkaAe5UrBqiUJc6bcclX0zODwRCPZuLZ3GVcKPorRV75azPNEjW+pOjU72fIDNYTVLq+4+VmpI77rOfgoKYqsT9mjbhpMqpwST+YjgSOAv8Wr2WaUpaYxJyUxtsQXUMSZWhqheJBIfAdoWd7+MgqNYvK6lGzuvaVbFugv7pwzV8ZxxopW7A/LAKgoJrIdFaVbHg/iXHuWLPTZ4YocyWXWAEkUUNcUo5Ezg77PdPLox0HvZuIAJfgM129Pl6OCZeVeUxpI2Q1s770m72ULwMVTILLIkhhi6PCmNUbVxbdnqIZCHXf+kdicHeSLF9fxbMO7AIDX6D0ixQ/SWOVdHQVUZmoPCal2Lv2RPJvl+1clXUfKSPmX4Ht3v+z4OwwObAzb/cW2uB1djxzRtHD/bAs7XD692w9ddEcdiPp/MvEyC9jCwZ9T7o9z3tPjGPWepNRsUoKK2SqlFUcsLR97KEPP/jRPVUnqtPN8PvNLyFOvbyVFe8PZEqqtuVDftqFUEBsy8+NPaXI8/qcyg/hZO0M01JXIN5ILE+8W3eBqj4pHL8IveAXkiRS5SsSY791+N/0Ujoy5T3eMcQGPdoaTeWvA=
+  file: mykrobe.command_line.${TRAVIS_OS_NAME}.${TRAVIS_TAG}.tar.gz
+  on:
+    tags: true
+    condition: $TRAVIS_OS_NAME = osx
+    repo: martinghunt/mykrobe
+
+notifications:
+  email: false

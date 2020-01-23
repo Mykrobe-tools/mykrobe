@@ -10,41 +10,16 @@ logger = logging.getLogger(__name__)
 
 class McCortexRunner(object):
 
-    def __init__(self, mccortex31_path):
-        self.mccortex31_path = mccortex31_path
-
-    @property
-    def mccortex31_path(self):
-        if not hasattr(self, '_mccortex31_path'):
-            logger.error('mccortex31_path attribute used before setter called')
-            exit(-1)
-        return self._mccortex31_path
-
-    @mccortex31_path.setter
-    def mccortex31_path(self, suggested_fpath):
-        logger.debug('Setting path to mccortex executable')
-        if os.path.isfile(suggested_fpath):
-            logger.debug(
-                'Suggested path to mccortex executable is valid: %s', suggested_fpath)
-            self._mccortex31_path = suggested_fpath
-            return
-
-        logger.debug(
-            'Suggested path to mccortex executable is invalid: %s', suggested_fpath)
-        fallback_path = os.path.join(
-            os.path.dirname(sys.argv[0]), 'mccortex31')
-        logger.debug(
-            'Checking fallback mccortex executable file path: %s', fallback_path)
-
-        if not os.path.isfile(fallback_path):
-            logger.debug(
-                'Fallback mccortex executable file path invalid: %s', fallback_path)
-            exit(-1)
-
-        logger.debug(
-            'Valid path to mccortex executable found: %s', fallback_path)
-        self._mccortex31_path = fallback_path
-
+    def __init__(self):
+        dir_of_this_file = os.path.dirname(os.path.abspath(__file__))
+        self.mccortex31_path = os.path.join(dir_of_this_file, "mccortex31")
+        if os.path.exists(self.mccortex31_path):
+            pass
+        elif os.path.exists(self.mccortex31_path + ".exe"):
+            self.mccortex31_path += ".exe"
+        else:
+            raise RuntimeError(f"Did not find mccortex31. Expected it to be here: {self.mccortex31_path}. Cannot continue")
+        logger.debug(f"Found mccortex31: {self.mccortex31_path}")
 
 class McCortexJoin(McCortexRunner):
 
@@ -53,8 +28,8 @@ class McCortexJoin(McCortexRunner):
             sample,
             intersect_graph,
             ingraph,
-            mccortex31_path="mccortex31"):
-        super(McCortexJoin, self).__init__(mccortex31_path)
+        ):
+        super(McCortexJoin, self).__init__()
         self.sample = sample
         self.intersect_graph = intersect_graph
         self.ingraph = ingraph
@@ -81,8 +56,8 @@ class McCortexJoin(McCortexRunner):
 
 class McCortexUnitigs(McCortexRunner):
 
-    def __init__(self, ingraph, mccortex31_path="mccortex31"):
-        super(McCortexUnitigs, self).__init__(mccortex31_path)
+    def __init__(self, ingraph):
+        super(McCortexUnitigs, self).__init__()
         self.ingraph = ingraph
 
     def run(self):
@@ -104,8 +79,8 @@ class McCortexSubgraph(McCortexRunner):
             rmgraph,
             ingraph,
             tmp_dir=None,
-            mccortex31_path="mccortex31"):
-        super(McCortexSubgraph, self).__init__(mccortex31_path=mccortex31_path)
+        ):
+        super(McCortexSubgraph, self).__init__()
         self.rmgraph = rmgraph
         self.sample = sample
         self.ingraph = ingraph
@@ -162,8 +137,8 @@ class McCortexGenoRunner(McCortexRunner):
             panel_name=None,
             tmp_dir='tmp/',
             skeleton_dir='data/skeletons/',
-            mccortex31_path="mccortex31"):
-        super(McCortexGenoRunner, self).__init__(mccortex31_path)
+        ):
+        super(McCortexGenoRunner, self).__init__()
         self.sample = sample
         self.panels = panels
         self.seq = seq
@@ -256,8 +231,8 @@ class McCortexGenoRunner(McCortexRunner):
                 self._execute_command(self.coverages_cmd)
             except subprocess.CalledProcessError:
                 command = subprocess.list2cmdline(self.coverages_cmd)
-                exception_message = '''mccortex31 raised an error. 
-                    Is it on PATH? check by running `mccortex31 geno`. 
+                exception_message = '''mccortex31 raised an error.
+                    Is it on PATH? check by running `mccortex31 geno`.
                     'The command that through the error was `%s` ''' % command
                 raise ValueError(exception_message)
         else:
