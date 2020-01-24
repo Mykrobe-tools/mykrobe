@@ -275,10 +275,16 @@ def run(parser, args):
         elif args.panel == "custom":
             if not args.custom_probe_set_path:
                 raise ValueError("Custom panel requires custom_probe_set_path")
-            TB_PANELS = [
-                args.custom_probe_set_path,
-                "data/panels/tb-species-170421.fasta.gz",
-            ]
+            if args.species == "tb":
+                TB_PANELS = [
+                    args.custom_probe_set_path,
+                    "data/panels/tb-species-170421.fasta.gz",
+                ]
+            elif args.species == "staph":
+                STAPH_PANELS = [
+                    args.custom_probe_set_path,
+                    "data/panels/staph-species-160227.fasta.gz",
+                ]
             variant_to_resistance_json_fp = args.custom_variant_to_resistance_json
     Predictor = None
     if not args.species:
@@ -287,7 +293,8 @@ def run(parser, args):
         panels = STAPH_PANELS
         Predictor = StaphPredictor
         args.kmer = 15  # Forced
-        variant_to_resistance_json_fp = None
+        if args.panel != "custom":
+            variant_to_resistance_json_fp = None
     elif args.species == "tb":
         panels = TB_PANELS
         hierarchy_json_file = "data/phylo/mtbc_hierarchy.json"
