@@ -4,6 +4,7 @@ image:
 branches:
   only:
     - master
+    - draft_release_test
     - /v\d*\.\d*\.\d*/
 
 
