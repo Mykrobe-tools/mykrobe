@@ -77,7 +77,6 @@ deploy:
   auth_token:
       secure: 3DyaU0V4K58oeRoR6XM2eHP8CGzDhY6qlB9b6CHOApbHfGvi8e85/d9BUvoVm4tR
   artifact: mykrobe.command_line.windows.${APPVEYOR_REPO_TAG_NAME}.tar.gz
-  draft: false
   prerelease: false
   on:
     APPVEYOR_REPO_TAG: true
