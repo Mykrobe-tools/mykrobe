@@ -482,18 +482,28 @@ def run(parser, args):
     if not args.keep_tmp:
         cp.remove_temporary_files()
 
-    # write to file is specified by user, otherwise send to stdout
-    if args.output_format == "csv":
-        output = json_to_csv(base_json)
-    else:
+    outputs = {}
+
+    if args.output_format in ["csv", "json_and_csv"]:
+        outputs["csv"] = json_to_csv(base_json)
+    if args.output_format in ["json", "json_and_csv"]:
         ## Verbose json output requires --report_all_calls
         if not args.report_all_calls:
             del base_json[args.sample]["variant_calls"]
             del base_json[args.sample]["sequence_calls"]
-        output = json.dumps(base_json, indent=4)
+        outputs["json"] = json.dumps(base_json, indent=4)
 
-    if args.output:
-        with open(args.output, "w") as outfile:
-            outfile.write(output)
-    else:
-        print(output)
+    if len(outputs) == 0:
+        raise ValueError(f"Output format must be one of: csv,json,json_and_csv. Got '{args.output_format}'")
+
+    for output_type, output in outputs.items():
+        # write to file is specified by user, otherwise send to stdout
+        if args.output:
+            if args.output_format == "json_and_csv":
+                outfile = args.output + "." + output_type
+            else:
+                outfile = args.output
+            with open(outfile, "w") as f:
+                f.write(output)
+        else:
+            print(output)

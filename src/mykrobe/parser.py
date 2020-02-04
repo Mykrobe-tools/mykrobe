@@ -124,7 +124,7 @@ parser_amr.add_argument(
     dest="output_format",
     type=str,
     help="Choose output format. Default: csv.",
-    choices=["json", "csv"],
+    choices=["json", "csv", "json_and_csv"],
     default="csv",
 )
 parser_amr.set_defaults(func=run_subtool)
