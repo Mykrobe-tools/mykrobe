@@ -10,6 +10,8 @@ import numpy as np
 import os
 import random
 import time
+from enum import Enum
+from typing import NamedTuple, List, Union, Optional
 from mykrobe.mformat import json_to_csv
 from mykrobe.typing import CoverageParser
 from mykrobe.typing import Genotyper
@@ -23,18 +25,8 @@ from mykrobe.metagenomics import AMRSpeciesPredictor
 from mykrobe.version import __version__ as predictor_version
 from mykrobe.version import __version__ as atlas_version
 
-STAPH_PANELS = [
-    "data/panels/staph-species-160227.fasta.gz",
-    "data/panels/staph-amr-bradley_2015-feb-17-2017.fasta.gz",
-]
 
-GN_PANELS = [
-    "data/panels/gn-amr-genes",
-    "data/panels/Escherichia_coli",
-    "data/panels/Klebsiella_pneumoniae",
-    "data/panels/gn-amr-genes-extended",
-]
-
+PathLike = Union[str, os.PathLike]
 
 random.seed(42)
 
@@ -200,6 +192,93 @@ class MykrobePredictorResult(object):
     # sequence_calls = DictField()
 
 
+class Species(Enum):
+    TB = "tb"
+    STAPH = "staph"
+    GN = "gn"
+
+
+class TbPanel(Enum):
+    BRADLEY = "bradley-2015"
+    WALKER = "walker-2015"
+    NEJM_WALKER = "201901"
+    ATLAS = "atlas"
+    CUSTOM = "custom"
+
+
+class StaphPanel(Enum):
+    DEFAULT = "default"
+    CUSTOM = "custom"
+
+class GnPanel(Enum):
+    DEFAULT = "default"
+
+PanelName = Union[StaphPanel, TbPanel, GnPanel]
+
+class Panel(NamedTuple):
+    paths: List[str]
+    name: PanelName
+
+    @staticmethod
+    def from_species_and_name(species: Species, name: str) -> "Panel":
+        if species is Species.STAPH:
+            panel_name = StaphPanel(name)
+        elif species is Species.TB:
+            panel_name = TbPanel(name)
+        elif species is Species.GN:
+            panel_name = GnPanel(name)
+        else:
+            raise NameError(f"{species} is not a known species.")
+
+        paths: List[str] = PANELS[species][panel_name]
+        return Panel(paths, panel_name)
+
+    def add_path(self, *args):
+        for path in args:
+            self.paths.append(path)
+
+
+PANELS = {
+    Species.STAPH: {
+        StaphPanel.DEFAULT: [
+            "data/panels/staph-species-160227.fasta.gz",
+            "data/panels/staph-amr-bradley_2015-feb-17-2017.fasta.gz",
+        ],
+        StaphPanel.CUSTOM: ["data/panels/staph-species-160227.fasta.gz"]
+    }
+    ,
+    Species.GN: {
+        GnPanel.DEFAULT: [
+            "data/panels/gn-amr-genes",
+            "data/panels/Escherichia_coli",
+            "data/panels/Klebsiella_pneumoniae",
+            "data/panels/gn-amr-genes-extended",
+        ]
+    }
+    ,
+    Species.TB: {
+        TbPanel.ATLAS: [
+            "data/panels/tb-species-170421.fasta.gz",
+            "data/panels/tb-walker-probe-set-jan-2019.fasta.gz",
+            "data/panels/tb-k21-probe-set-feb-09-2017.fasta.gz",
+        ],
+        TbPanel.BRADLEY: [
+            "data/panels/tb-species-170421.fasta.gz",
+            "data/panels/tb-bradley-probe-set-jan-2019.fasta.gz",
+        ],
+        TbPanel.WALKER: [
+            "data/panels/tb-species-170421.fasta.gz",
+            "data/panels/tb-walker-probe-set-jan-2019.fasta.gz",
+        ],
+        TbPanel.NEJM_WALKER: [
+            "data/panels/tb-species-170421.fasta.gz",
+            "data/panels/tb-hunt-probe-set-jan-03-2019.fasta.gz",
+        ],
+        TbPanel.CUSTOM: ["data/panels/tb-species-170421.fasta.gz"]
+    }
+}
+
+
 def describe_panels(parser, args):
     all_panels = {
         "tb": {
@@ -236,70 +315,59 @@ def run(parser, args):
     base_json = {args.sample: {}}
     args = parser.parse_args()
     hierarchy_json_file = None
-    if args.panel is not None:
-        variant_to_resistance_json_fp = None
-        if args.species == "tb" and args.panel == "bradley-2015":
-            TB_PANELS = [
-                "data/panels/tb-species-170421.fasta.gz",
-                "data/panels/tb-bradley-probe-set-jan-2019.fasta.gz",
-            ]
-        elif args.species == "tb" and args.panel == "walker-2015":
-            TB_PANELS = [
-                "data/panels/tb-species-170421.fasta.gz",
-                "data/panels/tb-walker-probe-set-jan-2019.fasta.gz",
-            ]
-        elif args.species == "tb" and args.panel == "201901":
-            TB_PANELS = [
-                "data/panels/tb-species-170421.fasta.gz",
-                "data/panels/tb-hunt-probe-set-jan-03-2019.fasta.gz",
-            ]
-            data_dir = os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "../data/predict/tb/")
+    variant_to_resistance_json_fp: Optional[PathLike] = None
+    species = Species(args.species)
+    if species is not Species.TB and args.panel != "custom":
+        args.panel = "default"
+    panels = Panel.from_species_and_name(species, args.panel)
+
+    if species is Species.TB and panels.name is TbPanel.NEJM_WALKER:
+        data_dir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "../data/predict/tb/")
+        )
+        variant_to_resistance_json_fp = os.path.join(
+            data_dir, "variant_to_resistance_drug-jan-03-2019.json"
+        )
+    if panels.name in (TbPanel.CUSTOM, StaphPanel.CUSTOM):
+        if not args.custom_probe_set_path:
+            raise ValueError("Custom panel requires custom_probe_set_path")
+
+        if not os.path.exists(args.custom_probe_set_path):
+            raise FileNotFoundError(
+                f"Custom probe path {args.custom_probe_set_path} does not exist!"
             )
-            variant_to_resistance_json_fp = os.path.join(
-                data_dir, "variant_to_resistance_drug-jan-03-2019.json"
+        panels.add_path(args.custom_probe_set_path)
+
+        if not os.path.exists(args.custom_variant_to_resistance_json):
+            raise FileNotFoundError(
+                ("Custom variant to resistance json "
+                 f"{args.custom_variant_to_resistance_json} does not exist!")
             )
-        elif args.species == "tb" and args.panel == "atlas":
-            TB_PANELS = [
-                "data/panels/tb-species-170421.fasta.gz",
-                "data/panels/tb-walker-probe-set-jan-2019.fasta.gz",
-                "data/panels/tb-k21-probe-set-feb-09-2017.fasta.gz",
-            ]
-        elif args.panel == "custom":
-            if not args.custom_probe_set_path:
-                raise ValueError("Custom panel requires custom_probe_set_path")
-            if args.species == "tb":
-                TB_PANELS = [
-                    args.custom_probe_set_path,
-                    "data/panels/tb-species-170421.fasta.gz",
-                ]
-            elif args.species == "staph":
-                STAPH_PANELS = [
-                    args.custom_probe_set_path,
-                    "data/panels/staph-species-160227.fasta.gz",
-                ]
-            variant_to_resistance_json_fp = args.custom_variant_to_resistance_json
-    Predictor = None
-    if not args.species:
-        panels = TB_PANELS + GN_PANELS + STAPH_PANELS
-    elif args.species == "staph":
-        panels = STAPH_PANELS
+        variant_to_resistance_json_fp = args.custom_variant_to_resistance_json
+
+    # todo: the following two lines are flagged for deletion. Based on the current CLI
+    # implementation, we cannot get to here without there being a species
+    # if not species:
+    #     panels = TB_PANELS + GN_PANELS + STAPH_PANELS
+    if species is Species.STAPH:
         Predictor = StaphPredictor
         args.kmer = 15  # Forced
-        if args.panel != "custom":
-            variant_to_resistance_json_fp = None
-    elif args.species == "tb":
-        panels = TB_PANELS
+    elif species is Species.TB:
         hierarchy_json_file = "data/phylo/mtbc_hierarchy.json"
         Predictor = TBPredictor
-    logger.info("Running AMR prediction with panels %s" % ", ".join(panels))
-    version = {}
+    elif species is Species.GN:
+        raise NotImplementedError("Predictor not implement for gram negatives.")
+    else:
+        raise ValueError(f"Unrecognised species {species}")
+
+    logger.info("Running AMR prediction with panels %s" % ", ".join(panels.paths))
+    version = dict()
     version["mykrobe-predictor"] = predictor_version
     version["mykrobe-atlas"] = atlas_version
     # Get real paths for panels
     panels = [
         os.path.realpath(os.path.join(os.path.dirname(__file__), "..", f))
-        for f in panels
+        for f in panels.paths
     ]
     if hierarchy_json_file is not None:
         hierarchy_json_file = os.path.realpath(
@@ -427,7 +495,6 @@ def run(parser, args):
                 sample=args.sample,
                 expected_depths=depths,
                 expected_error_rate=kmer_count_error_rate,
-                # expected_error_rate=args.expected_error_rate,
                 variant_covgs=cp.variant_covgs,
                 gene_presence_covgs=cp.covgs["presence"],
                 base_json=base_json,
@@ -480,14 +547,17 @@ def run(parser, args):
     if args.output_format in ["csv", "json_and_csv"]:
         outputs["csv"] = json_to_csv(base_json)
     if args.output_format in ["json", "json_and_csv"]:
-        ## Verbose json output requires --report_all_calls
+        # Verbose json output requires --report_all_calls
         if not args.report_all_calls:
             del base_json[args.sample]["variant_calls"]
             del base_json[args.sample]["sequence_calls"]
         outputs["json"] = json.dumps(base_json, indent=4)
 
     if len(outputs) == 0:
-        raise ValueError(f"Output format must be one of: csv,json,json_and_csv. Got '{args.output_format}'")
+        raise ValueError(
+            (f"Output format must be one of: csv,json,json_and_csv. Got "
+             f"'{args.output_format}'")
+        )
 
     for output_type, output in outputs.items():
         # write to file is specified by user, otherwise send to stdout
