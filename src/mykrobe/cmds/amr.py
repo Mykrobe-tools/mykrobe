@@ -210,10 +210,13 @@ class StaphPanel(Enum):
     DEFAULT = "default"
     CUSTOM = "custom"
 
+
 class GnPanel(Enum):
     DEFAULT = "default"
 
+
 PanelName = Union[StaphPanel, TbPanel, GnPanel]
+
 
 class Panel(NamedTuple):
     paths: List[str]
@@ -244,9 +247,8 @@ PANELS = {
             "data/panels/staph-species-160227.fasta.gz",
             "data/panels/staph-amr-bradley_2015-feb-17-2017.fasta.gz",
         ],
-        StaphPanel.CUSTOM: ["data/panels/staph-species-160227.fasta.gz"]
-    }
-    ,
+        StaphPanel.CUSTOM: ["data/panels/staph-species-160227.fasta.gz"],
+    },
     Species.GN: {
         GnPanel.DEFAULT: [
             "data/panels/gn-amr-genes",
@@ -254,8 +256,7 @@ PANELS = {
             "data/panels/Klebsiella_pneumoniae",
             "data/panels/gn-amr-genes-extended",
         ]
-    }
-    ,
+    },
     Species.TB: {
         TbPanel.ATLAS: [
             "data/panels/tb-species-170421.fasta.gz",
@@ -274,8 +275,8 @@ PANELS = {
             "data/panels/tb-species-170421.fasta.gz",
             "data/panels/tb-hunt-probe-set-jan-03-2019.fasta.gz",
         ],
-        TbPanel.CUSTOM: ["data/panels/tb-species-170421.fasta.gz"]
-    }
+        TbPanel.CUSTOM: ["data/panels/tb-species-170421.fasta.gz"],
+    },
 }
 
 
@@ -340,8 +341,10 @@ def run(parser, args):
 
         if not os.path.exists(args.custom_variant_to_resistance_json):
             raise FileNotFoundError(
-                ("Custom variant to resistance json "
-                 f"{args.custom_variant_to_resistance_json} does not exist!")
+                (
+                    "Custom variant to resistance json "
+                    f"{args.custom_variant_to_resistance_json} does not exist!"
+                )
             )
         variant_to_resistance_json_fp = args.custom_variant_to_resistance_json
 
@@ -443,9 +446,10 @@ def run(parser, args):
             ploidy=args.ploidy,
         )
         gt.run()
-        kmer_count_error_rate, incorrect_kmer_to_pc_cov = (
-            gt.estimate_kmer_count_error_rate_and_incorrect_kmer_to_percent_cov()
-        )
+        (
+            kmer_count_error_rate,
+            incorrect_kmer_to_pc_cov,
+        ) = gt.estimate_kmer_count_error_rate_and_incorrect_kmer_to_percent_cov()
         logger.info(
             "Estimated error rate for kmer count model: "
             + str(round(100 * kmer_count_error_rate, 2))
@@ -555,8 +559,10 @@ def run(parser, args):
 
     if len(outputs) == 0:
         raise ValueError(
-            (f"Output format must be one of: csv,json,json_and_csv. Got "
-             f"'{args.output_format}'")
+            (
+                f"Output format must be one of: csv,json,json_and_csv. Got "
+                f"'{args.output_format}'"
+            )
         )
 
     for output_type, output in outputs.items():
