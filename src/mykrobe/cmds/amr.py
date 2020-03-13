@@ -1,9 +1,9 @@
 from __future__ import print_function
+
 import logging
 
 logger = logging.getLogger(__name__)
 
-from pprint import pprint
 import json
 
 import numpy as np
@@ -11,7 +11,6 @@ import os
 import random
 import time
 from mykrobe.mformat import json_to_csv
-from mykrobe.utils import check_args
 from mykrobe.typing import CoverageParser
 from mykrobe.typing import Genotyper
 from mykrobe.typing.models.base import ProbeCoverage
@@ -21,14 +20,8 @@ from mykrobe.predict import TBPredictor
 from mykrobe.predict import StaphPredictor
 from mykrobe.predict import MykrobePredictorSusceptibilityResult
 from mykrobe.metagenomics import AMRSpeciesPredictor
-from mykrobe.metagenomics import MykrobePredictorPhylogeneticsResult
 from mykrobe.version import __version__ as predictor_version
 from mykrobe.version import __version__ as atlas_version
-
-from mongoengine import EmbeddedDocumentField
-from mongoengine import IntField
-from mongoengine import DictField
-from mongoengine import StringField
 
 STAPH_PANELS = [
     "data/panels/staph-species-160227.fasta.gz",
