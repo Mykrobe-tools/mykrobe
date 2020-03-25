@@ -1,14 +1,9 @@
-import sys
-import pytest
-
-sys.path.append(".")
 from unittest import TestCase
 
-from mykrobe.variants.schema.models import VariantCall
-from mykrobe.variants.schema.models import Variant
-from mykrobe.cmds.amr import Panel, Species, TbPanel, StaphPanel, GnPanel, PANELS
-
+import pytest
+from mykrobe.cmds.amr import Panel, Species, TbPanel, StaphPanel, PANELS
 from mykrobe.predict import TBPredictor
+from mykrobe.variants.schema.models import Variant
 
 
 class AMRPredictTest(TestCase):
@@ -45,7 +40,7 @@ class AMRPredictTest(TestCase):
             },
         }
 
-        assert self.predictor._coverage_greater_than_threshold(call, [""]) == False
+        assert self.predictor._coverage_greater_than_threshold(call, [""]) is False
 
 
 class TestPanel:
@@ -67,12 +62,6 @@ class TestPanel:
         with pytest.raises(ValueError):
             Panel.from_species_and_name(species, name)
 
-    def test_fromSpeciesAndName_gnWithInvalidPanel_raisesError(self):
-        species = Species.GN
-        name = "bar"
-        with pytest.raises(ValueError):
-            Panel.from_species_and_name(species, name)
-
     def test_fromSpeciesAndName_staphWithCustomPanel_returnsCustom(self):
         species = Species.STAPH
         name = "custom"
@@ -90,16 +79,6 @@ class TestPanel:
 
         actual = panel.name
         expected = TbPanel.NEJM_WALKER
-
-        assert actual == expected
-
-    def test_fromSpeciesAndName_GnWithValidPanel_returnsPanel(self):
-        species = Species.GN
-        name = "default"
-        panel = Panel.from_species_and_name(species, name)
-
-        actual = panel.name
-        expected = GnPanel.DEFAULT
 
         assert actual == expected
 

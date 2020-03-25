@@ -195,7 +195,6 @@ class MykrobePredictorResult(object):
 class Species(Enum):
     TB = "tb"
     STAPH = "staph"
-    GN = "gn"
 
 
 class TbPanel(Enum):
@@ -211,11 +210,7 @@ class StaphPanel(Enum):
     CUSTOM = "custom"
 
 
-class GnPanel(Enum):
-    DEFAULT = "default"
-
-
-PanelName = Union[StaphPanel, TbPanel, GnPanel]
+PanelName = Union[StaphPanel, TbPanel]
 
 
 class Panel(NamedTuple):
@@ -228,8 +223,6 @@ class Panel(NamedTuple):
             panel_name = StaphPanel(name)
         elif species is Species.TB:
             panel_name = TbPanel(name)
-        elif species is Species.GN:
-            panel_name = GnPanel(name)
         else:
             raise NameError(f"{species} is not a known species.")
 
@@ -248,14 +241,6 @@ PANELS = {
             "data/panels/staph-amr-bradley_2015-feb-17-2017.fasta.gz",
         ],
         StaphPanel.CUSTOM: ["data/panels/staph-species-160227.fasta.gz"],
-    },
-    Species.GN: {
-        GnPanel.DEFAULT: [
-            "data/panels/gn-amr-genes",
-            "data/panels/Escherichia_coli",
-            "data/panels/Klebsiella_pneumoniae",
-            "data/panels/gn-amr-genes-extended",
-        ]
     },
     Species.TB: {
         TbPanel.ATLAS: [
@@ -348,18 +333,12 @@ def run(parser, args):
             )
         variant_to_resistance_json_fp = args.custom_variant_to_resistance_json
 
-    # todo: the following two lines are flagged for deletion. Based on the current CLI
-    # implementation, we cannot get to here without there being a species
-    # if not species:
-    #     panels = TB_PANELS + GN_PANELS + STAPH_PANELS
     if species is Species.STAPH:
         Predictor = StaphPredictor
         args.kmer = 15  # Forced
     elif species is Species.TB:
         hierarchy_json_file = "data/phylo/mtbc_hierarchy.json"
         Predictor = TBPredictor
-    elif species is Species.GN:
-        raise NotImplementedError("Predictor not implement for gram negatives.")
     else:
         raise ValueError(f"Unrecognised species {species}")
 
