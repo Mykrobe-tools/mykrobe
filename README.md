@@ -27,6 +27,7 @@ mykrobe predict my_sample_name tb \
   --seq reads.fq.gz
 ```
 
+
 Test reads can be obtained by running:
 
 ```
