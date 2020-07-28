@@ -238,6 +238,9 @@ parser_make_probes.add_argument(
     default=False,
     action="store_true",
 )
+parser_make_probes.add_argument(
+    "--lineage", type=str, help="Write lineages to output file", metavar="FILENAME",
+)
 parser_make_probes.set_defaults(func=run_subtool)
 
 # ##########

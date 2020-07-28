@@ -1,4 +1,5 @@
 from __future__ import print_function
+import csv
 import sys
 from collections import Counter
 from mongoengine import connect
@@ -8,6 +9,7 @@ from mykrobe.utils import split_var_name
 from mykrobe.utils import flatten
 from mykrobe.utils import unique
 from mykrobe.probes import AlleleGenerator
+from mykrobe.probes.models import Mutation
 from mykrobe.variants.schema.models import VariantSet
 
 import logging
@@ -106,3 +108,22 @@ def make_variant_probe(al, variant, kmer, DB=None, no_backgrounds=False):
         variant_probe.alts = unique(variant_probe.alts)
         variant_probe.refs = unique(variant_probe.refs)
     return variant_probe
+
+
+def load_dna_vars_txt_file(infile, reference):
+    mutations = []
+    lineages = {}
+
+    with open(infile, "r") as infile:
+        reader = csv.reader(infile, delimiter="\t")
+        for row in reader:
+            gene_name, pos, ref, alt, alphabet, *lineage = row
+            if gene_name == "ref":
+                var_name = "".join([ref, pos, alt])
+            else:
+                var_name = gene_name
+            mutations.append(Mutation(reference=reference, var_name=var_name))
+            if len(lineage) > 0:
+                lineages[var_name] = lineage[0]
+
+    return mutations, lineages

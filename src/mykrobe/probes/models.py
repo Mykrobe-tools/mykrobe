@@ -68,7 +68,7 @@ class AlleleGenerator(object):
             self.reference_sequence=record.seq
             self.ref += list(record.seq)
         ### Pad with Ns for SNPs at the end of the reference
-        self.ref.extend(["N"]*self.kmer)            
+        self.ref.extend(["N"]*self.kmer)
         self.ref_length = len(self.ref)
 
     def create(self, v, context=[]):
@@ -84,7 +84,7 @@ class AlleleGenerator(object):
         alternates = self._generate_alternates_on_all_backgrounds(v, context)
         ## The alternates shouldn't contain kmers in the reference
         if v.is_indel:
-            alternates=self.trim_uninformative_kmers(alternates, references)   
+            alternates=self.trim_uninformative_kmers(alternates, references)
         return Panel(v, references, v.start, alternates)
 
     def trim_uninformative_kmers(self, alternates, references=[]):
@@ -108,8 +108,8 @@ class AlleleGenerator(object):
             if informative_kmers:
                 trim=(min(informative_kmers), max(informative_kmers))
                 alt=alt[trim[0]:trim[1]+self.kmer]
-            assert alt   
-                     
+            assert alt
+
             new_alternates.append(alt)
         return new_alternates
 
@@ -336,7 +336,7 @@ class AlleleGenerator(object):
         start_delta = int(math.floor(float(delta) / 2))
         end_delta = int(math.ceil(float(delta) / 2))
         start_index = pos - kmer - start_delta
-        end_index = pos + kmer + end_delta-1            
+        end_index = pos + kmer + end_delta-1
         min_probe_length=(2 * kmer) - 1
         i = kmer - 1 + start_delta
         ### Is the variant at the start of the sequence? This is a special case.
@@ -398,6 +398,9 @@ class Mutation(object):
         self.reference = reference
         self.input_mutation_name = mut
         self.protein_coding_var = protein_coding_var
+
+    def __eq__(self, other):
+        return type(other) is type(self) and self.__dict__ == other.__dict__
 
     @property
     def mutation_output_name(self):
