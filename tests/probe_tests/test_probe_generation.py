@@ -12,8 +12,8 @@ def test_load_dna_vars_txt_file():
         Mutation(reference="ref", var_name="C62G"),
     ]
     expect_lineage = {
-        "G42A": "lineage1",
-        "C52G": "lineage1.2",
+            "G42A": {"name": "lineage1", "use_ref_allele": False},
+            "C52G": {"name": "lineage1.2", "use_ref_allele": True},
     }
     assert got_mutations == expect_mutations
     assert got_lineage == expect_lineage
