@@ -22,6 +22,7 @@ from mykrobe.predict import TBPredictor
 from mykrobe.predict import StaphPredictor
 from mykrobe.predict import MykrobePredictorSusceptibilityResult
 from mykrobe.metagenomics import AMRSpeciesPredictor
+from mykrobe.utils import load_json
 from mykrobe.version import __version__ as predictor_version
 from mykrobe.version import __version__ as atlas_version
 
@@ -154,6 +155,8 @@ class MykrobePredictorResult(object):
         phylogenetics,
         variant_calls,
         sequence_calls,
+        lineage_calls,
+        lineage_predict,
         kmer,
         probe_sets,
         files,
@@ -164,6 +167,8 @@ class MykrobePredictorResult(object):
         self.phylogenetics = phylogenetics
         self.variant_calls = variant_calls
         self.sequence_calls = sequence_calls
+        self.lineage_calls = lineage_calls
+        self.lineage_predict = lineage_predict
         self.kmer = kmer
         self.probe_sets = probe_sets
         self.files = files
@@ -171,11 +176,15 @@ class MykrobePredictorResult(object):
         self.model = model
 
     def to_dict(self):
+        phylogenetics = list(self.phylogenetics.to_dict().values())[0]
+        if "lineage" in phylogenetics and len(self.lineage_predict) > 0:
+            phylogenetics["lineage"] = self.lineage_predict
         return {
             "susceptibility": list(self.susceptibility.to_dict().values())[0],
-            "phylogenetics": list(self.phylogenetics.to_dict().values())[0],
+            "phylogenetics": phylogenetics,
             "variant_calls": self.variant_calls,
             "sequence_calls": self.sequence_calls,
+            "lineage_calls": self.lineage_calls,
             "kmer": self.kmer,
             "probe_sets": self.probe_sets,
             "files": self.files,
@@ -404,6 +413,10 @@ def run(parser, args):
     if args.force and not depths:
         depths = [1]
     gt = None
+    if args.lineage is None:
+        lineage_dict = None
+    else:
+        lineage_dict = load_json(args.lineage)
 
     if depths or args.force:
         gt = Genotyper(
@@ -423,6 +436,7 @@ def run(parser, args):
             kmer_size=args.kmer,
             min_proportion_expected_depth=args.min_proportion_expected_depth,
             ploidy=args.ploidy,
+            lineage_variants=lineage_dict,
         )
         gt.run()
         (
@@ -491,11 +505,14 @@ def run(parser, args):
                 kmer_size=args.kmer,
                 min_proportion_expected_depth=args.min_proportion_expected_depth,
                 ploidy=args.ploidy,
+                lineage_variants=lineage_dict,
             )
             gt.run()
 
         variant_calls_dict = gt.variant_calls_dict
         sequence_calls_dict = gt.sequence_calls_dict
+        lineage_calls_dict = gt.lineage_calls_dict
+        lineage_predict_dict = gt.predict_lineage()
     else:
         depths = [cp.estimate_depth()]
     args.quiet = q
@@ -516,6 +533,8 @@ def run(parser, args):
         phylogenetics=phylogenetics,
         variant_calls=variant_calls_dict,
         sequence_calls=sequence_calls_dict,
+        lineage_calls=lineage_calls_dict,
+        lineage_predict=lineage_predict_dict,
         probe_sets=panels,
         files=args.seq,
         kmer=args.kmer,
@@ -534,6 +553,7 @@ def run(parser, args):
         if not args.report_all_calls:
             del base_json[args.sample]["variant_calls"]
             del base_json[args.sample]["sequence_calls"]
+            del base_json[args.sample]["lineage_calls"]
         outputs["json"] = json.dumps(base_json, indent=4)
 
     if len(outputs) == 0:
