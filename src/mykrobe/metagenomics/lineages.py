@@ -101,7 +101,7 @@ class LineagePredictor:
         for path_dict in best_paths:
             used_calls[path_dict["lineage"]] = {}
             for lineage in path_dict["scores"]:
-                used_calls[path_dict["lineage"]][lineage] = lineage_calls[lineage]
+                used_calls[path_dict["lineage"]][lineage] = lineage_calls.get(lineage, None)
 
         return result
 
