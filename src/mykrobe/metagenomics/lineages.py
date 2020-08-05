@@ -10,13 +10,19 @@ class LineagePredictor:
         self._make_tree()
         self.result = {}
 
+
+    @classmethod
+    def _lineage_to_itself_plus_parents(cls, lineage):
+        pieces = lineage.split(".")
+        return [".".join(pieces[:i+1]) for i in range(len(pieces))]
+
+
     def _make_tree(self):
         self.tree_nodes = {}
         self.tree_root = anytree.Node("root")
 
         for variant, lineage in self.variant_to_lineage.items():
-            pieces = lineage["name"].split(".")
-            nodes_to_add = [".".join(pieces[:i+1]) for i in range(len(pieces))]
+            nodes_to_add = LineagePredictor._lineage_to_itself_plus_parents(lineage["name"])
 
             for i, node_name in enumerate(nodes_to_add):
                 if node_name in self.tree_nodes:
@@ -81,7 +87,7 @@ class LineagePredictor:
     # on conf scores from the genotyping. Expect to replace this with
     # something more sophisitcated, that can identify mixed samples and report
     # a mix of lineages.
-    def call_lineage(self, lineage_calls):
+    def call_lineage_using_conf_scores(self, lineage_calls):
         """Calls the lineage from the given lineage calls.  lineage_calls should
         be the dictionary from a Genotype instance lineage_calls_dict. Has
         lineage name -> {dict of variant name -> call}."""
@@ -102,6 +108,90 @@ class LineagePredictor:
             used_calls[path_dict["lineage"]] = {}
             for lineage in path_dict["scores"]:
                 used_calls[path_dict["lineage"]][lineage] = lineage_calls.get(lineage, None)
+
+        return result
+
+
+    def _genotype_each_lineage_node(self, lineage_calls):
+        genotypes = {}
+
+        for lineage_name, var_dict in lineage_calls.items():
+            best_geno = None
+            for var_name, call in var_dict.items():
+                if self.variant_to_lineage[var_name]["use_ref_allele"]:
+                    wanted_genotype = [0, 0]
+                else:
+                    wanted_genotype = [1, 1]
+
+                if call["genotype"] == wanted_genotype:
+                    geno = 1
+                elif call["genotype"] == [0, 1]:
+                    geno = 0.5
+                else:
+                    geno = 0
+
+                if best_geno is None or best_geno < geno:
+                    best_geno = geno
+
+            genotypes[lineage_name] = 0 if best_geno is None else best_geno
+
+        return genotypes
+
+    def _get_good_paths_using_genotype_calls(self, lineage_calls, min_frac_called=0.5):
+        paths = {}
+        node_genos = self._genotype_each_lineage_node(lineage_calls)
+
+        for leaf_node in self.tree_root.leaves:
+            path = leaf_node.path[1:]
+            path_genos = [(x.name, node_genos.get(x.name, 0)) for x in path]
+            path_leaf = leaf_node
+            while len(path_genos) > 0 and path_genos[-1][1] == 0:
+                path_genos.pop()
+                path_leaf = path_leaf.parent
+
+            number_good_nodes = len([x for x in path_genos if x[1] > 0])
+            if len(path_genos) == 0 or number_good_nodes / len(path_genos) < min_frac_called or path_leaf.name in paths:
+                continue
+
+            # We could end up having say [l1, l1.1, l1.1.2], and also just
+            # [l1] because the leaf l1.2 had no support.  Could come across these
+            # in either order.
+            # Check if new path is a subpath of one we've already found:
+            if any(path_leaf.name in x for x in paths):
+                continue
+
+            subpaths_to_remove = [x for x in paths if x in path_leaf.name]
+            for x in subpaths_to_remove:
+                del paths[x]
+
+            paths[path_leaf.name] = {
+                "good_nodes": number_good_nodes,
+                "lineage_depth": len(path_genos),
+                "genotypes": {x[0]: x[1] for x in path_genos}}
+
+        return paths
+
+
+    def call_lineage(self, lineage_calls, min_frac_called=0.5):
+        """Calls the lineage from the given lineage calls.  lineage_calls should
+        be the dictionary from a Genotype instance lineage_calls_dict. Has
+        lineage name -> {dict of variant name -> call}."""
+        paths = self._get_good_paths_using_genotype_calls(lineage_calls, min_frac_called=min_frac_called)
+
+        if len(paths) == 0:
+            return None
+
+        used_calls = {}
+        result = {
+            "lineage": sorted(list(paths.keys())),
+            "calls_summary": paths,
+            "calls": used_calls,
+        }
+
+        for lineage, path_dict in paths.items():
+            used_calls[lineage] = {}
+            for lineage2 in path_dict["genotypes"]:
+                used_calls[lineage][lineage2] = lineage_calls.get(lineage2, None)
 
         return result
 
