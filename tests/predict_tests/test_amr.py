@@ -1,9 +1,11 @@
+import os
 from unittest import TestCase
 
 import pytest
 from mykrobe.cmds.amr import Panel, Species, TbPanel, StaphPanel, PANELS
 from mykrobe.predict import TBPredictor
 from mykrobe.variants.schema.models import Variant
+DATA_DIR = os.path.join("tests", "ref_data")
 
 
 class AMRPredictTest(TestCase):
@@ -12,7 +14,7 @@ class AMRPredictTest(TestCase):
             start=0, end=1, reference_bases="A", alternate_bases=["T"]
         )
 
-        self.predictor = TBPredictor(variant_calls={}, called_genes={})
+        self.predictor = TBPredictor(variant_calls={}, called_genes={}, variant_to_resistance_json_fp=os.path.join(DATA_DIR, "tb_variant_to_resistance_drug.json"))
 
     def teardown(self):
         pass

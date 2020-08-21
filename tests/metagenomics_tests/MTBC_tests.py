@@ -1,13 +1,14 @@
 from unittest import TestCase
+import os
 import sys
 sys.path.append(".")
 from mykrobe.metagenomics import AMRSpeciesPredictor
-
+DATA_DIR = os.path.join("tests", "ref_data")
 
 class MTBCSpeciesTests(TestCase):
 
     def setUp(self):
-        self.hierarchy_json_file = "mykrobe/data/phylo/mtbc_hierarchy.json"
+        self.hierarchy_json_file = f"{DATA_DIR}/mtbc_hierarchy.json"
 
     def teardown(self):
         pass
