@@ -24,7 +24,6 @@ from setuptools.command.install import install as DistutilsInstall
 class MyInstall(DistutilsInstall):
 
     def run(self):
-        self._get_mykrobe_data()
         self._install_mccortex()
 
     def _get_mykrobe_data(self):
