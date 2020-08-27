@@ -2,7 +2,6 @@ import os
 from unittest import TestCase
 
 import pytest
-from mykrobe.cmds.amr import Panel, Species, TbPanel, StaphPanel, PANELS
 from mykrobe.predict import TBPredictor
 from mykrobe.variants.schema.models import Variant
 DATA_DIR = os.path.join("tests", "ref_data")
@@ -44,68 +43,3 @@ class AMRPredictTest(TestCase):
 
         assert self.predictor._coverage_greater_than_threshold(call, [""]) is False
 
-
-class TestPanel:
-    def test_fromSpeciesAndName_invalidSpecies_raisesError(self):
-        species = "foo"
-        name = "bar"
-        with pytest.raises(NameError):
-            Panel.from_species_and_name(species, name)
-
-    def test_fromSpeciesAndName_tbWithInvalidPanel_raisesError(self):
-        species = Species.TB
-        name = "bar"
-        with pytest.raises(ValueError):
-            Panel.from_species_and_name(species, name)
-
-    def test_fromSpeciesAndName_staphWithInvalidPanel_raisesError(self):
-        species = Species.STAPH
-        name = "bar"
-        with pytest.raises(ValueError):
-            Panel.from_species_and_name(species, name)
-
-    def test_fromSpeciesAndName_staphWithCustomPanel_returnsCustom(self):
-        species = Species.STAPH
-        name = "custom"
-        panel = Panel.from_species_and_name(species, name)
-
-        actual = panel.name
-        expected = StaphPanel.CUSTOM
-
-        assert actual == expected
-
-    def test_fromSpeciesAndName_TbWithValidPanel_returnsPanel(self):
-        species = Species.TB
-        name = "201901"
-        panel = Panel.from_species_and_name(species, name)
-
-        actual = panel.name
-        expected = TbPanel.NEJM_WALKER
-
-        assert actual == expected
-
-    def test_add_multiple_paths(self):
-        species = Species.TB
-        name = "201901"
-        panel = Panel.from_species_and_name(species, name)
-        additions = ["foo", "bar"]
-        panel.add_path(*additions)
-
-        actual = panel.paths
-        expected = PANELS[species][panel.name]
-        expected.extend(additions)
-
-        assert actual == expected
-
-    def test_add_single_path(self):
-        species = Species.TB
-        name = "201901"
-        panel = Panel.from_species_and_name(species, name)
-        additions = "foo"
-        panel.add_path(*additions)
-
-        actual = panel.paths
-        expected = PANELS[species][panel.name]
-        expected.append(additions)
-
-        assert actual == expected
