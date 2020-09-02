@@ -384,7 +384,7 @@ def run(parser, args):
 
     base_json[args.sample] = {
         "susceptibility": list(mykrobe_predictor_susceptibility_result.to_dict().values())[0],
-        "phylogenetics": {} if phylogenetics == {} else list(self.phylogenetics.to_dict().values())[0],
+        "phylogenetics": {} if phylogenetics == {} else list(phylogenetics.to_dict().values())[0],
         "variant_calls": variant_calls_dict,
         "sequence_calls": sequence_calls_dict,
         "lineage_calls": lineage_calls_dict,
