@@ -38,10 +38,10 @@ def run(parser, args):
     if DB is not None:
         try:
             Variant.objects()
-            logging.info("Connected to %s-%s" % (DB_PREFIX, args.db_name))
+            logger.info("Connected to %s-%s" % (DB_PREFIX, args.db_name))
         except (ServerSelectionTimeoutError):
             DB = None
-            logging.warning(
+            logger.warning(
                 "Could not connect to database. Continuing without using genetic backgrounds"
             )
     mutations = []
@@ -140,7 +140,7 @@ def run(parser, args):
 
                 sys.stdout.write("%s\n" % a)
         else:
-            logging.warning(
+            logger.warning(
                 "All variants failed for %s_%s - %s"
                 % (mut.gene, mut.mutation_output_name, mut.variant)
             )

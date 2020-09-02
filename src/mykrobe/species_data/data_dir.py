@@ -8,6 +8,8 @@ import tarfile
 
 from mykrobe.species_data import SpeciesDir
 
+logger = logging.getLogger(__name__)
+
 MANIFEST_URL = "https://raw.githubusercontent.com/Mykrobe-tools/mykrobe/master/src/mykrobe/data_dir/manifest.json"
 
 class DataDir:
@@ -42,7 +44,7 @@ class DataDir:
 
     def create_root(self):
         if not os.path.exists(self.root_dir):
-            logging.info(f"Creating panels directory {self.root_dir}")
+            logger.info(f"Creating panels directory {self.root_dir}")
             os.mkdir(self.root_dir)
 
     def save_manifest(self):
@@ -55,27 +57,27 @@ class DataDir:
         error_message = f"Cannot update panel list. Looks like another process is already trying to modify the mykrobe data directory {self.root_dir}. If this is not the case, then you can delete this file and try again: {self.lock_file}"
         self.start_lock(error_message)
         if filename is not None:
-            logging.info(f"Getting latest panel information from file {filename}")
+            logger.info(f"Getting latest panel information from file {filename}")
             with open(filename) as f:
                 new_manifest = json.load(f)
         else:
             if url is None:
                 url = MANIFEST_URL
             try:
-                logging.info(f"Getting panels information from {url}")
+                logger.info(f"Getting panels information from {url}")
                 new_manifest = json.loads(requests.get(url).text)
             except:
                 raise RuntimeError(f"Error getting latest panel information from {url}")
 
         for species, species_dict in new_manifest.items():
-            logging.info(f"Updating metadata for species {species}")
+            logger.info(f"Updating metadata for species {species}")
             if species not in self.manifest:
                 self.manifest[species] = {"installed": None}
             self.manifest[species]["latest"] = species_dict
 
         self.save_manifest()
         self.stop_lock()
-        logging.info(f"Finished updating metadata in panels directory {self.root_dir}")
+        logger.info(f"Finished updating metadata in panels directory {self.root_dir}")
 
     def print_panels_summary(self):
         if len(self.manifest) == 0:
@@ -129,16 +131,16 @@ class DataDir:
         # not, but our downloads will always match this, so is ok here.
         from_file = re.search(r"^https?://", tarball_name) is None
         if from_file:
-            logging.info(f"Installing species from file {tarball_name}")
+            logger.info(f"Installing species from file {tarball_name}")
             to_extract = tarball_name
         else:
-            logging.info(f"Downloading file {tarball_name}")
+            logger.info(f"Downloading file {tarball_name}")
             request = requests.get(tarball_name, allow_redirects=True)
             to_extract = os.path.join(tmp_dir, "tmp.add_species.tar.gz")
             with open(to_extract, 'wb') as t:
                 t.write(request.content)
 
-        logging.info(f"Extracting tarball {to_extract}")
+        logger.info(f"Extracting tarball {to_extract}")
         with tarfile.open(to_extract, mode="r") as t:
             t.extractall(path=tmp_dir)
 
@@ -207,15 +209,15 @@ class DataDir:
         if species not in self.manifest:
             raise KeyError(f"Unknown species '{species}'. Must choose from: {self.all_species_list()}")
         if self.species_is_up_to_date(species):
-            logging.info(f"Species {species} is up to date. Nothing to do.")
+            logger.info(f"Species {species} is up to date. Nothing to do.")
         else:
             tarball = self.manifest[species]["latest"]["url"]
-            logging.info(f"{species}: updating from {tarball}")
+            logger.info(f"{species}: updating from {tarball}")
             self.add_or_replace_species_data(tarball, force=True)
-            logging.info(f"Updated species {species}")
+            logger.info(f"Updated species {species}")
 
     def update_all_species(self):
-        logging.info("Updating all species")
+        logger.info("Updating all species")
         for species in self.all_species_list():
             self.update_species(species)
-        logging.info("Finished updating")
+        logger.info("Finished updating")

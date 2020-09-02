@@ -235,7 +235,7 @@ def run(parser, args):
     args = parser.parse_args()
     ref_data = ref_data_from_args(args)
     if args.species == "custom" and ref_data["var_to_res_json"] is None and ref_data["lineage_json"] is None:
-        logging.info("Forcing --report_all_calls because species is 'custom' and options --custom_variant_to_resistance_json,--custom_lineage_json were not used")
+        logger.info("Forcing --report_all_calls because species is 'custom' and options --custom_variant_to_resistance_json,--custom_lineage_json were not used")
         args.report_all_calls = True
     logger.info(f"Running mkyrobe predict using species {args.species}, and panel version {ref_data['version']}")
 

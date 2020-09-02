@@ -2,6 +2,8 @@ import json
 import logging
 import os
 
+logger = logging.getLogger(__name__)
+
 class SpeciesDir:
     def __init__(self, root_dir):
         self.root_dir = os.path.abspath(root_dir)
@@ -29,36 +31,36 @@ class SpeciesDir:
         all_ok = True
         for key in keys_to_check:
             key_found = key in d
-            logging.debug(f"Check '{key}' found: {key_found}")
+            logger.debug(f"Check '{key}' found: {key_found}")
             if not key_found:
                 all_ok = False
         return all_ok
 
     def sanity_check(self):
-        logging.debug(f"Checking all panels in {self.root_dir}")
+        logger.debug(f"Checking all panels in {self.root_dir}")
         expect_keys = ["species_name", "version", "panels", "default_panel"]
         all_ok = SpeciesDir._check_keys_in_dict(expect_keys, self.manifest)
         if "panels" not in self.manifest:
-            logging.warning(f"No 'panels' section found in JSON file {self.manifest_json}")
+            logger.warning(f"No 'panels' section found in JSON file {self.manifest_json}")
             return False
         expect_keys = ["description", "reference_genome", "fasta_files", "json_files", "kmer", "species_phylo_group"]
         json_types = ["amr", "lineage", "hierarchy"]
 
         for panel_name in self.panel_names():
-            logging.debug(f"Checking panel {panel_name} in {self.root_dir}")
+            logger.debug(f"Checking panel {panel_name} in {self.root_dir}")
             self.set_panel(panel_name)
             all_ok = all_ok and SpeciesDir._check_keys_in_dict(expect_keys, self.panel)
             fasta_files = self.fasta_files()
             if fasta_files is None or len(fasta_files) == 0:
-                logging.warning(f"Must have at least one FASTA file name in {self.manifest_json}")
+                logger.warning(f"Must have at least one FASTA file name in {self.manifest_json}")
                 all_ok = False
             else:
                 for filename in fasta_files:
                     file_found = os.path.exists(filename)
-                    logging.debug(f"Found file {filename}: {file_found}")
+                    logger.debug(f"Found file {filename}: {file_found}")
                     all_ok = all_ok and file_found
                     if not file_found:
-                        logging.warning(f"FASTA file not found: {filename}")
+                        logger.warning(f"FASTA file not found: {filename}")
 
             found_at_least_one_json = False
             for json_type in json_types:
@@ -68,7 +70,7 @@ class SpeciesDir:
                 if  os.path.exists(json_file):
                     found_at_least_one_json = True
                 else:
-                    logging.warning(f"JSON {json_type} file not found: {json_file}")
+                    logger.warning(f"JSON {json_type} file not found: {json_file}")
 
             all_ok = all_ok and found_at_least_one_json
 
