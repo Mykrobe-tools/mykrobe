@@ -14,8 +14,12 @@ from mykrobe.base import panels_mixin
 
 import argparse
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="[mykrobe %(asctime)s %(levelname)s] %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%S"
+)
+logger = logging.getLogger()
 
 
 def run_subtool(parser, args):
@@ -47,15 +51,41 @@ def run_subtool(parser, args):
     run(parser, args)
 
 
+class LogLevelWarn(argparse.Action):
+    def __init__(self, nargs=0, **kw):
+        if nargs != 0:
+            raise ValueError("nargs for LogLevelWarn must be 0, it's a flag")
+        super().__init__(nargs=nargs, **kw)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        logger.setLevel(logging.WARN)
+
+class LogLevelDebug(argparse.Action):
+    def __init__(self, nargs=0, **kw):
+        if nargs != 0:
+            raise ValueError("nargs for LogLevelDebug must be 0, it's a flag")
+        super().__init__(nargs=nargs, **kw)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        logger.setLevel(logging.DEBUG)
+
+
 class ArgumentParserWithDefaults(argparse.ArgumentParser):
     def __init__(self, *args, **kwargs):
         super(ArgumentParserWithDefaults, self).__init__(*args, **kwargs)
         self.add_argument(
             "-q",
             "--quiet",
-            help="do not output warnings to stderr",
-            action="store_true",
-            dest="quiet",
+            help="Only output warnings/errors to stderr",
+            action=LogLevelWarn,
+            nargs=0,
+        )
+        self.add_argument(
+            '-d',
+            '--debug',
+            help="Output debugging information to stderr",
+            action=LogLevelDebug,
+            nargs=0,
         )
 
 
