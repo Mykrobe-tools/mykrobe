@@ -177,7 +177,7 @@ class SpeciesPredictor(object):
         for pg in phylo_groups.keys():
             if self.hierarchy:
                 allowed_species = flatten([self.hierarchy.dict[pg]["children"][subc]["children"].keys(
-                ) for subc in self.hierarchy.dict[pg]["children"].keys() if subc is not "Unknown"])
+                ) for subc in self.hierarchy.dict[pg]["children"].keys() if subc != "Unknown"])
                 species_to_consider = {k: phylogenetics["species"].get(
                     k, {"percent_coverage": 0}) for k in allowed_species}
             else:
