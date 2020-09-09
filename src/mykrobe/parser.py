@@ -23,6 +23,8 @@ logger = logging.getLogger()
 
 
 def run_subtool(parser, args):
+    logger.debug(f"command: {args.command}")
+    logger.debug(f"args: {args}")
     if args.command == "variants":
         if args.sub_command == "add":
             from mykrobe.cmds.variants.add import run
@@ -48,7 +50,9 @@ def run_subtool(parser, args):
     elif args.command == "diff":
         from mykrobe.cmds.diff import run
     # run the chosen submodule.
+    logger.debug(f"Start run {run.__module__}")
     run(parser, args)
+    logger.debug(f"End run {run.__module__}")
 
 
 class LogLevelWarn(argparse.Action):

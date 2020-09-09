@@ -9,6 +9,7 @@ import json
 import numpy as np
 import os
 import random
+import sys
 import time
 from enum import Enum
 from mykrobe.mformat import json_to_csv
@@ -231,13 +232,14 @@ def write_outputs(args, base_json):
 
 
 def run(parser, args):
+    logger.info(f"Start runnning mykrobe predict. Command line: {' '.join(sys.argv)}")
     base_json = {args.sample: {}}
     args = parser.parse_args()
     ref_data = ref_data_from_args(args)
     if args.species == "custom" and ref_data["var_to_res_json"] is None and ref_data["lineage_json"] is None:
         logger.info("Forcing --report_all_calls because species is 'custom' and options --custom_variant_to_resistance_json,--custom_lineage_json were not used")
         args.report_all_calls = True
-    logger.info(f"Running mkyrobe predict using species {args.species}, and panel version {ref_data['version']}")
+    logger.info(f"Running mykrobe predict using species {args.species}, and panel version {ref_data['version']}")
 
     # Run Cortex
     cp = CoverageParser(
@@ -261,8 +263,6 @@ def run(parser, args):
         phylogenetics, depths = detect_species_and_get_depths(cp, ref_data["hierarchy_json"], ref_data["species_phylo_group"])
 
     # Genotype
-    q = args.quiet
-    args.quiet = True
     variant_calls_dict = {}
     sequence_calls_dict = {}
     lineage_calls_dict = {}
@@ -296,7 +296,7 @@ def run(parser, args):
             kmer_count_error_rate,
             incorrect_kmer_to_pc_cov,
         ) = gt.estimate_kmer_count_error_rate_and_incorrect_kmer_to_percent_cov()
-        logger.info(
+        logger.debug(
             "Estimated error rate for kmer count model: "
             + str(round(100 * kmer_count_error_rate, 2))
             + "%"
@@ -324,7 +324,7 @@ def run(parser, args):
         # conf_percent_cutoff == 100 means that we want to keep all variant calls,
         # in which case there is no need to run the simulations
         if args.conf_percent_cutoff < 100:
-            logger.info("Expected depth: " + str(depths[0]))
+            logger.debug("Expected depth: " + str(depths[0]))
             conf_thresholder = ConfThresholder(
                 kmer_count_error_rate, depths[0], ref_data["kmer"], incorrect_kmer_to_pc_cov
             )
@@ -334,8 +334,8 @@ def run(parser, args):
             )
             time_end = time.time()
             time_to_sim = time_end - time_start
-            logger.info("Simulation time: " + str(time_to_sim))
-            logger.info(
+            logger.debug("Simulation time: " + str(time_to_sim))
+            logger.debug(
                 "Confidence cutoff (using percent cutoff "
                 + str(args.conf_percent_cutoff)
                 + "%): "
@@ -368,7 +368,7 @@ def run(parser, args):
         lineage_predict_dict = gt.predict_lineage()
     else:
         depths = [cp.estimate_depth()]
-    args.quiet = q
+
     mykrobe_predictor_susceptibility_result = MykrobePredictorSusceptibilityResult()
     if gt is not None and (max(depths) > args.min_depth or args.force) and ref_data["var_to_res_json"] is not None:
         predictor = BasePredictor(
@@ -381,6 +381,7 @@ def run(parser, args):
             variant_to_resistance_json_fp=ref_data["var_to_res_json"],
         )
         mykrobe_predictor_susceptibility_result = predictor.run()
+        logging.info("Progress: finished making AMR predictions")
 
     base_json[args.sample] = {
         "susceptibility": list(mykrobe_predictor_susceptibility_result.to_dict().values())[0],
@@ -400,4 +401,6 @@ def run(parser, args):
     if not args.keep_tmp:
         cp.remove_temporary_files()
 
+    logging.info("Progress: writing output")
     write_outputs(args, base_json)
+    logging.info("Progress: finished")
