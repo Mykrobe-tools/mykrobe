@@ -14,6 +14,13 @@ def fix_file(filename, to_replace):
         print(*lines, sep="", file=f)
 
 
+filename = os.path.join("mccortex", "src", "global", "util.h")
+to_replace = {
+    "const uint8_t rev_nibble_table[16];\n": "extern const uint8_t rev_nibble_table[16];\n"
+}
+fix_file(filename, to_replace)
+
+
 filename = os.path.join("mccortex", "libs", "xxHash", "xxhsum.c")
 to_replace = {
     "#if defined(MSDOS) || defined(OS2) || defined(WIN32) || defined(_WIN32) || defined(__CYGWIN__)\n": "#if defined(MSDOS) || defined(OS2) || defined(WIN32) || defined(_WIN32)\n"
