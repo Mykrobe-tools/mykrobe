@@ -90,7 +90,7 @@ def read(*names, **kwargs):
 
 setup(
     name='mykrobe',
-    version='0.8.1',
+    version='0.8.2',
     license='MIT',
     description='Antibiotic resistance prediction in minutes',
     # long_description='%s\n%s' % (
