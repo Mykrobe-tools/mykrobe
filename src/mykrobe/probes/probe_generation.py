@@ -124,12 +124,13 @@ def load_dna_vars_txt_file(infile, reference):
                 var_name = gene_name
             mutations.append(Mutation(reference=reference, var_name=var_name))
             if len(lineage) > 0:
-                lineage = lineage[0]
-                if lineage.startswith("*"):
+                if lineage[0].startswith("*"):
                     use_ref_allele = True
-                    lineage = lineage.lstrip("*")
+                    lineage[0] = lineage[0].lstrip("*")
                 else:
                     use_ref_allele = False
-                lineages[var_name] = {"name": lineage, "use_ref_allele": use_ref_allele}
+                lineages[var_name] = {"name": lineage[0], "use_ref_allele": use_ref_allele}
+                if len(lineage) == 2:
+                    lineages[var_name]["report_name"] = lineage[1]
 
     return mutations, lineages

@@ -364,8 +364,7 @@ def run(parser, args):
 
         variant_calls_dict = gt.variant_calls_dict
         sequence_calls_dict = gt.sequence_calls_dict
-        lineage_calls_dict = gt.lineage_calls_dict
-        lineage_predict_dict = gt.predict_lineage()
+        lineage_predict_dict, lineage_calls_dict = gt.predict_lineage()
     else:
         depths = [cp.estimate_depth()]
 
@@ -381,7 +380,7 @@ def run(parser, args):
             variant_to_resistance_json_fp=ref_data["var_to_res_json"],
         )
         mykrobe_predictor_susceptibility_result = predictor.run()
-        logging.info("Progress: finished making AMR predictions")
+        logger.info("Progress: finished making AMR predictions")
 
     base_json[args.sample] = {
         "susceptibility": list(mykrobe_predictor_susceptibility_result.to_dict().values())[0],
@@ -401,6 +400,6 @@ def run(parser, args):
     if not args.keep_tmp:
         cp.remove_temporary_files()
 
-    logging.info("Progress: writing output")
+    logger.info("Progress: writing output")
     write_outputs(args, base_json)
-    logging.info("Progress: finished")
+    logger.info("Progress: finished")

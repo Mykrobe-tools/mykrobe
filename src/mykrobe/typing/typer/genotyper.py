@@ -376,9 +376,10 @@ class Genotyper(object):
         self.out_json[self.sample]["genotypes"] = genotypes
         self.out_json[self.sample]["filtered"] = filters
         self.out_json[self.sample]["variant_calls"] = self.variant_calls_dict
+        lineage_result, lineage_calls = self.predict_lineage()
         self.out_json[self.sample]["lineage"] = {
-            "all_calls": self.lineage_calls_dict,
-            "result": self.predict_lineage(),
+            "all_calls": lineage_calls,
+            "result": lineage_result,
         }
 
     def predict_lineage(self):
@@ -387,7 +388,8 @@ class Genotyper(object):
 
         lin_pred = LineagePredictor(self.lineage_variants)
         lineage_call = lin_pred.call_lineage(self.lineage_calls_dict)
-        return {} if lineage_call is None else lineage_call
+        all_calls = lin_pred.replace_dict_keys(self.lineage_calls_dict)
+        return ({}, {}) if lineage_call is None else (lineage_call, all_calls)
 
     def _name_to_id(self, probe_name):
         names = []

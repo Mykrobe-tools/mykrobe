@@ -7,6 +7,7 @@ class LineagePredictor:
         """lineage_calls should be a dictionary of variant name -> lineage name.
         eg X42Y -> "lineageM.N"."""
         self.variant_to_lineage = variant_to_lineage
+        self.report_names = {d["name"]: d.get("report_name", d["name"]) for d in variant_to_lineage.values()}
         self._make_tree()
         self.result = {}
 
@@ -172,6 +173,27 @@ class LineagePredictor:
         return paths
 
 
+    def replace_dict_keys(self, d):
+        return {self.report_names.get(k, k): v for k, v in d.items()}
+
+    # The initial implementation assumed that the user would have consistent
+    # lineage names with X.Y being a child of X. Unfortunately, for TB we
+    # actually have lineage2.2.8 being a child of lineage2.2.7. This class
+    # uses the dots in the names to define the tree. So we now have a
+    # "report name", which is what the user will get in the output JSON
+    # file. This function goes through all the results and changes all
+    # the relevant lineage names to their "report name" where they are different
+    # from the internal name that defines the lineage tree.
+    def _apply_report_names_to_lineage_call_result(self, result):
+        result["lineage"] = [self.report_names.get(x, x) for x in result["lineage"]]
+        result["calls"] = self.replace_dict_keys(result["calls"])
+        for lineage, d in result["calls"].items():
+            result["calls"][lineage] = self.replace_dict_keys(d)
+        result["calls_summary"] = self.replace_dict_keys(result["calls_summary"])
+        for d in result["calls_summary"].values():
+            d["genotypes"] = self.replace_dict_keys(d["genotypes"])
+
+
     def call_lineage(self, lineage_calls, min_frac_called=0.5):
         """Calls the lineage from the given lineage calls.  lineage_calls should
         be the dictionary from a Genotype instance lineage_calls_dict. Has
@@ -193,5 +215,6 @@ class LineagePredictor:
             for lineage2 in path_dict["genotypes"]:
                 used_calls[lineage][lineage2] = lineage_calls.get(lineage2, None)
 
+        self._apply_report_names_to_lineage_call_result(result)
         return result
 

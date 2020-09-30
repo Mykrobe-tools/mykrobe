@@ -208,7 +208,7 @@ def test_call_lineage():
         "var1": {"name": "lineage1", "use_ref_allele": False},
         "var1a": {"name": "lineage1", "use_ref_allele": False},
         "var1.1": {"name": "lineage1.1", "use_ref_allele": False},
-        "var1.1.1": {"name": "lineage1.1.1", "use_ref_allele": False},
+        "var1.1.1": {"name": "lineage1.1.1", "use_ref_allele": False, "report_name": "l1-1-1"},
         "var2": {"name": "lineage2", "use_ref_allele": False},
         "var2.1": {"name": "lineage2.1", "use_ref_allele": False},
     }
@@ -228,12 +228,16 @@ def test_call_lineage():
         "lineage1.1.1": {"var1.1.1": var1_1_1_call,},
     }
 
+    expect_lineage_calls = copy.deepcopy(lineage_calls)
+    expect_lineage_calls["l1-1-1"] = {"var1.1.1": var1_1_1_call}
+    del expect_lineage_calls["lineage1.1.1"]
+
     expect = {
-        "lineage": ["lineage1.1.1"],
-        "calls": {"lineage1.1.1": copy.deepcopy(lineage_calls)},
+        "lineage": ["l1-1-1"],
+        "calls": {"l1-1-1": expect_lineage_calls},
         "calls_summary": {
-            "lineage1.1.1": {
-                "genotypes": {"lineage1": 1, "lineage1.1": 1, "lineage1.1.1": 1},
+            "l1-1-1": {
+                "genotypes": {"lineage1": 1, "lineage1.1": 1, "l1-1-1": 1},
                 "good_nodes": 3,
                 "lineage_depth": 3,
             },
