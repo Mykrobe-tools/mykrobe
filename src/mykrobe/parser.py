@@ -44,7 +44,8 @@ def run_subtool(parser, args):
         elif args.sub_command == "update_species":
             from mykrobe.cmds.panels import update_species as run
     elif args.command == "genotype":
-        from mykrobe.cmds.genotype import run
+        raise NotImplementedError("The 'genotype' option is no longer available - please use 'predict' with the species as 'custom' and the option --custom_probe_set_path probes.fasta (and also see the options --custom_variant_to_resistance_json, --custom_lineage_json) ")
+        #from mykrobe.cmds.genotype import run
     elif args.command == "place":
         from mykrobe.cmds.place import run
     elif args.command == "diff":
@@ -339,19 +340,19 @@ parser_make_probes.set_defaults(func=run_subtool)
 # ##########
 # # Genotype
 # ##########
-parser_geno = subparsers.add_parser(
-    "genotype",
-    parents=[
-        sequence_or_binary_parser_mixin,
-        probe_set_mixin,
-        force_mixin,
-        genotyping_mixin,
-    ],
-    help="genotype a sample using a probe set",
-)
-parser_geno.add_argument(
-    "--lineage",
-    type=str,
-    help="Input JSON file of lineages (made by make-probes --lineage)",
-    metavar="FILENAME")
-parser_geno.set_defaults(func=run_subtool)
+#parser_geno = subparsers.add_parser(
+#    "genotype",
+#    parents=[
+#        sequence_or_binary_parser_mixin,
+#        probe_set_mixin,
+#        force_mixin,
+#        genotyping_mixin,
+#    ],
+#    help="genotype a sample using a probe set",
+#)
+#parser_geno.add_argument(
+#    "--lineage",
+#    type=str,
+#    help="Input JSON file of lineages (made by make-probes --lineage)",
+#    metavar="FILENAME")
+#parser_geno.set_defaults(func=run_subtool)
