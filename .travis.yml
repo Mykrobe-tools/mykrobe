@@ -43,8 +43,6 @@ install:
 - pip3 install cython
 - pip3 install requests
 - travis_retry pip3 install tox
-- mykrobe panels update_metadata
-- mykrobe panels update_species --debug all
 script: tox -e $TOXENV
 
 deploy:
