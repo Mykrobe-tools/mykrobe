@@ -191,13 +191,13 @@ def test_get_good_paths_using_genotype_calls():
         {
             "genotypes": {"lineage1": 1, "lineage1.1": 1, "lineage1.1.1": 1},
             "good_nodes": 3,
-            "lineage_depth": 3,
+            "tree_depth": 3,
         },
         "lineage2":
         {
             "genotypes": {"lineage2": 1},
             "good_nodes": 1,
-            "lineage_depth": 1,
+            "tree_depth": 1,
         },
     }
     assert got == expect
@@ -239,7 +239,7 @@ def test_call_lineage():
             "l1-1-1": {
                 "genotypes": {"lineage1": 1, "lineage1.1": 1, "l1-1-1": 1},
                 "good_nodes": 3,
-                "lineage_depth": 3,
+                "tree_depth": 3,
             },
         }
     }
@@ -255,6 +255,6 @@ def test_call_lineage():
     expect["calls_summary"]["lineage2.1"] = {
         "genotypes": {'lineage2': 1, 'lineage2.1': 1},
         "good_nodes": 2,
-        "lineage_depth": 2,
+        "tree_depth": 2,
     }
     assert lin_pred.call_lineage(lineage_calls) == expect

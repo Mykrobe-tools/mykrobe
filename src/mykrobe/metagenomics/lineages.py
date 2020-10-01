@@ -167,7 +167,7 @@ class LineagePredictor:
 
             paths[path_leaf.name] = {
                 "good_nodes": number_good_nodes,
-                "lineage_depth": len(path_genos),
+                "tree_depth": len(path_genos),
                 "genotypes": {x[0]: x[1] for x in path_genos}}
 
         return paths
