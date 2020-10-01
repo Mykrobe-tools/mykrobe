@@ -349,4 +349,9 @@ parser_geno = subparsers.add_parser(
     ],
     help="genotype a sample using a probe set",
 )
+parser_geno.add_argument(
+    "--lineage",
+    type=str,
+    help="Input JSON file of lineages (made by make-probes --lineage)",
+    metavar="FILENAME")
 parser_geno.set_defaults(func=run_subtool)

@@ -155,11 +155,6 @@ genotyping_mixin.add_argument(
     type=str,
     help='File path to save output json file as. Default is to stdout.',
     default='')
-genotyping_mixin.add_argument(
-    "--lineage",
-    type=str,
-    help="Input JSON file of lineages (made by make-probes --lineage)",
-    metavar="FILENAME")
 
 
 panels_mixin = argparse.ArgumentParser(add_help=False)
