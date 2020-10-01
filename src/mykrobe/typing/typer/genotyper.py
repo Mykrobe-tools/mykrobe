@@ -384,7 +384,7 @@ class Genotyper(object):
 
     def predict_lineage(self):
         if len(self.lineage_calls_dict) == 0 or self.lineage_variants is None:
-            return {}
+            return {}, {}
 
         lin_pred = LineagePredictor(self.lineage_variants)
         lineage_call = lin_pred.call_lineage(self.lineage_calls_dict)
