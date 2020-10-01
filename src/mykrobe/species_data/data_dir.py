@@ -123,6 +123,7 @@ class DataDir:
         tmp_dir = os.path.join(self.root_dir, "tmp.add_species")
         if os.path.exists(tmp_dir):
             shutil.rmtree(tmp_dir)
+        os.mkdir(tmp_dir)
 
         # For testing, is useful to install from files. But this is hidden from
         # the user because we wan't them to download out tarballs. So check
