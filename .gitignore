@@ -118,5 +118,3 @@ data
 test-probes.txt
 z.test.pncA_T2ATAC.txt
 
-# include panels metadata manifest json
-!src/mykrobe/species_data/manifest.json
