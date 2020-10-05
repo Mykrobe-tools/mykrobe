@@ -5,17 +5,18 @@ import os
 sys.path.append(".")
 from mykrobe.probes.models import Mutation
 from mykrobe.annotation.genes import GeneAminoAcidChangeToDNAVariants
+DATA_DIR = os.path.join("tests", "ref_data")
 
 
 class TestMutation():
 
     def setup(self):
-        self.reference_filepath = "src/mykrobe/data/NC_000962.3.fasta"
+        self.reference_filepath = f"{DATA_DIR}/NC_000962.3.fasta"
         self.reference = os.path.basename(
             self.reference_filepath).split('.fa')[0]
         self.aa2dna = GeneAminoAcidChangeToDNAVariants(
-            "src/mykrobe/data/NC_000962.3.fasta",
-            "src/mykrobe/data/NC_000962.3.gb")
+            f"{DATA_DIR}/NC_000962.3.fasta",
+            f"{DATA_DIR}/NC_000962.3.gb")
 
     def teardown(self):
         pass

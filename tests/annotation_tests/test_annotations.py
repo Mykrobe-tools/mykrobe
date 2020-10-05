@@ -1,4 +1,5 @@
 import copy
+import os
 
 from mykrobe.annotation.genes import Region
 from mykrobe.annotation.genes import Gene
@@ -16,7 +17,7 @@ from Bio.Seq import Seq
 from mongoengine import connect
 DB = connect('mykrobe-test')
 import pytest
-
+DATA_DIR = os.path.join("tests", "ref_data")
 
 class TestRegions():
 
@@ -25,12 +26,12 @@ class TestRegions():
 
     def setup(self):
         DB.drop_database('mykrobe-test')
-        with open("src/mykrobe/data/NC_000962.3.fasta", 'r') as infile:
+        with open(f"{DATA_DIR}/NC_000962.3.fasta", 'r') as infile:
             self.reference_seq = list(SeqIO.parse(infile, "fasta"))[0].seq
 
         self.gm = GeneAminoAcidChangeToDNAVariants(
-            reference="src/mykrobe/data/NC_000962.3.fasta",
-            genbank="src/mykrobe/data/NC_000962.3.gb")
+            reference=f"{DATA_DIR}/NC_000962.3.fasta",
+            genbank=f"{DATA_DIR}/NC_000962.3.gb")
         self.reference_set = ReferenceSet().create_and_save(name="ref_set")
         self.variant_set = VariantSet.create_and_save(
             name="this_vcf_file",
@@ -117,8 +118,8 @@ class TestRegions():
 
     def test_gene_muts(self):
         self.gm = GeneAminoAcidChangeToDNAVariants(
-            reference="src/mykrobe/data/NC_000962.3.fasta",
-            genbank="src/mykrobe/data/NC_000962.3.gb")
+            reference=f"{DATA_DIR}/NC_000962.3.fasta",
+            genbank=f"{DATA_DIR}/NC_000962.3.gb")
         assert self.gm.get_alts("K") == ['AAA', 'AAG']
         # GAT -> ['GCA', 'GCT', 'GCC', 'GCG'], positions 759813,14,15
         assert sorted(self.gm.get_variant_names("rpoB", "D3A")) == sorted(
@@ -188,8 +189,8 @@ class TestRegions():
 
     def test_gene_muts2(self):
         self.gm = GeneAminoAcidChangeToDNAVariants(
-            reference="src/mykrobe/data/NC_000962.3.fasta",
-            genbank="src/mykrobe/data/NC_000962.3.gb")
+            reference=f"{DATA_DIR}/NC_000962.3.fasta",
+            genbank=f"{DATA_DIR}/NC_000962.3.gb")
         assert self.gm.get_alts("K") == ['AAA', 'AAG']
         # AGC -> ['CTT', 'CTC', 'CTA', 'CTG']
     #   # GAG -> ['GCA', 'GCT', 'GCC', 'GCG']
@@ -199,7 +200,7 @@ class TestRegions():
         DB.drop_database('mykrobe-test')
 
     def test_make_variant_panel1(self):
-        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
+        ag = AlleleGenerator(f"{DATA_DIR}/NC_000962.3.fasta")
         gene = self.gm.get_gene("rpoB")
         for var in self.gm.get_variant_names("rpoB", "D3A"):
             ref, start, alt = split_var_name(var)
@@ -212,14 +213,14 @@ class TestRegions():
             panel = ag.create(v)
             for alt in panel.alts:
                 seq = copy.copy(str(gene.seq))
-                assert Seq(seq).translate()[2] == "D"    
+                assert Seq(seq).translate()[2] == "D"
                 seq = seq.replace(panel.refs[0][25:], alt[24:])
                 assert seq != str(gene.seq)
                 assert Seq(seq).translate()[2] == "A"
         DB.drop_database('mykrobe-test')
 
     def test_make_variant_panel2(self):
-        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
+        ag = AlleleGenerator(f"{DATA_DIR}/NC_000962.3.fasta")
         gene = self.gm.get_gene("katG")
         for var in self.gm.get_variant_names("katG", "E3A"):
             ref, start, alt = split_var_name(var)
@@ -238,7 +239,7 @@ class TestRegions():
         DB.drop_database('mykrobe-test')
 
     def test_make_variant_panel3(self):
-        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
+        ag = AlleleGenerator(f"{DATA_DIR}/NC_000962.3.fasta")
         gene = self.gm.get_gene("katG")
         for var in self.gm.get_variant_names("katG", "S315L"):
             ref, start, alt = split_var_name(var)
@@ -257,7 +258,7 @@ class TestRegions():
         DB.drop_database('mykrobe-test')
 
     def test_make_variant_panel4(self):
-        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
+        ag = AlleleGenerator(f"{DATA_DIR}/NC_000962.3.fasta")
         gene = self.gm.get_gene("katG")
         for var in self.gm.get_variant_names("katG", "W90R"):
             ref, start, alt = split_var_name(var)
@@ -276,7 +277,7 @@ class TestRegions():
         DB.drop_database('mykrobe-test')
 
     def test_make_variant_panel5(self):
-        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
+        ag = AlleleGenerator(f"{DATA_DIR}/NC_000962.3.fasta")
         gene = self.gm.get_gene("gyrA")
         for var in self.gm.get_variant_names("gyrA", "D94X"):
             ref, start, alt = split_var_name(var)
@@ -294,7 +295,7 @@ class TestRegions():
         DB.drop_database('mykrobe-test')
 
     def test_make_variant_panel6(self):
-        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
+        ag = AlleleGenerator(f"{DATA_DIR}/NC_000962.3.fasta")
         gene = self.gm.get_gene("pncA")
         variants = list(self.gm.get_variant_names(
             "pncA", "CAG28TAA", protein_coding_var=False))
@@ -336,7 +337,7 @@ class TestRegions():
         # CACAGAATCCGACTGTGGCATATGCCGC
         #   |
         #   | <- C = last nucleotide of gene, at 2715332
-        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
+        ag = AlleleGenerator(f"{DATA_DIR}/NC_000962.3.fasta")
         gene = self.gm.get_gene("eis")
         variants = list(self.gm.get_variant_names(
             "eis", "G-10A", protein_coding_var=False))
@@ -367,7 +368,7 @@ class TestRegions():
         DB.drop_database('mykrobe-test')
 
     def test_make_variant_panel8(self):
-        ag = AlleleGenerator("src/mykrobe/data/NC_000962.3.fasta")
+        ag = AlleleGenerator(f"{DATA_DIR}/NC_000962.3.fasta")
         gene = self.gm.get_gene("eis")
         variants = list(self.gm.get_variant_names(
             "eis", "TG-1T", protein_coding_var=False))

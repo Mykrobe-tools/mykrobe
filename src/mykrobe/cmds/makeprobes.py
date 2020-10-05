@@ -1,5 +1,6 @@
 from __future__ import print_function
 import csv
+import json
 import os
 import sys
 import logging
@@ -23,6 +24,7 @@ from mykrobe._vcf import VCF
 from mykrobe.probes.models import Mutation
 from mykrobe.probes import AlleleGenerator
 from mykrobe.probes import make_variant_probe
+from mykrobe.probes import load_dna_vars_txt_file
 from mykrobe.constants import DB_PREFIX
 
 
@@ -36,13 +38,14 @@ def run(parser, args):
     if DB is not None:
         try:
             Variant.objects()
-            logging.info("Connected to %s-%s" % (DB_PREFIX, args.db_name))
+            logger.info("Connected to %s-%s" % (DB_PREFIX, args.db_name))
         except (ServerSelectionTimeoutError):
             DB = None
-            logging.warning(
+            logger.warning(
                 "Could not connect to database. Continuing without using genetic backgrounds"
             )
     mutations = []
+    lineages = set()
     reference = os.path.basename(args.reference_filepath).split(".fa")[0]
     if args.vcf:
         run_make_probes_from_vcf_file(args)
@@ -83,22 +86,15 @@ def run(parser, args):
                     )
     else:
         if args.text_file:
-            with open(args.text_file, "r") as infile:
-                reader = csv.reader(infile, delimiter="\t")
-                for row in reader:
-                    gene_name, pos, ref, alt, alphabet = row
-                    if gene_name == "ref":
-                        mutations.append(
-                            Mutation(
-                                reference=reference, var_name="".join([ref, pos, alt])
-                            )
-                        )
-                    else:
-                        mutations.append(Mutation(reference=reference, var_name=row[0]))
+            mutations, lineages = load_dna_vars_txt_file(args.text_file, reference)
+            if args.lineage:
+                with open(args.lineage, "w") as f:
+                    json.dump(lineages, f, sort_keys=True, indent=2)
         else:
             mutations.extend(
                 Mutation(reference=reference, var_name=v) for v in args.variants
             )
+
     al = AlleleGenerator(reference_filepath=args.reference_filepath, kmer=args.kmer)
     for enum, mut in enumerate(mutations):
         if enum % 100 == 0:
@@ -144,7 +140,7 @@ def run(parser, args):
 
                 sys.stdout.write("%s\n" % a)
         else:
-            logging.warning(
+            logger.warning(
                 "All variants failed for %s_%s - %s"
                 % (mut.gene, mut.mutation_output_name, mut.variant)
             )

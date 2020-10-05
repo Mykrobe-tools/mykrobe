@@ -155,3 +155,12 @@ genotyping_mixin.add_argument(
     type=str,
     help='File path to save output json file as. Default is to stdout.',
     default='')
+
+
+panels_mixin = argparse.ArgumentParser(add_help=False)
+panels_mixin.add_argument(
+    "--panels_dir",
+    metavar="DIRNAME",
+    help="Name of directory that contains panel data. Default: %(default)s",
+    default=os.path.abspath(os.path.join(os.path.dirname(__file__), "data")),
+)

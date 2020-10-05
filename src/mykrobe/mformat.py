@@ -42,7 +42,14 @@ def get_lineage_string(d):
     s = []
     depth=[]
     per_cov=[]
-    for k, v in d.get("phylogenetics", {}).get("lineage", {}).items():
+    lineage_dict = d.get("phylogenetics", {}).get("lineage", {})
+    if len(lineage_dict) == 0:
+        return "", "", ""
+
+    if set(lineage_dict.keys()) == {"lineage", "calls_summary", "calls"}:
+        return ";".join(lineage_dict.get("lineage", [])), "NA", "NA"
+
+    for k, v in lineage_dict.items():
         s.append(k)
         depth.append(str(v.get("median_depth")))
         per_cov.append(str(v.get("percent_coverage")))
@@ -75,11 +82,11 @@ def get_variant_calls(d):
 
 def json_to_csv(json_dict):
     header = [
-        "sample",    
+        "sample",
         "drug",
-        "susceptibility",  
+        "susceptibility",
         "variants (dna_variant-AA_variant:ref_kmer_count:alt_kmer_count:conf) [use --format json for more info]",
-        "genes (prot_mut-ref_mut:percent_covg:depth) [use --format json for more info]",              
+        "genes (prot_mut-ref_mut:percent_covg:depth) [use --format json for more info]",
 
         "mykrobe_version",
         "files",
@@ -91,10 +98,10 @@ def json_to_csv(json_dict):
         "lineage",
         "phylo_group_per_covg",
         "species_per_covg",
-        "lineage_per_covg", 
+        "lineage_per_covg",
         "phylo_group_depth",
         "species_depth",
-        "lineage_depth"                  
+        "lineage_depth"
 ]
     rows = [header]
 
@@ -122,8 +129,8 @@ def json_to_csv(json_dict):
                 call.get(
                     "predict",
                     'N'),
-                called_by_variants, 
-                called_by_genes,  
+                called_by_variants,
+                called_by_genes,
 
                 d.get("version",{}).get("mykrobe-predictor","-1"),
                 files,
@@ -135,14 +142,14 @@ def json_to_csv(json_dict):
                 lineage,
                 phylo_group_per_covg,
                 species_per_covg,
-                lineage_per_covg,                  
+                lineage_per_covg,
                 phylo_group_depth,
                 species_depth,
-                lineage_depth              
+                lineage_depth
                 ]
             rows.append(row)
     output = io.StringIO()
-    writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)            
+    writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
     for row in rows:
         writer.writerow(row)
     csv_string=output.getvalue()

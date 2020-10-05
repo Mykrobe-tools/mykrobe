@@ -28,8 +28,9 @@ jobs:
     # We need to install mykrobe, including the data, so that when we run
     # pyinstaller later, it includes the data and the python module
     # dependencies
-    - ./ci/download_data.sh
     - pip3 install .
+    - mykrobe panels update_metadata
+    - mykrobe panels update_species --debug all
     - pip3 install pyinstaller
     - cd dist
     - pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller.spec
@@ -42,7 +43,6 @@ install:
 - pip3 install cython
 - pip3 install requests
 - travis_retry pip3 install tox
-- ./ci/download_data.sh
 script: tox -e $TOXENV
 
 deploy:

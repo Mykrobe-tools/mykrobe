@@ -9,9 +9,9 @@ import json
 import numpy as np
 import os
 import random
+import sys
 import time
 from enum import Enum
-from typing import NamedTuple, List, Union, Optional
 from mykrobe.mformat import json_to_csv
 from mykrobe.typing import CoverageParser
 from mykrobe.typing import Genotyper
@@ -20,13 +20,14 @@ from mykrobe.typing.models.variant import VariantProbeCoverage
 from mykrobe.typing.typer.variant import VariantTyper
 from mykrobe.predict import TBPredictor
 from mykrobe.predict import StaphPredictor
+from mykrobe.predict import BasePredictor
 from mykrobe.predict import MykrobePredictorSusceptibilityResult
 from mykrobe.metagenomics import AMRSpeciesPredictor
+from mykrobe.species_data import DataDir
+from mykrobe.utils import load_json
 from mykrobe.version import __version__ as predictor_version
 from mykrobe.version import __version__ as atlas_version
 
-
-PathLike = Union[str, os.PathLike]
 
 random.seed(42)
 
@@ -80,8 +81,6 @@ class ConfThresholder:
         incorrect_covg = np.random.binomial(
             self.mean_depth, self.error_rate, size=self.iterations
         )
-        # f = open('test.simulate_snps_data.tsv', 'w')
-        # print('Correct_cov', 'Incorrect_cov', 'correct_k_count', 'incorrect_k_count', 'correct_percent_coverage', 'incorrect_percent_coverage', 'Cov', 'Conf', sep='\t', file=f)
         probe_coverage_list = []
         vtyper = VariantTyper(
             [self.mean_depth], error_rate=self.error_rate, kmer_size=self.kmer_length
@@ -100,8 +99,6 @@ class ConfThresholder:
                 self.kmer_length * incorrect_covg[i]
             ) + 0.01  #  see KmerCountGenotypeModel.depth_to_expected_kmer_count()
 
-            # correct_percent_coverage = ConfThresholder._simulate_percent_coverage(int(correct_k_count), 2 + self.kmer_length)
-            # incorrect_percent_coverage = ConfThresholder._simulate_percent_coverage(int(incorrect_k_count), 2 + self.kmer_length)
             correct_percent_coverage = 100
             incorrect_percent_coverage = ConfThresholder._get_incorrect_kmer_percent_cov(
                 int(incorrect_k_count), self.incorrect_kmer_to_pc_cov
@@ -128,9 +125,7 @@ class ConfThresholder:
             cov = np.log10(correct_covg[i] + incorrect_covg[i])
             conf = call["info"]["conf"]
             self.log_conf_and_covg.append((conf, cov))
-            # print(correct_covg[i], incorrect_covg[i], correct_k_count, incorrect_k_count, correct_percent_coverage, incorrect_percent_coverage, cov, conf, sep='\t', file=f)
 
-        # f.close()
         self.log_conf_and_covg.sort(reverse=True)
 
     def get_conf_threshold(self, percent_to_keep=95):
@@ -147,220 +142,111 @@ class ConfThresholder:
         return self.log_conf_and_covg[conf_cutoff_index][0]
 
 
-class MykrobePredictorResult(object):
-    def __init__(
-        self,
-        susceptibility,
-        phylogenetics,
-        variant_calls,
-        sequence_calls,
-        kmer,
-        probe_sets,
-        files,
-        version,
-        model,
-    ):
-        self.susceptibility = susceptibility
-        self.phylogenetics = phylogenetics
-        self.variant_calls = variant_calls
-        self.sequence_calls = sequence_calls
-        self.kmer = kmer
-        self.probe_sets = probe_sets
-        self.files = files
-        self.version = version
-        self.model = model
-
-    def to_dict(self):
-        return {
-            "susceptibility": list(self.susceptibility.to_dict().values())[0],
-            "phylogenetics": list(self.phylogenetics.to_dict().values())[0],
-            "variant_calls": self.variant_calls,
-            "sequence_calls": self.sequence_calls,
-            "kmer": self.kmer,
-            "probe_sets": self.probe_sets,
-            "files": self.files,
-            "version": self.version,
-            "genotype_model": self.model,
+def ref_data_from_args(args):
+    if args.species == "custom":
+        if args.custom_probe_set_path is None:
+            raise ValueError("Must use --custom_probe_set_path option if the species is 'custom'")
+        ref_data = {
+            "fasta_files": [args.custom_probe_set_path],
+            "var_to_res_json": args.custom_variant_to_resistance_json,
+            "hierarchy_json": None,
+            "lineage_json": args.custom_lineage_json,
+            "kmer": args.kmer,
+            "version": "custom",
+            "species_phylo_group": None,
+        }
+    else:
+        data_dir = DataDir(args.panels_dir)
+        species_dir = data_dir.get_species_dir(args.species)
+        if args.panel is not None:
+            species_dir.set_panel(args.panel)
+        ref_data = {
+            "fasta_files": species_dir.fasta_files(),
+            "var_to_res_json": species_dir.json_file("amr"),
+            "hierarchy_json": species_dir.json_file("hierarchy"),
+            "lineage_json": species_dir.json_file("lineage"),
+            "kmer": species_dir.kmer(),
+            "version": species_dir.version(),
+            "species_phylo_group": species_dir.species_phylo_group(),
         }
 
-    # For database document
-    # susceptibility = EmbeddedDocumentField("MykrobePredictorSusceptibilityResult")
-    # phylogenetics = EmbeddedDocumentField("MykrobePredictorPhylogeneticsResult")
-    # kmer = IntField()
-    # probe_sets = StringField()
-    # variant_calls = DictField()
-    # sequence_calls = DictField()
+    if ref_data["lineage_json"] is None:
+        ref_data["lineage_dict"] = None
+    else:
+        ref_data["lineage_dict"] = load_json(ref_data["lineage_json"])
+
+    return ref_data
 
 
-class Species(Enum):
-    TB = "tb"
-    STAPH = "staph"
+def detect_species_and_get_depths(cov_parser, hierarchy_json, wanted_phylo_group):
+    depths = []
+    if wanted_phylo_group is None:
+        return {}, depths
+
+    species_predictor = AMRSpeciesPredictor(
+        phylo_group_covgs=cov_parser.covgs.get("complex", cov_parser.covgs.get("phylo_group", {})),
+        sub_complex_covgs=cov_parser.covgs.get("sub-complex", {}),
+        species_covgs=cov_parser.covgs["species"],
+        lineage_covgs=cov_parser.covgs.get("sub-species", {}),
+        hierarchy_json_file=hierarchy_json,
+    )
+    phylogenetics = species_predictor.run()
+
+    if wanted_phylo_group in species_predictor.out_json["phylogenetics"]["phylo_group"]:
+        depths = [species_predictor.out_json["phylogenetics"]["phylo_group"][wanted_phylo_group]["median_depth"]]
+    return phylogenetics, depths
 
 
-class TbPanel(Enum):
-    BRADLEY = "bradley-2015"
-    WALKER = "walker-2015"
-    NEJM_WALKER = "201901"
-    ATLAS = "atlas"
-    CUSTOM = "custom"
+def write_outputs(args, base_json):
+    outputs = {}
 
+    if args.output_format in ["csv", "json_and_csv"]:
+        outputs["csv"] = json_to_csv(base_json)
+    if args.output_format in ["json", "json_and_csv"]:
+        # Verbose json output requires --report_all_calls
+        if not args.report_all_calls:
+            del base_json[args.sample]["variant_calls"]
+            del base_json[args.sample]["sequence_calls"]
+            del base_json[args.sample]["lineage_calls"]
+        outputs["json"] = json.dumps(base_json, indent=4)
 
-class StaphPanel(Enum):
-    DEFAULT = "default"
-    CUSTOM = "custom"
-
-
-PanelName = Union[StaphPanel, TbPanel]
-
-
-class Panel(NamedTuple):
-    paths: List[str]
-    name: PanelName
-
-    @staticmethod
-    def from_species_and_name(species: Species, name: str) -> "Panel":
-        if species is Species.STAPH:
-            panel_name = StaphPanel(name)
-        elif species is Species.TB:
-            panel_name = TbPanel(name)
-        else:
-            raise NameError(f"{species} is not a known species.")
-
-        paths: List[str] = PANELS[species][panel_name]
-        return Panel(paths, panel_name)
-
-    def add_path(self, *args):
-        for path in args:
-            self.paths.append(path)
-
-
-PANELS = {
-    Species.STAPH: {
-        StaphPanel.DEFAULT: [
-            "data/panels/staph-species-160227.fasta.gz",
-            "data/panels/staph-amr-bradley_2015-feb-17-2017.fasta.gz",
-        ],
-        StaphPanel.CUSTOM: ["data/panels/staph-species-160227.fasta.gz"],
-    },
-    Species.TB: {
-        TbPanel.ATLAS: [
-            "data/panels/tb-species-170421.fasta.gz",
-            "data/panels/tb-walker-probe-set-jan-2019.fasta.gz",
-            "data/panels/tb-k21-probe-set-feb-09-2017.fasta.gz",
-        ],
-        TbPanel.BRADLEY: [
-            "data/panels/tb-species-170421.fasta.gz",
-            "data/panels/tb-bradley-probe-set-jan-2019.fasta.gz",
-        ],
-        TbPanel.WALKER: [
-            "data/panels/tb-species-170421.fasta.gz",
-            "data/panels/tb-walker-probe-set-jan-2019.fasta.gz",
-        ],
-        TbPanel.NEJM_WALKER: [
-            "data/panels/tb-species-170421.fasta.gz",
-            "data/panels/tb-hunt-probe-set-jan-03-2019.fasta.gz",
-        ],
-        TbPanel.CUSTOM: ["data/panels/tb-species-170421.fasta.gz"],
-    },
-}
-
-
-def describe_panels(parser, args):
-    all_panels = {
-        "tb": {
-            "bradley-2015": {
-                "description": "AMR panel described in Bradley, P et al. Rapid antibiotic-resistance predictions from genome sequence data for Staphylococcus aureus and Mycobacterium tuberculosis. Nat. Commun. 6:10063 doi: 10.1038/ncomms10063 (2015).",
-                "reference": "NC_000962.3",
-            },
-            "walker-2015": {
-                "description": "AMR panel described in Walker, Timothy M et al. Whole-genome sequencing for prediction of Mycobacterium tuberculosis drug susceptibility and resistance: a retrospective cohort study. The Lancet Infectious Diseases , Volume 15 , Issue 10 , 1193 - 1202",
-                "reference": "NC_000962.3",
-            },
-            "201901": {
-                "description": "AMR panel based on first line drugs from NEJM-2018 variants (DOI 10.1056/NEJMoa1800474), and second line drugs from Walker 2015 panel.",
-                "reference": "NC_000962.3",
-            },
-        },
-        "staph": {
-            "default": {
-                "description": "AMR panel described in Bradley, P et al. Rapid antibiotic-resistance predictions from genome sequence data for Staphylococcus aureus and Mycobacterium tuberculosis. Nat. Commun. 6:10063 doi: 10.1038/ncomms10063 (2015).",
-                "reference": "BX571856.1",
-            }
-        },
-    }
-
-    print("\t".join(["species", "panel-name", "description", "reference"]))
-    for species, panels in all_panels.items():
-        for panel_name, data in panels.items():
-            print(
-                "\t".join([species, panel_name, data["description"], data["reference"]])
+    if len(outputs) == 0:
+        raise ValueError(
+            (
+                f"Output format must be one of: csv,json,json_and_csv. Got "
+                f"'{args.output_format}'"
             )
+        )
+
+    for output_type, output in outputs.items():
+        # write to file is specified by user, otherwise send to stdout
+        if args.output:
+            if args.output_format == "json_and_csv":
+                outfile = args.output + "." + output_type
+            else:
+                outfile = args.output
+            with open(outfile, "w") as f:
+                f.write(output)
+        else:
+            print(output)
 
 
 def run(parser, args):
+    logger.info(f"Start runnning mykrobe predict. Command line: {' '.join(sys.argv)}")
     base_json = {args.sample: {}}
     args = parser.parse_args()
-    hierarchy_json_file = None
-    variant_to_resistance_json_fp: Optional[PathLike] = None
-    species = Species(args.species)
-    if species is not Species.TB and args.panel != "custom":
-        args.panel = "default"
-    panels = Panel.from_species_and_name(species, args.panel)
+    ref_data = ref_data_from_args(args)
+    if args.species == "custom" and ref_data["var_to_res_json"] is None and ref_data["lineage_json"] is None:
+        logger.info("Forcing --report_all_calls because species is 'custom' and options --custom_variant_to_resistance_json,--custom_lineage_json were not used")
+        args.report_all_calls = True
+    logger.info(f"Running mykrobe predict using species {args.species}, and panel version {ref_data['version']}")
 
-    if species is Species.TB and panels.name is TbPanel.NEJM_WALKER:
-        data_dir = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "../data/predict/tb/")
-        )
-        variant_to_resistance_json_fp = os.path.join(
-            data_dir, "variant_to_resistance_drug-jan-03-2019.json"
-        )
-    if panels.name in (TbPanel.CUSTOM, StaphPanel.CUSTOM):
-        if not args.custom_probe_set_path:
-            raise ValueError("Custom panel requires custom_probe_set_path")
-
-        if not os.path.exists(args.custom_probe_set_path):
-            raise FileNotFoundError(
-                f"Custom probe path {args.custom_probe_set_path} does not exist!"
-            )
-        panels.add_path(args.custom_probe_set_path)
-
-        if not os.path.exists(args.custom_variant_to_resistance_json):
-            raise FileNotFoundError(
-                (
-                    "Custom variant to resistance json "
-                    f"{args.custom_variant_to_resistance_json} does not exist!"
-                )
-            )
-        variant_to_resistance_json_fp = args.custom_variant_to_resistance_json
-
-    if species is Species.STAPH:
-        Predictor = StaphPredictor
-        args.kmer = 15  # Forced
-    elif species is Species.TB:
-        hierarchy_json_file = "data/phylo/mtbc_hierarchy.json"
-        Predictor = TBPredictor
-    else:
-        raise ValueError(f"Unrecognised species {species}")
-
-    logger.info("Running AMR prediction with panels %s" % ", ".join(panels.paths))
-    version = dict()
-    version["mykrobe-predictor"] = predictor_version
-    version["mykrobe-atlas"] = atlas_version
-    # Get real paths for panels
-    panels = [
-        os.path.realpath(os.path.join(os.path.dirname(__file__), "..", f))
-        for f in panels.paths
-    ]
-    if hierarchy_json_file is not None:
-        hierarchy_json_file = os.path.realpath(
-            os.path.join(os.path.dirname(__file__), "..", hierarchy_json_file)
-        )
     # Run Cortex
     cp = CoverageParser(
         sample=args.sample,
-        panel_file_paths=panels,
+        panel_file_paths=ref_data["fasta_files"],
         seq=args.seq,
-        kmer=args.kmer,
+        kmer=ref_data["kmer"],
         force=args.force,
         threads=1,
         verbose=False,
@@ -370,42 +256,22 @@ def run(parser, args):
     cp.run()
     logger.debug("CoverageParser complete")
 
-    # Detect species
-    species_predictor = AMRSpeciesPredictor(
-        phylo_group_covgs=cp.covgs.get("complex", cp.covgs.get("phylo_group", {})),
-        sub_complex_covgs=cp.covgs.get("sub-complex", {}),
-        species_covgs=cp.covgs["species"],
-        lineage_covgs=cp.covgs.get("sub-species", {}),
-        hierarchy_json_file=hierarchy_json_file,
-    )
-    phylogenetics = species_predictor.run()
+    if ref_data["species_phylo_group"] is None:
+        phylogenetics = {}
+        depths = [cp.estimate_depth()]
+    else:
+        phylogenetics, depths = detect_species_and_get_depths(cp, ref_data["hierarchy_json"], ref_data["species_phylo_group"])
 
-    # ## AMR prediction
-
-    depths = []
-    if species_predictor.is_saureus_present():
-        depths = [
-            species_predictor.out_json["phylogenetics"]["phylo_group"]["Staphaureus"][
-                "median_depth"
-            ]
-        ]
-    elif species_predictor.is_mtbc_present():
-        depths = [
-            species_predictor.out_json["phylogenetics"]["phylo_group"][
-                "Mycobacterium_tuberculosis_complex"
-            ]["median_depth"]
-        ]
-    # pprint (species_predictor.out_json["phylogenetics"]["species"])
     # Genotype
-    q = args.quiet
-    args.quiet = True
     variant_calls_dict = {}
     sequence_calls_dict = {}
-    if args.force and not depths:
-        depths = [1]
+    lineage_calls_dict = {}
+    lineage_predict_dict = {}
+    if args.force and len(depths) == 0:
+        depths = [cp.estimate_depth()]
     gt = None
 
-    if depths or args.force:
+    if len(depths) > 0 or args.force:
         gt = Genotyper(
             sample=args.sample,
             expected_depths=depths,
@@ -420,16 +286,17 @@ def run(parser, args):
             variant_confidence_threshold=args.min_variant_conf,
             sequence_confidence_threshold=args.min_gene_conf,
             model=args.model,
-            kmer_size=args.kmer,
+            kmer_size=ref_data["kmer"],
             min_proportion_expected_depth=args.min_proportion_expected_depth,
             ploidy=args.ploidy,
+            lineage_variants=ref_data["lineage_dict"],
         )
         gt.run()
         (
             kmer_count_error_rate,
             incorrect_kmer_to_pc_cov,
         ) = gt.estimate_kmer_count_error_rate_and_incorrect_kmer_to_percent_cov()
-        logger.info(
+        logger.debug(
             "Estimated error rate for kmer count model: "
             + str(round(100 * kmer_count_error_rate, 2))
             + "%"
@@ -457,9 +324,9 @@ def run(parser, args):
         # conf_percent_cutoff == 100 means that we want to keep all variant calls,
         # in which case there is no need to run the simulations
         if args.conf_percent_cutoff < 100:
-            logger.info("Expected depth: " + str(depths[0]))
+            logger.debug("Expected depth: " + str(depths[0]))
             conf_thresholder = ConfThresholder(
-                kmer_count_error_rate, depths[0], args.kmer, incorrect_kmer_to_pc_cov
+                kmer_count_error_rate, depths[0], ref_data["kmer"], incorrect_kmer_to_pc_cov
             )
             time_start = time.time()
             conf_threshold = conf_thresholder.get_conf_threshold(
@@ -467,8 +334,8 @@ def run(parser, args):
             )
             time_end = time.time()
             time_to_sim = time_end - time_start
-            logger.info("Simulation time: " + str(time_to_sim))
-            logger.info(
+            logger.debug("Simulation time: " + str(time_to_sim))
+            logger.debug(
                 "Confidence cutoff (using percent cutoff "
                 + str(args.conf_percent_cutoff)
                 + "%): "
@@ -488,70 +355,51 @@ def run(parser, args):
                 variant_confidence_threshold=conf_threshold,
                 sequence_confidence_threshold=args.min_gene_conf,
                 model=args.model,
-                kmer_size=args.kmer,
+                kmer_size=ref_data["kmer"],
                 min_proportion_expected_depth=args.min_proportion_expected_depth,
                 ploidy=args.ploidy,
+                lineage_variants=ref_data["lineage_dict"],
             )
             gt.run()
 
         variant_calls_dict = gt.variant_calls_dict
         sequence_calls_dict = gt.sequence_calls_dict
+        lineage_predict_dict, lineage_calls_dict = gt.predict_lineage()
     else:
         depths = [cp.estimate_depth()]
-    args.quiet = q
+
     mykrobe_predictor_susceptibility_result = MykrobePredictorSusceptibilityResult()
-    if gt is not None and (max(depths) > args.min_depth or args.force):
-        predictor = Predictor(
+    if gt is not None and (max(depths) > args.min_depth or args.force) and ref_data["var_to_res_json"] is not None:
+        predictor = BasePredictor(
             variant_calls=gt.variant_calls,
             called_genes=gt.sequence_calls_dict,
             base_json=base_json[args.sample],
             depth_threshold=args.min_depth,
             ignore_filtered=True,
             ignore_minor_calls=args.ignore_minor_calls,
-            variant_to_resistance_json_fp=variant_to_resistance_json_fp,
+            variant_to_resistance_json_fp=ref_data["var_to_res_json"],
         )
         mykrobe_predictor_susceptibility_result = predictor.run()
-    base_json[args.sample] = MykrobePredictorResult(
-        susceptibility=mykrobe_predictor_susceptibility_result,
-        phylogenetics=phylogenetics,
-        variant_calls=variant_calls_dict,
-        sequence_calls=sequence_calls_dict,
-        probe_sets=panels,
-        files=args.seq,
-        kmer=args.kmer,
-        version=version,
-        model=args.model,
-    ).to_dict()
+        logger.info("Progress: finished making AMR predictions")
+
+    base_json[args.sample] = {
+        "susceptibility": list(mykrobe_predictor_susceptibility_result.to_dict().values())[0],
+        "phylogenetics": {} if phylogenetics == {} else list(phylogenetics.to_dict().values())[0],
+        "variant_calls": variant_calls_dict,
+        "sequence_calls": sequence_calls_dict,
+        "lineage_calls": lineage_calls_dict,
+        "kmer": ref_data["kmer"],
+        "probe_sets": ref_data["fasta_files"],
+        "files": args.seq,
+        "version": {"mykrobe-predictor": predictor_version, "mykrobe-atlas": atlas_version},
+        "genotype_model": args.model,
+    }
+    if len(lineage_predict_dict) > 0:
+        base_json[args.sample]["phylogenetics"]["lineage"] = lineage_predict_dict
+
     if not args.keep_tmp:
         cp.remove_temporary_files()
 
-    outputs = {}
-
-    if args.output_format in ["csv", "json_and_csv"]:
-        outputs["csv"] = json_to_csv(base_json)
-    if args.output_format in ["json", "json_and_csv"]:
-        # Verbose json output requires --report_all_calls
-        if not args.report_all_calls:
-            del base_json[args.sample]["variant_calls"]
-            del base_json[args.sample]["sequence_calls"]
-        outputs["json"] = json.dumps(base_json, indent=4)
-
-    if len(outputs) == 0:
-        raise ValueError(
-            (
-                f"Output format must be one of: csv,json,json_and_csv. Got "
-                f"'{args.output_format}'"
-            )
-        )
-
-    for output_type, output in outputs.items():
-        # write to file is specified by user, otherwise send to stdout
-        if args.output:
-            if args.output_format == "json_and_csv":
-                outfile = args.output + "." + output_type
-            else:
-                outfile = args.output
-            with open(outfile, "w") as f:
-                f.write(output)
-        else:
-            print(output)
+    logger.info("Progress: writing output")
+    write_outputs(args, base_json)
+    logger.info("Progress: finished")

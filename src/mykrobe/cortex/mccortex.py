@@ -8,6 +8,33 @@ import tempfile
 logger = logging.getLogger(__name__)
 
 
+def syscall(command):
+    if isinstance(command, list):
+        command = " ".join(command)
+    logger.info(f"Run command: {command}")
+    completed_process = subprocess.run(
+        command,
+        shell=True,
+        stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        universal_newlines=True,
+    )
+    logger.debug(f"Return code: {completed_process.returncode}")
+    if completed_process.returncode != 0:
+        print("Error running this command:", command, file=sys.stderr)
+        print("Return code:", completed_process.returncode, file=sys.stderr)
+        print(
+            "Output from stdout:", completed_process.stdout, sep="\n", file=sys.stderr
+        )
+        print(
+            "Output from stderr:", completed_process.stderr, sep="\n", file=sys.stderr
+        )
+        raise RuntimeError("Error in system call. Cannot continue")
+
+    logger.debug(f"stdout:\n{completed_process.stdout.rstrip()}")
+    logger.debug(f"stderr:\n{completed_process.stderr.rstrip()}")
+    return completed_process
+
 class McCortexRunner(object):
 
     def __init__(self):
@@ -51,7 +78,7 @@ class McCortexJoin(McCortexRunner):
                "--intersect",
                self.intersect_graph,
                self.ingraph]
-        subprocess.check_output(cmd)
+        syscall(cmd)
 
 
 class McCortexUnitigs(McCortexRunner):
@@ -68,7 +95,7 @@ class McCortexUnitigs(McCortexRunner):
                "unitigs",
                "-q",
                self.ingraph]
-        return subprocess.check_output(cmd)
+        return syscall(cmd)
 
 
 class McCortexSubgraph(McCortexRunner):
@@ -119,7 +146,7 @@ class McCortexSubgraph(McCortexRunner):
                ]
         logger.debug(subprocess.list2cmdline(cmd))
         logger.debug(" ".join(cmd))
-        cmd = subprocess.Popen(" ".join(cmd), shell=True).wait()
+        syscall(cmd)
 
 
 class McCortexGenoRunner(McCortexRunner):
@@ -189,7 +216,7 @@ class McCortexGenoRunner(McCortexRunner):
                    "-k",
                    str(self.kmer)] + seq_list + [self.ctx_skeleton_filepath]
             logger.debug('Executing command:\n%s', cmd)
-            subprocess.check_output(cmd)
+            syscall(cmd)
 
     def _create_sequence_list(self):
         seq_list = []
@@ -225,16 +252,7 @@ class McCortexGenoRunner(McCortexRunner):
             if os.path.exists(self.covg_tmp_file_path):
                 os.remove(self.covg_tmp_file_path)
 
-            logger.debug('Running coverages command:\n%s',
-                         ' '.join(self.coverages_cmd))
-            try:
-                self._execute_command(self.coverages_cmd)
-            except subprocess.CalledProcessError:
-                command = subprocess.list2cmdline(self.coverages_cmd)
-                exception_message = '''mccortex31 raised an error.
-                    Is it on PATH? check by running `mccortex31 geno`.
-                    'The command that through the error was `%s` ''' % command
-                raise ValueError(exception_message)
+            syscall(self.coverages_cmd)
         else:
             logger.warning('Using pre-built binaries. Run with --force if '
                            'panel has been updated.')

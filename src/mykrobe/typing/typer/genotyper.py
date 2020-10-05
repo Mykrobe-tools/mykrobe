@@ -7,6 +7,8 @@ import logging
 import subprocess
 from copy import copy
 
+from mykrobe.metagenomics import LineagePredictor
+
 from mykrobe.typing import SequenceProbeCoverage
 from mykrobe.typing import VariantProbeCoverage
 from mykrobe.typing import ProbeCoverage
@@ -269,6 +271,7 @@ class Genotyper(object):
         kmer_size=31,
         min_proportion_expected_depth=0.3,
         ploidy="diploid",
+        lineage_variants=None,
     ):
         self.sample = sample
         self.variant_covgs = variant_covgs
@@ -283,6 +286,8 @@ class Genotyper(object):
         self.sequence_calls = {}
         self.variant_calls_dict = {}
         self.sequence_calls_dict = {}
+        self.lineage_calls_dict = {}
+        self.lineage_variants = lineage_variants
         self.expected_error_rate = expected_error_rate
         self.report_all_calls = report_all_calls
         self.filters = filters
@@ -319,6 +324,21 @@ class Genotyper(object):
             ]
         self.out_json[self.sample]["sequence_calls"] = self.sequence_calls_dict
 
+
+    def _update_lineage_calls_dict(self, probe_name, call):
+        if self.lineage_variants is None:
+            return
+        params = get_params(probe_name)
+        try:
+            var_name = params["var_name"]
+            lineage = self.lineage_variants[var_name]
+        except KeyError:
+            return
+        if lineage["name"] not in self.lineage_calls_dict:
+            self.lineage_calls_dict[lineage["name"]] = {}
+        self.lineage_calls_dict[lineage["name"]][var_name] = call
+
+
     def _type_variants(self):
         self.out_json[self.sample]["variant_calls"] = {}
         gt = VariantTyper(
@@ -336,15 +356,13 @@ class Genotyper(object):
         )
         genotypes = []
         filters = []
+
         for probe_id, probe_coverages in self.variant_covgs.items():
             probe_name = self._name_to_id(probe_coverages.var_name)
-
-            variant = None
-
             call = gt.type(probe_coverages, variant=probe_name)
-
             genotypes.append(sum(call["genotype"]))
             filters.append(int(call["info"]["filter"] == []))
+
             if (
                 sum(call["genotype"]) > 0
                 or not call["genotype"]
@@ -352,9 +370,26 @@ class Genotyper(object):
             ):
                 self.variant_calls[probe_name] = call
                 self.variant_calls_dict[probe_id] = call
+
+            self._update_lineage_calls_dict(probe_coverages.var_name, call)
+
         self.out_json[self.sample]["genotypes"] = genotypes
         self.out_json[self.sample]["filtered"] = filters
         self.out_json[self.sample]["variant_calls"] = self.variant_calls_dict
+        lineage_result, lineage_calls = self.predict_lineage()
+        self.out_json[self.sample]["lineage"] = {
+            "all_calls": lineage_calls,
+            "result": lineage_result,
+        }
+
+    def predict_lineage(self):
+        if len(self.lineage_calls_dict) == 0 or self.lineage_variants is None:
+            return {}, {}
+
+        lin_pred = LineagePredictor(self.lineage_variants)
+        lineage_call = lin_pred.call_lineage(self.lineage_calls_dict)
+        all_calls = lin_pred.replace_dict_keys(self.lineage_calls_dict)
+        return ({}, {}) if lineage_call is None else (lineage_call, all_calls)
 
     def _name_to_id(self, probe_name):
         names = []

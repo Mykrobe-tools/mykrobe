@@ -1,5 +1,6 @@
 # Read the kmer counts into a hash
 from mykrobe.utils import check_args
+from mykrobe.utils import load_json
 from mykrobe.typing import Genotyper
 from mykrobe.typing import CoverageParser
 from mykrobe.version import __version__
@@ -49,6 +50,10 @@ def run_main(parser, args):
         base_json[args.sample]["files"] = args.ctx
     base_json[args.sample]["kmer"] = args.kmer
     base_json[args.sample]["version"] = __version__
+    if args.lineage is None:
+        lineage_dict = None
+    else:
+        lineage_dict = load_json(args.lineage)
     gt = Genotyper(
         sample=args.sample,
         expected_error_rate=args.expected_error_rate,
@@ -68,7 +73,7 @@ def run_main(parser, args):
         kmer_size=args.kmer,
         min_proportion_expected_depth=args.min_proportion_expected_depth,
         ploidy=args.ploidy,
-
+        lineage_variants=lineage_dict,
         )
     gt.run()
     if args.output:

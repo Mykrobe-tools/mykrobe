@@ -11,6 +11,18 @@ from mykrobe.stats import percent_coverage_from_expected_coverage
 
 DEFAULT_THRESHOLD = 30
 
+TAXON_THRESHOLDS = {
+    "Saureus" : 30,
+    "Sepidermidis" : 30,
+    "Shaemolyticus" : 30,
+    "Sother" : 15,
+    "Coagneg" : 30,
+    "Staphaureus" : 30,
+    "Escherichia_coli" : 15,
+    "Klebsiella_pneumoniae" : 15,
+    "Ecoli_Shigella": 90,
+    "Shigella_sonnei": 90,
+}
 
 class Hierarchy(object):
 
@@ -69,13 +81,14 @@ class SpeciesPredictor(object):
             covgs["Unknown"] = {"percent_coverage": -1, "median_depth": -1}
 
     def _load_taxon_thresholds(self):
-        taxon_coverage_threshold_file = os.path.realpath(
-            os.path.join(
-                os.path.dirname(__file__),
-                "..",
-                "data/predict/taxon_coverage_threshold.json"))
-        with open(taxon_coverage_threshold_file, "r") as infile:
-            self.threshold = json.load(infile)
+        #taxon_coverage_threshold_file = os.path.realpath(
+        #    os.path.join(
+        #        os.path.dirname(__file__),
+        #        "..",
+        #        "data/predict/taxon_coverage_threshold.json"))
+        #with open(taxon_coverage_threshold_file, "r") as infile:
+        #    self.threshold = json.load(infile)
+        self.threshold = TAXON_THRESHOLDS
 
     def calc_expected_depth(self):
         # Get all of the panels with % coverage > 30
@@ -164,7 +177,7 @@ class SpeciesPredictor(object):
         for pg in phylo_groups.keys():
             if self.hierarchy:
                 allowed_species = flatten([self.hierarchy.dict[pg]["children"][subc]["children"].keys(
-                ) for subc in self.hierarchy.dict[pg]["children"].keys() if subc is not "Unknown"])
+                ) for subc in self.hierarchy.dict[pg]["children"].keys() if subc != "Unknown"])
                 species_to_consider = {k: phylogenetics["species"].get(
                     k, {"percent_coverage": 0}) for k in allowed_species}
             else:
