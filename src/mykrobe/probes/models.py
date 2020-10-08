@@ -65,8 +65,8 @@ class AlleleGenerator(object):
 
     def _read_reference(self):
         for record in SeqIO.parse(self.reference_filepath, 'fasta'):
-            self.reference_sequence=record.seq
-            self.ref += list(record.seq)
+            self.reference_sequence=record.seq.upper()
+            self.ref += list(record.seq.upper())
         ### Pad with Ns for SNPs at the end of the reference
         self.ref.extend(["N"]*self.kmer)
         self.ref_length = len(self.ref)

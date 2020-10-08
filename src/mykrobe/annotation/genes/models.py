@@ -126,7 +126,7 @@ class GeneAminoAcidChangeToDNAVariants():
 
     def _parse_reference(self, reference):
         with open(reference, "r") as infile:
-            return list(SeqIO.parse(infile, "fasta"))[0].seq
+            return list(SeqIO.parse(infile, "fasta"))[0].seq.upper()
 
     def _parse_genbank(self, genbank):
         d = {}
