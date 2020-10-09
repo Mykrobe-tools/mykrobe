@@ -25,6 +25,7 @@ from mykrobe.predict import MykrobePredictorSusceptibilityResult
 from mykrobe.metagenomics import AMRSpeciesPredictor
 from mykrobe.species_data import DataDir
 from mykrobe.utils import load_json
+from mykrobe.utils import fix_amino_acid_X_variants_keys
 from mykrobe.version import __version__ as predictor_version
 from mykrobe.version import __version__ as atlas_version
 
@@ -145,7 +146,9 @@ class ConfThresholder:
 def ref_data_from_args(args):
     if args.species == "custom":
         if args.custom_probe_set_path is None:
-            raise ValueError("Must use --custom_probe_set_path option if the species is 'custom'")
+            raise ValueError(
+                "Must use --custom_probe_set_path option if the species is 'custom'"
+            )
         ref_data = {
             "fasta_files": [args.custom_probe_set_path],
             "var_to_res_json": args.custom_variant_to_resistance_json,
@@ -184,7 +187,9 @@ def detect_species_and_get_depths(cov_parser, hierarchy_json, wanted_phylo_group
         return {}, depths
 
     species_predictor = AMRSpeciesPredictor(
-        phylo_group_covgs=cov_parser.covgs.get("complex", cov_parser.covgs.get("phylo_group", {})),
+        phylo_group_covgs=cov_parser.covgs.get(
+            "complex", cov_parser.covgs.get("phylo_group", {})
+        ),
         sub_complex_covgs=cov_parser.covgs.get("sub-complex", {}),
         species_covgs=cov_parser.covgs["species"],
         lineage_covgs=cov_parser.covgs.get("sub-species", {}),
@@ -193,7 +198,11 @@ def detect_species_and_get_depths(cov_parser, hierarchy_json, wanted_phylo_group
     phylogenetics = species_predictor.run()
 
     if wanted_phylo_group in species_predictor.out_json["phylogenetics"]["phylo_group"]:
-        depths = [species_predictor.out_json["phylogenetics"]["phylo_group"][wanted_phylo_group]["median_depth"]]
+        depths = [
+            species_predictor.out_json["phylogenetics"]["phylo_group"][
+                wanted_phylo_group
+            ]["median_depth"]
+        ]
     return phylogenetics, depths
 
 
@@ -231,15 +240,33 @@ def write_outputs(args, base_json):
             print(output)
 
 
+def fix_X_amino_acid_variants(sample_json):
+    if "susceptibility" in sample_json:
+        for drug_dict in sample_json["susceptibility"].values():
+            if "called_by" in drug_dict:
+                fix_amino_acid_X_variants_keys(drug_dict["called_by"])
+
+    if "variant_calls" in sample_json:
+        fix_amino_acid_X_variants_keys(sample_json["variant_calls"])
+
+
 def run(parser, args):
     logger.info(f"Start runnning mykrobe predict. Command line: {' '.join(sys.argv)}")
     base_json = {args.sample: {}}
     args = parser.parse_args()
     ref_data = ref_data_from_args(args)
-    if args.species == "custom" and ref_data["var_to_res_json"] is None and ref_data["lineage_json"] is None:
-        logger.info("Forcing --report_all_calls because species is 'custom' and options --custom_variant_to_resistance_json,--custom_lineage_json were not used")
+    if (
+        args.species == "custom"
+        and ref_data["var_to_res_json"] is None
+        and ref_data["lineage_json"] is None
+    ):
+        logger.info(
+            "Forcing --report_all_calls because species is 'custom' and options --custom_variant_to_resistance_json,--custom_lineage_json were not used"
+        )
         args.report_all_calls = True
-    logger.info(f"Running mykrobe predict using species {args.species}, and panel version {ref_data['version']}")
+    logger.info(
+        f"Running mykrobe predict using species {args.species}, and panel version {ref_data['version']}"
+    )
 
     # Run Cortex
     cp = CoverageParser(
@@ -260,7 +287,9 @@ def run(parser, args):
         phylogenetics = {}
         depths = [cp.estimate_depth()]
     else:
-        phylogenetics, depths = detect_species_and_get_depths(cp, ref_data["hierarchy_json"], ref_data["species_phylo_group"])
+        phylogenetics, depths = detect_species_and_get_depths(
+            cp, ref_data["hierarchy_json"], ref_data["species_phylo_group"]
+        )
 
     # Genotype
     variant_calls_dict = {}
@@ -326,7 +355,10 @@ def run(parser, args):
         if args.conf_percent_cutoff < 100:
             logger.debug("Expected depth: " + str(depths[0]))
             conf_thresholder = ConfThresholder(
-                kmer_count_error_rate, depths[0], ref_data["kmer"], incorrect_kmer_to_pc_cov
+                kmer_count_error_rate,
+                depths[0],
+                ref_data["kmer"],
+                incorrect_kmer_to_pc_cov,
             )
             time_start = time.time()
             conf_threshold = conf_thresholder.get_conf_threshold(
@@ -369,7 +401,11 @@ def run(parser, args):
         depths = [cp.estimate_depth()]
 
     mykrobe_predictor_susceptibility_result = MykrobePredictorSusceptibilityResult()
-    if gt is not None and (max(depths) > args.min_depth or args.force) and ref_data["var_to_res_json"] is not None:
+    if (
+        gt is not None
+        and (max(depths) > args.min_depth or args.force)
+        and ref_data["var_to_res_json"] is not None
+    ):
         predictor = BasePredictor(
             variant_calls=gt.variant_calls,
             called_genes=gt.sequence_calls_dict,
@@ -383,15 +419,22 @@ def run(parser, args):
         logger.info("Progress: finished making AMR predictions")
 
     base_json[args.sample] = {
-        "susceptibility": list(mykrobe_predictor_susceptibility_result.to_dict().values())[0],
-        "phylogenetics": {} if phylogenetics == {} else list(phylogenetics.to_dict().values())[0],
+        "susceptibility": list(
+            mykrobe_predictor_susceptibility_result.to_dict().values()
+        )[0],
+        "phylogenetics": {}
+        if phylogenetics == {}
+        else list(phylogenetics.to_dict().values())[0],
         "variant_calls": variant_calls_dict,
         "sequence_calls": sequence_calls_dict,
         "lineage_calls": lineage_calls_dict,
         "kmer": ref_data["kmer"],
         "probe_sets": ref_data["fasta_files"],
         "files": args.seq,
-        "version": {"mykrobe-predictor": predictor_version, "mykrobe-atlas": atlas_version},
+        "version": {
+            "mykrobe-predictor": predictor_version,
+            "mykrobe-atlas": atlas_version,
+        },
         "genotype_model": args.model,
     }
     if len(lineage_predict_dict) > 0:
@@ -401,5 +444,6 @@ def run(parser, args):
         cp.remove_temporary_files()
 
     logger.info("Progress: writing output")
+    fix_X_amino_acid_variants(base_json[args.sample])
     write_outputs(args, base_json)
     logger.info("Progress: finished")
