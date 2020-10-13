@@ -10,7 +10,7 @@ from mykrobe.species_data import SpeciesDir
 
 logger = logging.getLogger(__name__)
 
-MANIFEST_URL = "https://ndownloader.figshare.com/files/24926678"
+MANIFEST_URL = "https://raw.githubusercontent.com/Mykrobe-tools/mykrobe-data/main/mykrobe_panels_manifest.json"
 
 class DataDir:
     def __init__(self, root_dir):
