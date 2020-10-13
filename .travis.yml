@@ -29,8 +29,8 @@ jobs:
     # pyinstaller later, it includes the data and the python module
     # dependencies
     - pip3 install .
-    - mykrobe panels update_metadata
-    - mykrobe panels update_species --debug all
+    - mykrobe panels update_metadata --panels_dir src/mykrobe/data
+    - mykrobe panels update_species --panels_dir src/mykrobe/data --debug all
     - pip3 install pyinstaller
     - cd dist
     - pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller.spec
