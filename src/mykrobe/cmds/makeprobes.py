@@ -34,7 +34,13 @@ logger = logging.getLogger(__name__)
 
 
 def run(parser, args):
-    DB = connect("%s-%s" % (DB_PREFIX, args.db_name))
+    # There's no need to try to connect to database if we're not doing backgrounds
+    if args.no_backgrounds:
+        logger.info("Not connecting to database, because --no-backgrounds option used")
+        DB = None
+    else:
+        DB = connect("%s-%s" % (DB_PREFIX, args.db_name))
+
     if DB is not None:
         try:
             Variant.objects()
