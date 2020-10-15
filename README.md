@@ -15,7 +15,7 @@ Please see the [mykrobe wiki](https://github.com/Mykrobe-tools/mykrobe/wiki) for
 **Install**:
 
 * bioconda - `conda install -c bioconda mykrobe`
-* from source - `pip3 install .`
+* from source - `pip3 install . && mykrobe panels update_metadata && mykrobe panels update_species all`
 * or using singularity or docker (see wiki for details)
 
 **Run** on Mtb, making a JSON file of results:
