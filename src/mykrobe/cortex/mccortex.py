@@ -10,18 +10,21 @@ logger = logging.getLogger(__name__)
 
 def syscall(command):
     if isinstance(command, list):
-        command = " ".join(command)
-    logger.info(f"Run command: {command}")
+        command_str = " ".join(command)
+    else:
+        command_str = command
+
+    logger.info(f"Run command: {command_str}")
     completed_process = subprocess.run(
         command,
-        shell=True,
+        shell=not isinstance(command, list),
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         universal_newlines=True,
     )
     logger.debug(f"Return code: {completed_process.returncode}")
     if completed_process.returncode != 0:
-        print("Error running this command:", command, file=sys.stderr)
+        print("Error running this command:", command_str, file=sys.stderr)
         print("Return code:", completed_process.returncode, file=sys.stderr)
         print(
             "Output from stdout:", completed_process.stdout, sep="\n", file=sys.stderr
@@ -47,6 +50,7 @@ class McCortexRunner(object):
         else:
             raise RuntimeError(f"Did not find mccortex31. Expected it to be here: {self.mccortex31_path}. Cannot continue")
         logger.debug(f"Found mccortex31: {self.mccortex31_path}")
+
 
 class McCortexJoin(McCortexRunner):
 
