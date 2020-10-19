@@ -28,7 +28,9 @@ jobs:
     # We need to install mykrobe, including the data, so that when we run
     # pyinstaller later, it includes the data and the python module
     # dependencies
-    - pip3 install .
+    # Also use sudo because otherwise anytree install failse when trying to
+    # put a copy of its license into /usr/local/
+    - sudo pip3 install .
     - mykrobe panels update_metadata --panels_dir src/mykrobe/data
     - mykrobe panels update_species --panels_dir src/mykrobe/data --debug all
     - pip3 install pyinstaller
