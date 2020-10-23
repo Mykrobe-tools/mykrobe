@@ -25,7 +25,12 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
     cd mccortex
     make
     cd ..
+    mkdir -p /data/db
+    mongod --logpath mongo.log --quiet &>/dev/null &
+    sleep 3s
     tox
+    mongod --shutdown
+    rm mongo.log
     pip3 install .
     # For whatever reason, mccortex is not getting put in the install location.
     # Do it manually.
