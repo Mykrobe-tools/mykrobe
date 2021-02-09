@@ -114,6 +114,9 @@ db_parser_mixin = argparse.ArgumentParser(add_help=False)
 db_parser_mixin.add_argument(
     "--db_name", metavar="db_name", type=str, help="db_name", default="default"
 )
+db_parser_mixin.add_argument(
+    "--db_uri", metavar="db_uri", type=str, help="e.g.: mongodb://admin:qwerty@localhost/db_name", default=None
+)
 
 # ##########
 # # AMR predict
