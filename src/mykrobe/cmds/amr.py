@@ -275,10 +275,11 @@ def run(parser, args):
         seq=args.seq,
         kmer=ref_data["kmer"],
         force=args.force,
-        threads=1,
+        threads=args.threads,
         verbose=False,
         tmp_dir=args.tmp,
         skeleton_dir=args.skeleton_dir,
+        memory=args.memory
     )
     cp.run()
     logger.debug("CoverageParser complete")
