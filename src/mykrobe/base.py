@@ -16,12 +16,12 @@ sequence_or_graph_parser_mixin.add_argument(
     '--kmer',
     metavar='kmer',
     type=int,
-    help='kmer length (default:21)',
+    help='kmer length (default: %(default)d)',
     default=DEFAULT_KMER_SIZE)
 sequence_or_graph_parser_mixin.add_argument(
     '--tmp',
-    help='tmp directory (default: tmp/)',
-    default="tmp/")
+    help='Directory to write temporary files to',
+    default=None)
 sequence_or_graph_parser_mixin.add_argument(
     '--keep_tmp',
     help="Dont remove tmp files",

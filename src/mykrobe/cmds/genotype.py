@@ -1,13 +1,13 @@
 # Read the kmer counts into a hash
-from mykrobe.utils import check_args
-from mykrobe.utils import load_json
-from mykrobe.typing import Genotyper
-from mykrobe.typing import CoverageParser
-from mykrobe.version import __version__
-
-from pprint import pprint
 import json
 import logging
+import tempfile
+
+from mykrobe.typing import CoverageParser
+from mykrobe.typing import Genotyper
+from mykrobe.utils import load_json
+from mykrobe.version import __version__
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,13 +18,19 @@ def run_main(parser, args):
         args.expected_error_rate = 0.15
         args.filters = ["LOW_GT_CONF"]
         args.model = "kmer_count"
-        logger.debug("Setting expected error rate to %s (--ont)" %
-                     args.expected_error_rate)
         logger.debug(
-            "Removing LOW_PERCENT_COVERAGE filter (increases sensitivity - in particular for ONT data)")
+            "Setting expected error rate to %s (--ont)" % args.expected_error_rate
+        )
+        logger.debug(
+            "Removing LOW_PERCENT_COVERAGE filter (increases sensitivity - in particular for ONT data)"
+        )
 
     if args.min_variant_conf is None:
         args.min_variant_conf = 100
+
+    if args.tmp is None:
+        args.tmp = tempfile.mkdtemp() + "/"
+
     cp = CoverageParser(
         sample=args.sample,
         panel_file_paths=[args.probe_set],
@@ -57,8 +63,7 @@ def run_main(parser, args):
     gt = Genotyper(
         sample=args.sample,
         expected_error_rate=args.expected_error_rate,
-        expected_depths=[
-            args.expected_depth],
+        expected_depths=[args.expected_depth],
         variant_covgs=cp.variant_covgs,
         gene_presence_covgs=cp.covgs["presence"],
         base_json=base_json,
@@ -74,10 +79,10 @@ def run_main(parser, args):
         min_proportion_expected_depth=args.min_proportion_expected_depth,
         ploidy=args.ploidy,
         lineage_variants=lineage_dict,
-        )
+    )
     gt.run()
     if args.output:
-        with open(args.output, 'w') as outfile:
+        with open(args.output, "w") as outfile:
             json.dump(gt.out_json, outfile, indent=4)
 
     if not args.keep_tmp:
