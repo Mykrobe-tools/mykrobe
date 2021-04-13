@@ -21,7 +21,8 @@ Please see the [mykrobe wiki](https://github.com/Mykrobe-tools/mykrobe/wiki) for
 **Run** on Mtb, making a JSON file of results:
 
 ```
-mykrobe predict my_sample_name tb \
+mykrobe predict --sample my_sample_name \
+  --species tb \
   --output out.json \
   --format json \
   --seq reads.fq.gz
