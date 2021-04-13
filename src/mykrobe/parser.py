@@ -278,19 +278,6 @@ parser_dump.add_argument(
 parser_dump.add_argument("-v", "--verbose", default=False, action="store_true")
 parser_dump.set_defaults(func=run_subtool)
 
-# parser_add_gt = subparsers.add_parser(
-#     'add-gt',
-#     help='adds a set of atlas genotype calls to the atlas',
-#     parents=[db_parser_mixin, force_mixin])
-# parser_add_gt.add_argument('jsons', type=str, nargs='+',
-#                            help='json output from `atlas genotype`')
-# parser_add_gt.add_argument(
-#     '-m',
-#     '--method',
-#     type=str,
-#     help='variant caller method (e.g. CORTEX)',
-#     default="atlas")
-# parser_add_gt.set_defaults(func=run_subtool)
 
 # ##################
 # ### Make Probes ##
@@ -335,23 +322,3 @@ parser_make_probes.add_argument(
     "--lineage", type=str, help="Write lineages to output file", metavar="FILENAME",
 )
 parser_make_probes.set_defaults(func=run_subtool)
-
-# ##########
-# # Genotype
-# ##########
-# parser_geno = subparsers.add_parser(
-#    "genotype",
-#    parents=[
-#        sequence_or_binary_parser_mixin,
-#        probe_set_mixin,
-#        force_mixin,
-#        genotyping_mixin,
-#    ],
-#    help="genotype a sample using a probe set",
-# )
-# parser_geno.add_argument(
-#    "--lineage",
-#    type=str,
-#    help="Input JSON file of lineages (made by make-probes --lineage)",
-#    metavar="FILENAME")
-# parser_geno.set_defaults(func=run_subtool)
