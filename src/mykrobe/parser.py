@@ -1,23 +1,19 @@
 #! /usr/bin/env python
 from __future__ import print_function
-import os
-import sys
+
+import argparse
 import logging
-from mykrobe.version import __version__
-from mykrobe.base import DEFAULT_DB_NAME
-from mykrobe.base import sequence_parser_mixin
-from mykrobe.base import sequence_or_binary_parser_mixin
-from mykrobe.base import probe_set_mixin
+
 from mykrobe.base import force_mixin
 from mykrobe.base import genotyping_mixin
 from mykrobe.base import panels_mixin
-
-import argparse
+from mykrobe.base import sequence_or_binary_parser_mixin
+from mykrobe.version import __version__
 
 logging.basicConfig(
     level=logging.INFO,
     format="[mykrobe %(asctime)s %(levelname)s] %(message)s",
-    datefmt="%Y-%m-%dT%H:%M:%S"
+    datefmt="%Y-%m-%dT%H:%M:%S",
 )
 logger = logging.getLogger()
 
@@ -44,8 +40,10 @@ def run_subtool(parser, args):
         elif args.sub_command == "update_species":
             from mykrobe.cmds.panels import update_species as run
     elif args.command == "genotype":
-        raise NotImplementedError("The 'genotype' option is no longer available - please use 'predict' with the species as 'custom' and the option --custom_probe_set_path probes.fasta (and also see the options --custom_variant_to_resistance_json, --custom_lineage_json) ")
-        #from mykrobe.cmds.genotype import run
+        raise NotImplementedError(
+            "The 'genotype' option is no longer available - please use 'predict' with the species as 'custom' and the option --custom_probe_set_path probes.fasta (and also see the options --custom_variant_to_resistance_json, --custom_lineage_json) "
+        )
+        # from mykrobe.cmds.genotype import run
     elif args.command == "place":
         from mykrobe.cmds.place import run
     elif args.command == "diff":
@@ -64,6 +62,7 @@ class LogLevelWarn(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         logger.setLevel(logging.WARN)
+
 
 class LogLevelDebug(argparse.Action):
     def __init__(self, nargs=0, **kw):
@@ -86,8 +85,8 @@ class ArgumentParserWithDefaults(argparse.ArgumentParser):
             nargs=0,
         )
         self.add_argument(
-            '-d',
-            '--debug',
+            "-d",
+            "--debug",
             help="Output debugging information to stderr",
             action=LogLevelDebug,
             nargs=0,
@@ -121,20 +120,27 @@ db_parser_mixin.add_argument(
 
 parser_amr = subparsers.add_parser(
     "predict",
-    parents=[sequence_or_binary_parser_mixin, force_mixin, genotyping_mixin, panels_mixin],
-    help="predict the sample's drug susceptibility",
+    parents=[
+        sequence_or_binary_parser_mixin,
+        force_mixin,
+        genotyping_mixin,
+        panels_mixin,
+    ],
+    help="Predict the sample's drug susceptibility",
 )
 parser_amr.add_argument(
-    #"species", metavar="species", choices=["staph", "tb"], type=str, help="species"
-    "species", metavar="species", type=str, help="species name, or 'custom' to use custom data, in which case --custom_probe_set_path is required"
+    "-S",
+    "--species",
+    metavar="species",
+    type=str,
+    required=True,
+    help="Species name, or 'custom' to use custom data, in which case --custom_probe_set_path is required. Run `mykrobe panels describe` to see list of options [REQUIRED]",
 )
 parser_amr.add_argument(
     "--panel",
     metavar="panel",
     type=str,
-    help="Name of panel to use. Ignored if species is 'custom'",
-    #choices=["bradley-2015", "walker-2015", "201901", "atlas", "custom"],
-    #default="201901",
+    help="Name of panel to use. Ignored if species is 'custom'. Run `mykrobe panels describe` to see list of options",
 )
 parser_amr.add_argument(
     "--custom_probe_set_path",
@@ -158,7 +164,11 @@ parser_amr.add_argument(
     default=None,
 )
 parser_amr.add_argument(
-    "--min_depth", metavar="min_depth", type=int, help="min_depth", default=1
+    "--min_depth",
+    metavar="min_depth",
+    type=int,
+    help="Minimum depth (default: %(default)d)",
+    default=1,
 )
 parser_amr.add_argument(
     "--conf_percent_cutoff",
@@ -171,7 +181,7 @@ parser_amr.add_argument(
     "--format",
     dest="output_format",
     type=str,
-    help="Choose output format. Default: csv.",
+    help="Choose output format (default: %(default)s)",
     choices=["json", "csv", "json_and_csv"],
     default="csv",
 )
@@ -181,19 +191,14 @@ parser_amr.set_defaults(func=run_subtool)
 # ##################
 # ###  Panels   ####
 # ##################
-parser_panels = subparsers.add_parser(
-    "panels",
-    help="Add, update, or remove panels",
-)
+parser_panels = subparsers.add_parser("panels", help="Add, update, or remove panels",)
 panels_subparsers = parser_panels.add_subparsers(
     title="[sub-commands]", dest="sub_command", help="help"
 )
 
 # -------- panels describe -------------#
 parser_describe = panels_subparsers.add_parser(
-    "describe",
-    help="Describe all known panels",
-    parents=[panels_mixin],
+    "describe", help="Describe all known panels", parents=[panels_mixin],
 )
 parser_describe.set_defaults(func=run_subtool)
 
@@ -204,26 +209,20 @@ parser_update_metadata = panels_subparsers.add_parser(
     parents=[panels_mixin],
 )
 parser_update_metadata.add_argument(
-    "--filename",
-    help=argparse.SUPPRESS, # for testing. Keep hidden from the user.
+    "--filename", help=argparse.SUPPRESS,  # for testing. Keep hidden from the user.
 )
 parser_update_metadata.set_defaults(func=run_subtool)
 
 
 # -------- panels update_species -------#
 parser_update_species = panels_subparsers.add_parser(
-    "update_species",
-    help="Update species panel(s)",
-    parents=[panels_mixin],
+    "update_species", help="Update species panel(s)", parents=[panels_mixin],
 )
 parser_update_species.add_argument(
-    "species",
-    help="Name of species to update, or 'all' to update all species",
+    "species", help="Name of species to update, or 'all' to update all species",
 )
 parser_update_species.add_argument(
-    "--remove",
-    help="Remove species instead of updating",
-    action="store_true",
+    "--remove", help="Remove species instead of updating", action="store_true",
 )
 parser_update_species.set_defaults(func=run_subtool)
 
@@ -340,7 +339,7 @@ parser_make_probes.set_defaults(func=run_subtool)
 # ##########
 # # Genotype
 # ##########
-#parser_geno = subparsers.add_parser(
+# parser_geno = subparsers.add_parser(
 #    "genotype",
 #    parents=[
 #        sequence_or_binary_parser_mixin,
@@ -349,10 +348,10 @@ parser_make_probes.set_defaults(func=run_subtool)
 #        genotyping_mixin,
 #    ],
 #    help="genotype a sample using a probe set",
-#)
-#parser_geno.add_argument(
+# )
+# parser_geno.add_argument(
 #    "--lineage",
 #    type=str,
 #    help="Input JSON file of lineages (made by make-probes --lineage)",
 #    metavar="FILENAME")
-#parser_geno.set_defaults(func=run_subtool)
+# parser_geno.set_defaults(func=run_subtool)

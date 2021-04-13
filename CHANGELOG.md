@@ -7,6 +7,13 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+
+- `-o` as another option for `--output`
+- `-i` as another option for `-1,--seq`
+- `-A` as another option for `--report_all_calls`
+- `-e` as another option for `--expected_error_rate`
+
 ### Changed
 
 - If `--tmp` is not specified now, it is set to [`tempfile.mkdtemp()`][mkdtemp]. By
@@ -18,6 +25,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   current directory after mykrobe is finished and the OS should clean it up
   periodically.
 - Ensure `--memory` and `--threads` are passed on to mccortex [[#114][114]].
+- Positional arguments `species` and `sample` are now options `-S,species` and
+  `-s,--sample` respectively.
 
 [113]: https://github.com/Mykrobe-tools/mykrobe/issues/113
 [114]: https://github.com/Mykrobe-tools/mykrobe/issues/114
