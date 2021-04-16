@@ -1,4 +1,4 @@
-[![Travis build Status](https://travis-ci.org/Mykrobe-tools/mykrobe.svg?branch=master)](https://travis-ci.org/Mykrobe-tools/mykrobe)
+[![Travis build Status](https://travis-ci.com/Mykrobe-tools/mykrobe.svg?branch=master)](https://travis-ci.org/Mykrobe-tools/mykrobe)
 
 # Mykrobe
 
