@@ -17,7 +17,7 @@ jobs:
     env:
     - TOXENV=py3
     before_install:
-    - brew uninstall --cask --force java
+    - brew uninstall --force java
     - brew update
     - brew tap mongodb/brew
     - brew install mongodb-community
