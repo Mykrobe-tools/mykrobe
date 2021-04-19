@@ -13,6 +13,7 @@ jobs:
 
   - name: OSX Python default version
     os: osx
+    osx_image: xcode11.3
     language: shell
     env:
     - TOXENV=py3
