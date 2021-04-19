@@ -1,25 +1,22 @@
 from __future__ import print_function
 
 import logging
+import tempfile
 
 logger = logging.getLogger(__name__)
 
 import json
 
 import numpy as np
-import os
 import random
 import sys
 import time
-from enum import Enum
 from mykrobe.mformat import json_to_csv
 from mykrobe.typing import CoverageParser
 from mykrobe.typing import Genotyper
 from mykrobe.typing.models.base import ProbeCoverage
 from mykrobe.typing.models.variant import VariantProbeCoverage
 from mykrobe.typing.typer.variant import VariantTyper
-from mykrobe.predict import TBPredictor
-from mykrobe.predict import StaphPredictor
 from mykrobe.predict import BasePredictor
 from mykrobe.predict import MykrobePredictorSusceptibilityResult
 from mykrobe.metagenomics import AMRSpeciesPredictor
@@ -268,6 +265,9 @@ def run(parser, args):
         f"Running mykrobe predict using species {args.species}, and panel version {ref_data['version']}"
     )
 
+    if args.tmp is None:
+        args.tmp = tempfile.mkdtemp() + "/"
+
     # Run Cortex
     cp = CoverageParser(
         sample=args.sample,
@@ -275,10 +275,11 @@ def run(parser, args):
         seq=args.seq,
         kmer=ref_data["kmer"],
         force=args.force,
-        threads=1,
+        threads=args.threads,
         verbose=False,
         tmp_dir=args.tmp,
         skeleton_dir=args.skeleton_dir,
+        memory=args.memory
     )
     cp.run()
     logger.debug("CoverageParser complete")
