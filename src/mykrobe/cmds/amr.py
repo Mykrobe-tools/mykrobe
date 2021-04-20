@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import copy
 import logging
 import tempfile
 
@@ -302,6 +303,11 @@ def run(parser, args):
     gt = None
 
     if len(depths) > 0 or args.force:
+        # Running the genotyper changes the contents of cp.covgs["presence"].
+        # The changes can cause later second run (if it happens) of the
+        # genotytper to crash.
+        # Store the original cp.covgs["presence"] so we can use it again later.
+        original_covgs_presence = copy.deepcopy(cp.covgs["presence"])
         gt = Genotyper(
             sample=args.sample,
             expected_depths=depths,
@@ -339,17 +345,21 @@ def run(parser, args):
             args.expected_error_rate = 0.15
             args.ploidy = "haploid"
             args.ignore_minor_calls = True
-            logger.warning("Setting ploidy to haploid")
-            logger.warning("Setting ignore_minor_calls to True")
-            logger.warning(
-                "Setting expected error rate to %s (--ont)" % args.expected_error_rate
-            )
+            logger.warning("Setting ploidy to haploid (because --ont flag used)")
+            logger.warning("Setting ignore_minor_calls to True (because --ont flag was used)")
+            logger.warning(f"Setting expected_error_rate error rate to {args.expected_error_rate} (because --ont flag was used)")
             args.model = "kmer_count"
 
         # If the user didn't specify the conf_percent_cutoff, then set it
         # depending on whether or not the --ont flag was used
         if args.conf_percent_cutoff == -1:
-            args.conf_percent_cutoff = 90 if args.ont else 100
+            if args.ont:
+                args.conf_percent_cutoff = 90
+                logger.warning("Setting conf_percent_cutoff to 90 (was not specified, and --ont flag was used)")
+            else:
+                args.conf_percent_cutoff = 100
+                logger.warning("Setting conf_percent_cutoff to 90 (was not specified, and --ont flag was not used)")
+
 
         # conf_percent_cutoff == 100 means that we want to keep all variant calls,
         # in which case there is no need to run the simulations
@@ -374,6 +384,7 @@ def run(parser, args):
                 + "%): "
                 + str(conf_threshold)
             )
+            cp.covgs["presence"] = copy.deepcopy(original_covgs_presence)
             gt = Genotyper(
                 sample=args.sample,
                 expected_depths=depths,
