@@ -51,7 +51,7 @@ def run(parser, args):
         logger.setLevel(logging.INFO)
     DBNAME = '%s-%s' % (DB_PREFIX, args.db_name)
     db = client[DBNAME]
-    connect(DBNAME)
+    connect(DBNAME, host=args.db_uri)
     logger.debug("Using DB %s" % DBNAME)
     reference_set_name = ".".join(os.path.basename(
         args.reference_set).split(".")[:-1])

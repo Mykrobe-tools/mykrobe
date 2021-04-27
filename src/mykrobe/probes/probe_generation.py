@@ -2,7 +2,6 @@ from __future__ import print_function
 import csv
 import sys
 from collections import Counter
-from mongoengine import connect
 from pymongo.errors import ServerSelectionTimeoutError
 from mykrobe.variants.schema.models import Variant
 from mykrobe.utils import split_var_name
