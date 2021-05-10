@@ -92,25 +92,53 @@ def _x_mutation_fixed_var_name(var_name):
     """Takes mutation name from results base_json. If it is an "X" amino acid
     mutation, returns new name, where X is fixed with correct amino acid name.
     Otherwise returns None"""
-    #                              (prefix-) (--middle-)
+    #                             prefix pos1     pos2
+    #                              ||||| |||     |||||||
     # Example var_name with an X: "katG_S315X-GCT2155167GGT"
-    #                                       |           |||
-    #                                       aa          codon
+    #                                   |   | |||       |||
+    #                                 aa1 aa2 codon1   codon2
     match = re.match(
-        r"""(?P<prefix>.*_[A-Z][0-9]+)(?P<aa>[A-Z])(?P<middle>-[ACGT]{3}[0-9]+)(?P<codon>[ACGT]{3})""",
+        r"""(?P<prefix>.*_)(?P<aa1>[A-Z])(?P<pos1>[0-9]+)(?P<aa2>[A-Z])-(?P<codon1>[ACGT]{3})(?P<pos2>[0-9]+)(?P<codon2>[ACGT]{3})""",
         var_name,
     )
-    if match is None or match.group("aa") != "X":
+    if match is None or match.group("aa2") != "X":
         return None
+
     try:
-        amino_acid = str(Seq(match.group("codon")).translate())
+        codon1_translate = str(Seq(match.group("codon1")).translate())
+        codon1_rev_translate = str(
+            Seq(match.group("codon1")).reverse_complement().translate()
+        )
     except:
         return None
+
+    # Check which strand the gene is on by checking if first codon or its
+    # reverse complement match the amino acid. This is a safe way of
+    # determining the strand because there is no codon where its translation
+    # and the translation of its reverse complement results in the same
+    # amino acid (this is checked in the tests of this repo)
+    if codon1_translate == match.group("aa1"):
+        try:
+            new_aa = str(Seq(match.group("codon2")).translate())
+        except:
+            return None
+    elif codon1_rev_translate == match.group("aa1"):
+        try:
+            new_aa = str(Seq(match.group("codon2")).reverse_complement().translate())
+        except:
+            return None
+    else:
+        return None
+
     return (
         match.group("prefix")
-        + amino_acid
-        + match.group("middle")
-        + match.group("codon")
+        + match.group("aa1")
+        + match.group("pos1")
+        + new_aa
+        + "-"
+        + match.group("codon1")
+        + match.group("pos2")
+        + match.group("codon2")
     )
 
 
