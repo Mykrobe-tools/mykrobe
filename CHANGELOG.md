@@ -28,8 +28,14 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Positional arguments `species` and `sample` are now options `-S,species` and
   `-s,--sample` respectively.
 
+### Fixed
+
+- Bug where the `--ont` flag resulted in mykrobe predict crashing if the panel
+  contained any presence/absence genes [[#123][123]].
+
 [113]: https://github.com/Mykrobe-tools/mykrobe/issues/113
 [114]: https://github.com/Mykrobe-tools/mykrobe/issues/114
+[123]: https://github.com/Mykrobe-tools/mykrobe/issues/123
 [Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.9.0...HEAD
 [mkdtemp]: https://docs.python.org/3.6/library/tempfile.html#tempfile.mkdtemp
 
