@@ -4,7 +4,7 @@ pyvcf
 requests
 mongoengine
 cython
-numpy==1.15 ## numpy 1.16 has a breaking change for pyinstaller distribution on Windows
+numpy
 ## Testing
 tox
 pytest
