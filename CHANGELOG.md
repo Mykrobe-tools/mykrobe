@@ -13,6 +13,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `-i` as another option for `-1,--seq`
 - `-A` as another option for `--report_all_calls`
 - `-e` as another option for `--expected_error_rate`
+- new species `typhi`
 
 ### Changed
 

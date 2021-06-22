@@ -22,6 +22,8 @@ TAXON_THRESHOLDS = {
     "Klebsiella_pneumoniae" : 15,
     "Ecoli_Shigella": 90,
     "Shigella_sonnei": 90,
+    "Salmonella_enterica": 90,
+    "Salmonella_Typhi": 90,
 }
 
 class Hierarchy(object):
