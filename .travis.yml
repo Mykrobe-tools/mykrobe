@@ -44,6 +44,7 @@ jobs:
 install:
 - pip3 install cython
 - pip3 install requests
+- pip3 install wheel
 - travis_retry pip3 install tox
 script: tox -e $TOXENV
 
