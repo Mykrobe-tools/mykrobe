@@ -17,7 +17,7 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
 
     pip3 install tox
 
-    mykrobe_version=0.9.0
+    mykrobe_version=0.10.0
     wget https://github.com/Mykrobe-tools/mykrobe/archive/v${mykrobe_version}.tar.gz
     tar xf v${mykrobe_version}.tar.gz
     cd mykrobe-${mykrobe_version}

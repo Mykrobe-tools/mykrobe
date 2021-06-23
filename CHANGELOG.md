@@ -7,6 +7,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+
+## 0.10.0
+
 ### Added
 
 - `-o` as another option for `--output`
@@ -42,6 +45,6 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 [114]: https://github.com/Mykrobe-tools/mykrobe/issues/114
 [123]: https://github.com/Mykrobe-tools/mykrobe/issues/123
 [127]: https://github.com/Mykrobe-tools/mykrobe/issues/127
-[Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.10.0...HEAD
 [mkdtemp]: https://docs.python.org/3.6/library/tempfile.html#tempfile.mkdtemp
 
