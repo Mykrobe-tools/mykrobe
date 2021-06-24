@@ -3,7 +3,6 @@ import json
 import os
 import pytest
 import shutil
-import subprocess
 import time
 
 from mykrobe.species_data import DataDir
@@ -18,7 +17,8 @@ def test_data_dir():
 
     # Create an empty data dir
     temp_dir = "tmp.test_data_dir"
-    subprocess.check_output(f"rm -rf {temp_dir}", shell=True)
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)
     ddir = DataDir(temp_dir)
     assert ddir.manifest == {}
     ddir.create_root()

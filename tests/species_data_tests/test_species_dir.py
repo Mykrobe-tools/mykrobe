@@ -2,14 +2,14 @@ import json
 import os
 import pytest
 import shutil
-import subprocess
 
 from mykrobe.species_data import SpeciesDir
 
 
 def test_species_dir():
     temp_dir = "tmp.test_species_dir"
-    subprocess.check_output(f"rm -rf {temp_dir}", shell=True)
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)
     with pytest.raises(FileNotFoundError):
         sdir = SpeciesDir(temp_dir)
     os.mkdir(temp_dir)
