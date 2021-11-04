@@ -6,6 +6,7 @@ from Bio.Data import CodonTable
 import itertools
 from mykrobe.utils import split_var_name
 import logging
+from collections import defaultdict
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
 
@@ -100,7 +101,7 @@ class Gene(Region):
 
 
 def make_backward_codon_table():
-    table = {}
+    table = defaultdict(list)
     standard_table = CodonTable.unambiguous_dna_by_id[11]
     codons = generate_all_possible_codons()
     for codon in codons:
@@ -109,6 +110,8 @@ def make_backward_codon_table():
                 table[standard_table.forward_table[codon]].append(codon)
             except:
                 table[standard_table.forward_table[codon]] = [codon]
+        else:
+            table["*"].append(codon)
     return table
 
 

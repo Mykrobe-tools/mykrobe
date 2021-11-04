@@ -26,7 +26,7 @@ def make_var_hash(ref, pos, alts):
 
 
 def split_var_name(name):
-    items = re.match(r"([A-Z]+)([-0-9]+)([A-Z/]+)", name, re.I).groups()
+    items = re.match(r"([A-Z]+)([-0-9]+)([A-Z/\*]+)", name, re.I).groups()
     return items[0], int(items[1]), items[2]
 
 
