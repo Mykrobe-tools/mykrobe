@@ -7,6 +7,12 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+- Support for including stop codons in the panel with the `*` character.
+
+### Fixed
+- Improved error messaging when an X amino acid resolves to a mutation already present
+  in the panel.
 
 ## 0.10.0
 
