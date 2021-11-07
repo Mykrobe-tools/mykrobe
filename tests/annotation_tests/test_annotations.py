@@ -398,3 +398,15 @@ class TestRegions():
         print(alt,seq[:31] + seq[31:])
         assert alt == seq[:30] + seq[31:]
         DB.drop_database('mykrobe-test')
+
+    def test_make_variant_panel_stop_codon(self):
+        variants = list(self.gm.get_variant_names(
+            "katG", "W90*", protein_coding_var=True))
+        assert len(variants) == 3
+        refs = sorted([split_var_name(v)[0] for v in variants])
+        alts = sorted([split_var_name(v)[-1] for v in variants])
+        var = variants[0]
+        ref, start, alt = split_var_name(var)
+        assert start == 2155842
+        assert refs == ["CCA"] * 3
+        assert alts == sorted(["TTA", "CTA", "TCA"])
