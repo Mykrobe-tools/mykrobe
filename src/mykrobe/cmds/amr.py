@@ -358,7 +358,7 @@ def run(parser, args):
                 logger.warning("Setting conf_percent_cutoff to 90 (was not specified, and --ont flag was used)")
             else:
                 args.conf_percent_cutoff = 100
-                logger.warning("Setting conf_percent_cutoff to 90 (was not specified, and --ont flag was not used)")
+                logger.warning("Setting conf_percent_cutoff to 100 (was not specified, and --ont flag was not used)")
 
 
         # conf_percent_cutoff == 100 means that we want to keep all variant calls,
