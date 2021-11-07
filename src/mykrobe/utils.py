@@ -151,8 +151,11 @@ def fix_amino_acid_X_variants_keys(dict_to_fix):
     for key in dict_to_fix:
         new_key = _x_mutation_fixed_var_name(key)
         if new_key is not None:
-            assert new_key not in keys_to_replace
-            assert new_key not in dict_to_fix
+            if new_key in keys_to_replace or new_key in dict_to_fix:
+                raise KeyError(
+                    f"The 'X' amino acid in mutation {key}, resolves to {new_key}, "
+                    f"which already exists in the panel"
+                )
             keys_to_replace[key] = new_key
 
     for key, new_key in keys_to_replace.items():
