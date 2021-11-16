@@ -140,6 +140,7 @@ genotyping_mixin.add_argument(
     type=int,
 )
 genotyping_mixin.add_argument(
+    "-D",
     "--min_proportion_expected_depth",
     help="Minimum depth required on the sum of both alleles (default: %(default).2f)",
     default=0.3,
@@ -155,7 +156,7 @@ genotyping_mixin.add_argument(
     "-o",
     "--output",
     type=str,
-    help="File path to save output json file as. Default is to stdout",
+    help="File path to save output file as. Default is to stdout",
     default="",
 )
 

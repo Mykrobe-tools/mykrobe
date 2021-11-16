@@ -147,6 +147,7 @@ parser_amr.add_argument(
     help="Name of panel to use. Ignored if species is 'custom'. Run `mykrobe panels describe` to see list of options",
 )
 parser_amr.add_argument(
+    "-P",
     "--custom_probe_set_path",
     metavar="FILENAME",
     type=str,
@@ -154,6 +155,7 @@ parser_amr.add_argument(
     default=None,
 )
 parser_amr.add_argument(
+    "-R",
     "--custom_variant_to_resistance_json",
     metavar="FILENAME",
     type=str,
@@ -161,6 +163,7 @@ parser_amr.add_argument(
     default=None,
 )
 parser_amr.add_argument(
+    "-L",
     "--custom_lineage_json",
     metavar="FILENAME",
     type=str,
@@ -182,6 +185,7 @@ parser_amr.add_argument(
     default=-1,
 )
 parser_amr.add_argument(
+    "-O",
     "--format",
     dest="output_format",
     type=str,
