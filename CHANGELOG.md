@@ -9,6 +9,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 - Support for including stop codons in the panel with the `*` character.
+- Panel version is now included in JSON output [[#119][119]]
 
 ### Changed
 - Default kmer size (21) made consistent across all subcommands [[#141][141]]
@@ -53,6 +54,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 [113]: https://github.com/Mykrobe-tools/mykrobe/issues/113
 [114]: https://github.com/Mykrobe-tools/mykrobe/issues/114
+[119]: https://github.com/Mykrobe-tools/mykrobe/issues/119
 [123]: https://github.com/Mykrobe-tools/mykrobe/issues/123
 [127]: https://github.com/Mykrobe-tools/mykrobe/issues/127
 [140]: https://github.com/Mykrobe-tools/mykrobe/issues/140
