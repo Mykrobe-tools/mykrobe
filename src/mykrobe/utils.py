@@ -2,6 +2,7 @@ import os
 import hashlib
 import re
 import json
+from typing import TextIO
 
 from Bio.Seq import Seq
 
@@ -161,3 +162,12 @@ def fix_amino_acid_X_variants_keys(dict_to_fix):
     for key, new_key in keys_to_replace.items():
         dict_to_fix[new_key] = dict_to_fix[key]
         del dict_to_fix[key]
+
+
+def get_first_chrom_name(fp: TextIO) -> str:
+    # make sure file pointer is at beginning of file
+    fp.seek(0)
+    header = fp.readline().rstrip()
+    if not header.startswith(">"):
+        raise ValueError(f"Expected fasta file, but it did not start with '>'")
+    return header[1:].split()[0]
