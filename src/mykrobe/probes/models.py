@@ -11,6 +11,8 @@ from collections import Counter
 import logging
 import datetime
 import math
+
+from mykrobe import K
 from mykrobe.utils import make_hash
 from mykrobe.utils import split_var_name
 from mykrobe.utils import seq_to_kmers
@@ -56,7 +58,7 @@ class AlleleGenerator(object):
 
     """docstring for PanelGenerator"""
 
-    def __init__(self, reference_filepath, kmer=31):
+    def __init__(self, reference_filepath, kmer=K):
         self.reference_filepath = reference_filepath
         self.kmer = kmer
         self.ref = []

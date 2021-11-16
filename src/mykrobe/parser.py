@@ -4,6 +4,7 @@ from __future__ import print_function
 import argparse
 import logging
 
+from mykrobe import K
 from mykrobe.base import force_mixin
 from mykrobe.base import genotyping_mixin
 from mykrobe.base import panels_mixin
@@ -276,7 +277,7 @@ parser_dump.add_argument(
     help="reference_filepath",
 )
 parser_dump.add_argument(
-    "--kmer", metavar="kmer", type=int, help="kmer length", default=31
+    "--kmer", metavar="kmer", type=int, help="kmer length", default=K
 )
 parser_dump.add_argument("-v", "--verbose", default=False, action="store_true")
 parser_dump.set_defaults(func=run_subtool)
@@ -313,7 +314,7 @@ parser_make_probes.add_argument(
     "-g", "--genbank", type=str, help="Genbank file containing genes as features"
 )
 parser_make_probes.add_argument(
-    "-k", "--kmer", type=int, help="kmer length", default=31
+    "-k", "--kmer", type=int, help="kmer length", default=K
 )
 parser_make_probes.add_argument(
     "--no-backgrounds",

@@ -10,6 +10,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Support for including stop codons in the panel with the `*` character.
 
+### Changed
+- Default kmer size (21) made consistent across all subcommands [[#141][141]]
+
 ### Fixed
 - Improved error messaging when an X amino acid resolves to a mutation already present
   in the panel.
@@ -51,6 +54,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 [114]: https://github.com/Mykrobe-tools/mykrobe/issues/114
 [123]: https://github.com/Mykrobe-tools/mykrobe/issues/123
 [127]: https://github.com/Mykrobe-tools/mykrobe/issues/127
+[141]: https://github.com/Mykrobe-tools/mykrobe/issues/141
 [Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.10.0...HEAD
 [mkdtemp]: https://docs.python.org/3.6/library/tempfile.html#tempfile.mkdtemp
 

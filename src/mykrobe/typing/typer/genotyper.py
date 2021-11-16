@@ -7,6 +7,7 @@ import logging
 import subprocess
 from copy import copy
 
+from mykrobe import K
 from mykrobe.metagenomics import LineagePredictor
 
 from mykrobe.typing import SequenceProbeCoverage
@@ -268,7 +269,7 @@ class Genotyper(object):
         sequence_confidence_threshold=0,
         min_gene_percent_covg_threshold=100,
         model="median_depth",
-        kmer_size=31,
+        kmer_size=K,
         min_proportion_expected_depth=0.3,
         ploidy="diploid",
         lineage_variants=None,

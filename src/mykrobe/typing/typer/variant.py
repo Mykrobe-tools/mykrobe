@@ -1,3 +1,4 @@
+from mykrobe import K
 from mykrobe.typing.typer.base import Typer
 from mykrobe.stats import log_lik_R_S_coverage
 from mykrobe.stats import log_lik_R_S_kmer_count
@@ -27,17 +28,20 @@ def likelihoods_to_confidence(l):
 
 class VariantTyper(Typer):
 
-    def __init__(self, expected_depths, contamination_depths=[],
+    def __init__(self, expected_depths, contamination_depths=None,
                  error_rate=DEFAULT_ERROR_RATE,
                  minor_freq=DEFAULT_MINOR_FREQ,
                  ignore_filtered=False,
-                 filters=[],
+                 filters=None,
                  confidence_threshold=3,
-                 model="kmer_count", 
-                 kmer_size=31, 
+                 model="kmer_count",
+                 kmer_size=K,
                  min_proportion_expected_depth=0.3,
                  ploidy="diploid"):
-
+        if filters is None:
+            filters = []
+        if contamination_depths is None:
+            contamination_depths = []
         super(
             VariantTyper,
             self).__init__(
@@ -168,7 +172,7 @@ class GenotypeModel(object):
 
 class KmerCountGenotypeModel(GenotypeModel):
 
-    def __init__(self, expected_depths, contamination_depths, error_rate, minor_freq, kmer_size=31):
+    def __init__(self, expected_depths, contamination_depths, error_rate, minor_freq, kmer_size=K):
         super(KmerCountGenotypeModel, self).__init__(
             expected_depths, contamination_depths, error_rate, minor_freq,kmer_size)
 
@@ -274,7 +278,7 @@ class KmerCountGenotypeModel(GenotypeModel):
 
 class DepthCoverageGenotypeModel(GenotypeModel):
 
-    def __init__(self, expected_depths, contamination_depths, error_rate, minor_freq, kmer_size=31):
+    def __init__(self, expected_depths, contamination_depths, error_rate, minor_freq, kmer_size=K):
         super(DepthCoverageGenotypeModel, self).__init__(
             expected_depths, contamination_depths, error_rate, minor_freq, kmer_size)
 
