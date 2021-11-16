@@ -10,6 +10,12 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Support for including stop codons in the panel with the `*` character.
 - Panel version is now included in JSON output [[#119][119]]
+- Shorthand CLI versions for common/long options:
+  - `-D`: `--min_proportion_expected_depth`
+  - `-P`: `--custom_probe_set_path`
+  - `-R`: `--custom_variant_to_resistance_json`
+  - `-L`: `--custom_lineage_json`
+  - `-O`: `--format`
 
 ### Changed
 - Default kmer size (21) made consistent across all subcommands [[#141][141]]
