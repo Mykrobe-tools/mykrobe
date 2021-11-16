@@ -1,35 +1,36 @@
 import os
+
+import pytest
+from mongoengine import connect
+
+from base import assert_no_overlapping_kmers
 from mykrobe.probes import AlleleGenerator
-from mykrobe.variants.schema.models import Variant
-from mykrobe.variants.schema.models import VariantSet
 from mykrobe.variants.schema.models import Reference
 from mykrobe.variants.schema.models import ReferenceSet
-from mongoengine import connect
-DB = connect('mykrobe-test')
-import pytest
-from base import assert_no_overlapping_kmers
+from mykrobe.variants.schema.models import Variant
+from mykrobe.variants.schema.models import VariantSet
+
+DB = connect("mykrobe-test")
 DATA_DIR = os.path.join("tests", "ref_data")
 
-class TestSNPAlleleGenerator():
 
+class TestSNPAlleleGenerator:
     def setup(self):
-        DB.drop_database('mykrobe-test')
+        DB.drop_database("mykrobe-test")
         self.pg = AlleleGenerator(
-            reference_filepath=f"{DATA_DIR}/BX571856.1.fasta")
+            reference_filepath=f"{DATA_DIR}/BX571856.1.fasta", kmer=31
+        )
         self.reference_set = ReferenceSet().create_and_save(name="ref_set")
         self.variant_set = VariantSet.create_and_save(
-            name="this_vcf_file",
-            reference_set=self.reference_set)
+            name="this_vcf_file", reference_set=self.reference_set
+        )
         self.variant_sets = [self.variant_set]
         self.reference = Reference().create_and_save(
-            name="ref",
-            md5checksum="sre",
-            reference_sets=[
-                self.reference_set])
+            name="ref", md5checksum="sre", reference_sets=[self.reference_set]
+        )
 
     def test_panel_generator(self):
-        pg = AlleleGenerator(
-            reference_filepath=f"{DATA_DIR}/BX571856.1.fasta")
+        pg = AlleleGenerator(reference_filepath=f"{DATA_DIR}/BX571856.1.fasta", kmer=31)
         assert pg.ref is not None
 
     def test_simple_snp_variant(self):
@@ -38,7 +39,8 @@ class TestSNPAlleleGenerator():
             reference=self.reference,
             reference_bases="A",
             start=31,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         panel = self.pg.create(v)
         assert panel.refs[0][:31] != panel.alts[0][:31]
         assert panel.refs[0][-32:] != panel.alts[0][-32:]
@@ -47,9 +49,11 @@ class TestSNPAlleleGenerator():
         assert_no_overlapping_kmers(panel)
 
         assert panel.refs == [
-            "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG"]
+            "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG"
+        ]
         assert panel.alts == [
-            "CGATTAAAGATAGAAATACACGATGCGAGCTATCAAATTTCATAACATCACCATGAGTTTG"]
+            "CGATTAAAGATAGAAATACACGATGCGAGCTATCAAATTTCATAACATCACCATGAGTTTG"
+        ]
         assert self.pg._calculate_length_delta_from_indels(v, []) == 0
         assert v.is_indel is False
 
@@ -59,14 +63,17 @@ class TestSNPAlleleGenerator():
             reference=self.reference,
             reference_bases="A",
             start=32,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         panel = self.pg.create(v)
         assert_no_overlapping_kmers(panel)
 
         assert panel.refs == [
-            "GATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGA"]
+            "GATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGA"
+        ]
         assert panel.alts == [
-            "GATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTGA"]
+            "GATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTGA"
+        ]
 
     def test_simple_variant_invalid(self):
         with pytest.raises(ValueError) as cm:
@@ -75,7 +82,8 @@ class TestSNPAlleleGenerator():
                 reference=self.reference,
                 reference_bases="T",
                 start=31,
-                alternate_bases=["T"])
+                alternate_bases=["T"],
+            )
             panel = self.pg.create(v)
 
     def test_simple_variant_start(self):
@@ -84,13 +92,16 @@ class TestSNPAlleleGenerator():
             reference=self.reference,
             reference_bases="C",
             start=1,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         panel = self.pg.create(v)
-#        assert_no_overlapping_kmers(panel) ## Will have overlapping kmers only if the SNP is in the i
+        #        assert_no_overlapping_kmers(panel) ## Will have overlapping kmers only if the SNP is in the i
         assert panel.refs == [
-            "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG"]
+            "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG"
+        ]
         assert panel.alts == [
-            "TGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG"]
+            "TGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG"
+        ]
 
     def test_simple_variant_end(self):
         v = Variant.create(
@@ -98,26 +109,32 @@ class TestSNPAlleleGenerator():
             reference=self.reference,
             reference_bases="A",
             start=2902618,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         panel = self.pg.create(v)
         assert_no_overlapping_kmers(panel)
 
         assert panel.refs == [
-            "TTTATACTACTGCTCAATTTTTTTACTTTTATNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"]
+            "TTTATACTACTGCTCAATTTTTTTACTTTTATNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+        ]
         assert panel.alts == [
-            "TTTATACTACTGCTCAATTTTTTTACTTTTTTNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"]
+            "TTTATACTACTGCTCAATTTTTTTACTTTTTTNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+        ]
 
         v = Variant.create(
             variant_sets=self.variant_sets,
             reference=self.reference,
             reference_bases="T",
             start=2902616,
-            alternate_bases=["C"])
+            alternate_bases=["C"],
+        )
         panel = self.pg.create(v)
         assert panel.refs == [
-            "ATTTTATACTACTGCTCAATTTTTTTACTTTTATNNNNNNNNNNNNNNNNNNNNNNNNNNN"]
+            "ATTTTATACTACTGCTCAATTTTTTTACTTTTATNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+        ]
         assert panel.alts == [
-            "ATTTTATACTACTGCTCAATTTTTTTACTTCTATNNNNNNNNNNNNNNNNNNNNNNNNNNN"]
+            "ATTTTATACTACTGCTCAATTTTTTTACTTCTATNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+        ]
 
     def test_simple_variant_with_nearby_snp(self):
         v = Variant.create(
@@ -125,21 +142,30 @@ class TestSNPAlleleGenerator():
             reference=self.reference,
             reference_bases="A",
             start=31,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         v2 = Variant.create(
             variant_sets=self.variant_sets,
             reference=self.reference,
             reference_bases="A",
             start=32,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         panel = self.pg.create(v, context=[v2])
         assert_no_overlapping_kmers(panel)
 
-        assert set(panel.refs) == set(["CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG",
-                              "CGATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTG"])
-        assert set(panel.alts) == set([
-            "CGATTAAAGATAGAAATACACGATGCGAGCTATCAAATTTCATAACATCACCATGAGTTTG",
-            "CGATTAAAGATAGAAATACACGATGCGAGCTTTCAAATTTCATAACATCACCATGAGTTTG"])
+        assert set(panel.refs) == set(
+            [
+                "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG",
+                "CGATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTG",
+            ]
+        )
+        assert set(panel.alts) == set(
+            [
+                "CGATTAAAGATAGAAATACACGATGCGAGCTATCAAATTTCATAACATCACCATGAGTTTG",
+                "CGATTAAAGATAGAAATACACGATGCGAGCTTTCAAATTTCATAACATCACCATGAGTTTG",
+            ]
+        )
 
     def test_simple_variant_with_multiple_nearby_snps(self):
         v = Variant.create(
@@ -147,32 +173,38 @@ class TestSNPAlleleGenerator():
             reference=self.reference,
             reference_bases="A",
             start=31,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         v2 = Variant.create(
             variant_sets=self.variant_sets,
             reference=self.reference,
             reference_bases="A",
             start=32,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         v3 = Variant.create(
             variant_sets=self.variant_sets,
             reference=self.reference,
             reference_bases="C",
             start=30,
-            alternate_bases=["G"])
+            alternate_bases=["G"],
+        )
 
         panel = self.pg.create(v, context=[v2, v3])
         assert_no_overlapping_kmers(panel)
 
-        assert panel.refs == ['CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGAT',
-                              'CGATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTGAT',
-                              'CGATTAAAGATAGAAATACACGATGCGAGGAATCAAATTTCATAACATCACCATGAGTTTGAT',
-                              'CGATTAAAGATAGAAATACACGATGCGAGGATTCAAATTTCATAACATCACCATGAGTTTGAT']
+        assert panel.refs == [
+            "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTGAT",
+            "CGATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTGAT",
+            "CGATTAAAGATAGAAATACACGATGCGAGGAATCAAATTTCATAACATCACCATGAGTTTGAT",
+            "CGATTAAAGATAGAAATACACGATGCGAGGATTCAAATTTCATAACATCACCATGAGTTTGAT",
+        ]
         assert panel.alts == [
             "CGATTAAAGATAGAAATACACGATGCGAGCTATCAAATTTCATAACATCACCATGAGTTTGAT",
             "CGATTAAAGATAGAAATACACGATGCGAGCTTTCAAATTTCATAACATCACCATGAGTTTGAT",
             "CGATTAAAGATAGAAATACACGATGCGAGGTATCAAATTTCATAACATCACCATGAGTTTGAT",
-            "CGATTAAAGATAGAAATACACGATGCGAGGTTTCAAATTTCATAACATCACCATGAGTTTGAT"]
+            "CGATTAAAGATAGAAATACACGATGCGAGGTTTCAAATTTCATAACATCACCATGAGTTTGAT",
+        ]
 
     def test_simple_variant_with_multiple_nearby_snps2(self):
         v = Variant.create(
@@ -180,37 +212,40 @@ class TestSNPAlleleGenerator():
             reference=self.reference,
             reference_bases="A",
             start=31,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         v2 = Variant.create(
             variant_sets=self.variant_sets,
             reference=self.reference,
             reference_bases="A",
             start=32,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         v3 = Variant.create(
             variant_sets=self.variant_sets,
             reference=self.reference,
             reference_bases="C",
             start=30,
-            alternate_bases=["G"])
+            alternate_bases=["G"],
+        )
         v4 = Variant.create(
             variant_sets=self.variant_sets,
             reference=self.reference,
             reference_bases="C",
             start=30,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         v5 = Variant.create(
             variant_sets=self.variant_sets,
             reference=self.reference,
             reference_bases="C",
             start=30,
-            alternate_bases=["A"])
+            alternate_bases=["A"],
+        )
 
-        assert sorted(self.pg._split_context([v, v3, v4])) == sorted(
-            [[v, v4], [v, v3]])
+        assert sorted(self.pg._split_context([v, v3, v4])) == sorted([[v, v4], [v, v3]])
         assert (self.pg._split_context([v3, v4])) == [[v4], [v3]]
-        assert (self.pg._split_context([v, v3, v4, v5])) == [
-            [v, v4, v5], [v, v3, v5]]
+        assert (self.pg._split_context([v, v3, v4, v5])) == [[v, v4, v5], [v, v3, v5]]
         panel = self.pg.create(v, context=[v2, v3, v4, v5])
         assert_no_overlapping_kmers(panel)
         assert sorted(panel.refs) == sorted(
@@ -222,9 +257,10 @@ class TestSNPAlleleGenerator():
                 "CGATTAAAGATAGAAATACACGATGCGAGTAATCAAATTTCATAACATCACCATGAGTTTG",
                 "CGATTAAAGATAGAAATACACGATGCGAGTATTCAAATTTCATAACATCACCATGAGTTTG",
                 "CGATTAAAGATAGAAATACACGATGCGAGAAATCAAATTTCATAACATCACCATGAGTTTG",
-                "CGATTAAAGATAGAAATACACGATGCGAGAATTCAAATTTCATAACATCACCATGAGTTTG"])
-        assert sorted(
-            panel.alts) == sorted(
+                "CGATTAAAGATAGAAATACACGATGCGAGAATTCAAATTTCATAACATCACCATGAGTTTG",
+            ]
+        )
+        assert sorted(panel.alts) == sorted(
             [
                 "CGATTAAAGATAGAAATACACGATGCGAGCTATCAAATTTCATAACATCACCATGAGTTTG",
                 "CGATTAAAGATAGAAATACACGATGCGAGCTTTCAAATTTCATAACATCACCATGAGTTTG",
@@ -233,7 +269,9 @@ class TestSNPAlleleGenerator():
                 "CGATTAAAGATAGAAATACACGATGCGAGTTATCAAATTTCATAACATCACCATGAGTTTG",
                 "CGATTAAAGATAGAAATACACGATGCGAGTTTTCAAATTTCATAACATCACCATGAGTTTG",
                 "CGATTAAAGATAGAAATACACGATGCGAGATATCAAATTTCATAACATCACCATGAGTTTG",
-                "CGATTAAAGATAGAAATACACGATGCGAGATTTCAAATTTCATAACATCACCATGAGTTTG"])
+                "CGATTAAAGATAGAAATACACGATGCGAGATTTCAAATTTCATAACATCACCATGAGTTTG",
+            ]
+        )
 
     def test_simple_variant_with_multiple_nearby_snps(self):
         v = Variant.create(
@@ -241,45 +279,52 @@ class TestSNPAlleleGenerator():
             reference=self.reference,
             reference_bases="A",
             start=31,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         v2 = Variant.create(
             variant_sets=self.variant_sets,
             reference=self.reference,
             reference_bases="A",
             start=32,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         v5 = Variant.create(
             variant_sets=self.variant_sets,
             reference=self.reference,
             reference_bases="A",
             start=32,
-            alternate_bases=["G"])
+            alternate_bases=["G"],
+        )
         v3 = Variant.create(
             variant_sets=self.variant_sets,
             reference=self.reference,
             reference_bases="C",
             start=30,
-            alternate_bases=["G"])
+            alternate_bases=["G"],
+        )
         v4 = Variant.create(
             variant_sets=self.variant_sets,
             reference=self.reference,
             reference_bases="C",
             start=30,
-            alternate_bases=["T"])
+            alternate_bases=["T"],
+        )
         panel = self.pg.create(v, context=[v2, v3, v4, v5])
         assert_no_overlapping_kmers(panel)
-        assert sorted(panel.refs) == sorted([
-            "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG",
-            "CGATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTG",
-            "CGATTAAAGATAGAAATACACGATGCGAGGAATCAAATTTCATAACATCACCATGAGTTTG",
-            "CGATTAAAGATAGAAATACACGATGCGAGGATTCAAATTTCATAACATCACCATGAGTTTG",
-            "CGATTAAAGATAGAAATACACGATGCGAGTAATCAAATTTCATAACATCACCATGAGTTTG",
-            "CGATTAAAGATAGAAATACACGATGCGAGTATTCAAATTTCATAACATCACCATGAGTTTG",
-            "CGATTAAAGATAGAAATACACGATGCGAGCAGTCAAATTTCATAACATCACCATGAGTTTG",
-            "CGATTAAAGATAGAAATACACGATGCGAGGAGTCAAATTTCATAACATCACCATGAGTTTG",
-            "CGATTAAAGATAGAAATACACGATGCGAGTAGTCAAATTTCATAACATCACCATGAGTTTG"])
-        assert sorted(
-            panel.alts) == sorted(
+        assert sorted(panel.refs) == sorted(
+            [
+                "CGATTAAAGATAGAAATACACGATGCGAGCAATCAAATTTCATAACATCACCATGAGTTTG",
+                "CGATTAAAGATAGAAATACACGATGCGAGCATTCAAATTTCATAACATCACCATGAGTTTG",
+                "CGATTAAAGATAGAAATACACGATGCGAGGAATCAAATTTCATAACATCACCATGAGTTTG",
+                "CGATTAAAGATAGAAATACACGATGCGAGGATTCAAATTTCATAACATCACCATGAGTTTG",
+                "CGATTAAAGATAGAAATACACGATGCGAGTAATCAAATTTCATAACATCACCATGAGTTTG",
+                "CGATTAAAGATAGAAATACACGATGCGAGTATTCAAATTTCATAACATCACCATGAGTTTG",
+                "CGATTAAAGATAGAAATACACGATGCGAGCAGTCAAATTTCATAACATCACCATGAGTTTG",
+                "CGATTAAAGATAGAAATACACGATGCGAGGAGTCAAATTTCATAACATCACCATGAGTTTG",
+                "CGATTAAAGATAGAAATACACGATGCGAGTAGTCAAATTTCATAACATCACCATGAGTTTG",
+            ]
+        )
+        assert sorted(panel.alts) == sorted(
             [
                 "CGATTAAAGATAGAAATACACGATGCGAGCTATCAAATTTCATAACATCACCATGAGTTTG",
                 "CGATTAAAGATAGAAATACACGATGCGAGCTTTCAAATTTCATAACATCACCATGAGTTTG",
@@ -289,4 +334,6 @@ class TestSNPAlleleGenerator():
                 "CGATTAAAGATAGAAATACACGATGCGAGTTTTCAAATTTCATAACATCACCATGAGTTTG",
                 "CGATTAAAGATAGAAATACACGATGCGAGCTGTCAAATTTCATAACATCACCATGAGTTTG",
                 "CGATTAAAGATAGAAATACACGATGCGAGGTGTCAAATTTCATAACATCACCATGAGTTTG",
-                "CGATTAAAGATAGAAATACACGATGCGAGTTGTCAAATTTCATAACATCACCATGAGTTTG"])
+                "CGATTAAAGATAGAAATACACGATGCGAGTTGTCAAATTTCATAACATCACCATGAGTTTG",
+            ]
+        )
