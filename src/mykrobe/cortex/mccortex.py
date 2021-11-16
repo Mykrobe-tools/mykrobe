@@ -5,6 +5,8 @@ import subprocess
 import logging
 import tempfile
 
+from mykrobe import K
+
 logger = logging.getLogger(__name__)
 
 
@@ -161,7 +163,7 @@ class McCortexGenoRunner(McCortexRunner):
             panels,
             seq=None,
             ctx=None,
-            kmer=31,
+            kmer=K,
             threads=2,
             memory="1GB",
             force=False,

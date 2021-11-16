@@ -3,8 +3,7 @@ from __future__ import print_function
 import argparse
 import os
 
-DEFAULT_KMER_SIZE = os.environ.get("KMER_SIZE", 21)
-DEFAULT_DB_NAME = os.environ.get("DB_NAME", "mykrobe")
+from mykrobe import K
 
 sequence_or_graph_parser_mixin = argparse.ArgumentParser(add_help=False)
 sequence_or_graph_parser_mixin.add_argument(
@@ -16,7 +15,7 @@ sequence_or_graph_parser_mixin.add_argument(
     metavar="kmer",
     type=int,
     help="K-mer length (default: %(default)d)",
-    default=DEFAULT_KMER_SIZE,
+    default=K,
 )
 sequence_or_graph_parser_mixin.add_argument(
     "--tmp", help="Directory to write temporary files to", default=None
