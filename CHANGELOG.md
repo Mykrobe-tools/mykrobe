@@ -16,6 +16,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Fixed
 - Improved error messaging when an X amino acid resolves to a mutation already present
   in the panel.
+- Do not assume reference fasta file name is the same as the chromosome [[#140][140]]
 
 ## 0.10.0
 
@@ -54,6 +55,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 [114]: https://github.com/Mykrobe-tools/mykrobe/issues/114
 [123]: https://github.com/Mykrobe-tools/mykrobe/issues/123
 [127]: https://github.com/Mykrobe-tools/mykrobe/issues/127
+[140]: https://github.com/Mykrobe-tools/mykrobe/issues/140
 [141]: https://github.com/Mykrobe-tools/mykrobe/issues/141
 [Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.10.0...HEAD
 [mkdtemp]: https://docs.python.org/3.6/library/tempfile.html#tempfile.mkdtemp
