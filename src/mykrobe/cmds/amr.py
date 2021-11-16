@@ -446,6 +446,7 @@ def run(parser, args):
         "version": {
             "mykrobe-predictor": predictor_version,
             "mykrobe-atlas": atlas_version,
+            "panel": ref_data["version"]
         },
         "genotype_model": args.model,
     }
