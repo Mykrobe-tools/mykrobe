@@ -1,35 +1,32 @@
 from __future__ import print_function
 
 import copy
-import logging
-import tempfile
-
-from mykrobe import ONT_E_RATE, ONT_PLOIDY
-
-logger = logging.getLogger(__name__)
-
 import json
-
-import numpy as np
+import logging
 import random
 import sys
+import tempfile
 import time
+
+import numpy as np
+
+from mykrobe import ONT_E_RATE, ONT_PLOIDY
+from mykrobe.metagenomics import AMRSpeciesPredictor
 from mykrobe.mformat import json_to_csv
+from mykrobe.predict import BasePredictor
+from mykrobe.predict import MykrobePredictorSusceptibilityResult
+from mykrobe.species_data import DataDir
 from mykrobe.typing import CoverageParser
 from mykrobe.typing import Genotyper
 from mykrobe.typing.models.base import ProbeCoverage
 from mykrobe.typing.models.variant import VariantProbeCoverage
 from mykrobe.typing.typer.variant import VariantTyper
-from mykrobe.predict import BasePredictor
-from mykrobe.predict import MykrobePredictorSusceptibilityResult
-from mykrobe.metagenomics import AMRSpeciesPredictor
-from mykrobe.species_data import DataDir
-from mykrobe.utils import load_json
 from mykrobe.utils import fix_amino_acid_X_variants_keys
-from mykrobe.version import __version__ as predictor_version
+from mykrobe.utils import load_json
 from mykrobe.version import __version__ as atlas_version
+from mykrobe.version import __version__ as predictor_version
 
-
+logger = logging.getLogger(__name__)
 random.seed(42)
 
 
