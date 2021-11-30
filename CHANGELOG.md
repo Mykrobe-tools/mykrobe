@@ -19,6 +19,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 - Default kmer size (21) made consistent across all subcommands [[#141][141]]
+- Nanopore preset `--ont` defaults to an expected error rate of 0.08 and ploidy
+  'haploid' [[#134][134]]
+- Default Illumina expected error rate change from 0.05 to 0.001 [[#133][133]]
 
 ### Fixed
 - Improved error messaging when an X amino acid resolves to a mutation already present
@@ -63,6 +66,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 [119]: https://github.com/Mykrobe-tools/mykrobe/issues/119
 [123]: https://github.com/Mykrobe-tools/mykrobe/issues/123
 [127]: https://github.com/Mykrobe-tools/mykrobe/issues/127
+[133]: https://github.com/Mykrobe-tools/mykrobe/issues/133
+[134]: https://github.com/Mykrobe-tools/mykrobe/issues/134
 [140]: https://github.com/Mykrobe-tools/mykrobe/issues/140
 [141]: https://github.com/Mykrobe-tools/mykrobe/issues/141
 [Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.10.0...HEAD

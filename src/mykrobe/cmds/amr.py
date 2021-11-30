@@ -4,6 +4,8 @@ import copy
 import logging
 import tempfile
 
+from mykrobe import ONT_E_RATE, ONT_PLOIDY
+
 logger = logging.getLogger(__name__)
 
 import json
@@ -342,24 +344,10 @@ def run(parser, args):
             args.ont = True
 
         if args.ont:
-            args.expected_error_rate = 0.15
-            args.ploidy = "haploid"
-            args.ignore_minor_calls = True
-            logger.warning("Setting ploidy to haploid (because --ont flag used)")
-            logger.warning("Setting ignore_minor_calls to True (because --ont flag was used)")
-            logger.warning(f"Setting expected_error_rate error rate to {args.expected_error_rate} (because --ont flag was used)")
-            args.model = "kmer_count"
-
-        # If the user didn't specify the conf_percent_cutoff, then set it
-        # depending on whether or not the --ont flag was used
-        if args.conf_percent_cutoff == -1:
-            if args.ont:
-                args.conf_percent_cutoff = 90
-                logger.warning("Setting conf_percent_cutoff to 90 (was not specified, and --ont flag was used)")
-            else:
-                args.conf_percent_cutoff = 100
-                logger.warning("Setting conf_percent_cutoff to 100 (was not specified, and --ont flag was not used)")
-
+            args.expected_error_rate = ONT_E_RATE
+            logger.info(f"Set expected error rate to {args.expected_error_rate} because --ont flag was used")
+            args.ploidy = ONT_PLOIDY
+            logger.info(f"Set ploidy to {args.ploidy} because --ont flag used")
 
         # conf_percent_cutoff == 100 means that we want to keep all variant calls,
         # in which case there is no need to run the simulations

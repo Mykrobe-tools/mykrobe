@@ -7,6 +7,7 @@ from mykrobe.typing import CoverageParser
 from mykrobe.typing import Genotyper
 from mykrobe.utils import load_json
 from mykrobe.version import __version__
+from mykrobe import ONT_E_RATE
 
 logger = logging.getLogger(__name__)
 
@@ -15,14 +16,9 @@ def run_main(parser, args):
     args = parser.parse_args()
     verbose = True
     if args.ont:
-        args.expected_error_rate = 0.15
-        args.filters = ["LOW_GT_CONF"]
-        args.model = "kmer_count"
+        args.expected_error_rate = ONT_E_RATE
         logger.debug(
             "Setting expected error rate to %s (--ont)" % args.expected_error_rate
-        )
-        logger.debug(
-            "Removing LOW_PERCENT_COVERAGE filter (increases sensitivity - in particular for ONT data)"
         )
 
     if args.min_variant_conf is None:

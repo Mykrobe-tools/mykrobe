@@ -3,7 +3,7 @@ from __future__ import print_function
 import argparse
 import os
 
-from mykrobe import K
+from mykrobe import K, ONT_E_RATE, ONT_PLOIDY, ILLUMINA_E_RATE
 
 sequence_or_graph_parser_mixin = argparse.ArgumentParser(add_help=False)
 sequence_or_graph_parser_mixin.add_argument(
@@ -75,7 +75,7 @@ genotyping_mixin = argparse.ArgumentParser(add_help=False)
 genotyping_mixin.add_argument(
     "--ont",
     action="store_true",
-    help="Set default for ONT data. Sets expected_error_rate to 0.15 and to haploid",
+    help=f"Set defaults for ONT data. Sets `-e {ONT_E_RATE} --ploidy {ONT_PLOIDY}`",
 )
 genotyping_mixin.add_argument(
     "--guess_sequence_method",
@@ -123,8 +123,8 @@ genotyping_mixin.add_argument(
 genotyping_mixin.add_argument(
     "-e",
     "--expected_error_rate",
-    help="Expected sequencing error rate (default: %(default).2f)",
-    default=0.05,
+    help="Expected sequencing error rate (default: %(default).3f)",
+    default=ILLUMINA_E_RATE,
     type=float,
 )
 genotyping_mixin.add_argument(
