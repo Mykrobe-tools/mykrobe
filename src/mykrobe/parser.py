@@ -25,8 +25,6 @@ def run_subtool(parser, args):
     if args.command == "variants":
         if args.sub_command == "add":
             from mykrobe.cmds.variants.add import run
-        # elif args.command == "add-gt":
-        #     from mykrobe.cmds.atlasadd import run
         elif args.sub_command == "dump-probes":
             from mykrobe.cmds.dump import run
         elif args.sub_command == "make-probes":
@@ -42,13 +40,14 @@ def run_subtool(parser, args):
             from mykrobe.cmds.panels import update_species as run
     elif args.command == "genotype":
         raise NotImplementedError(
-            "The 'genotype' option is no longer available - please use 'predict' with the species as 'custom' and the option --custom_probe_set_path probes.fasta (and also see the options --custom_variant_to_resistance_json, --custom_lineage_json) "
+            "The 'genotype' option is no longer available - please use 'predict' with "
+            "the species as 'custom' and the option --custom_probe_set_path "
+            "probes.fasta (and also see the options --custom_variant_to_resistance_json, "
+            "--custom_lineage_json) "
         )
-        # from mykrobe.cmds.genotype import run
-    elif args.command == "place":
-        from mykrobe.cmds.place import run
-    elif args.command == "diff":
-        from mykrobe.cmds.diff import run
+    else:
+        raise NotImplementedError(f"{args.command} is not a recognised mykrobe command")
+
     # run the chosen submodule.
     logger.debug(f"Start run {run.__module__}")
     run(parser, args)
@@ -181,8 +180,12 @@ parser_amr.add_argument(
     "--conf_percent_cutoff",
     metavar="conf_percent_cutoff",
     type=float,
-    help="Number between 0 and 100. Determines --min_variant_conf, by simulating variants and choosing the cutoff that would keep x%% of the variants. Default is 90 if --ont, otherwise --min_variant_conf is used as the cutoff",
-    default=-1,
+    help=(
+        "Number between 0 and 100. Determines --min_variant_conf, by simulating "
+        "variants and choosing the cutoff that would keep x%% of the variants "
+        "(default: %(default)d)"
+    ),
+    default=100,
 )
 parser_amr.add_argument(
     "-O",

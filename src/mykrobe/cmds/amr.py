@@ -1,33 +1,32 @@
 from __future__ import print_function
 
 import copy
-import logging
-import tempfile
-
-logger = logging.getLogger(__name__)
-
 import json
-
-import numpy as np
+import logging
 import random
 import sys
+import tempfile
 import time
+
+import numpy as np
+
+from mykrobe import ONT_E_RATE, ONT_PLOIDY
+from mykrobe.metagenomics import AMRSpeciesPredictor
 from mykrobe.mformat import json_to_csv
+from mykrobe.predict import BasePredictor
+from mykrobe.predict import MykrobePredictorSusceptibilityResult
+from mykrobe.species_data import DataDir
 from mykrobe.typing import CoverageParser
 from mykrobe.typing import Genotyper
 from mykrobe.typing.models.base import ProbeCoverage
 from mykrobe.typing.models.variant import VariantProbeCoverage
 from mykrobe.typing.typer.variant import VariantTyper
-from mykrobe.predict import BasePredictor
-from mykrobe.predict import MykrobePredictorSusceptibilityResult
-from mykrobe.metagenomics import AMRSpeciesPredictor
-from mykrobe.species_data import DataDir
-from mykrobe.utils import load_json
 from mykrobe.utils import fix_amino_acid_X_variants_keys
-from mykrobe.version import __version__ as predictor_version
+from mykrobe.utils import load_json
 from mykrobe.version import __version__ as atlas_version
+from mykrobe.version import __version__ as predictor_version
 
-
+logger = logging.getLogger(__name__)
 random.seed(42)
 
 
@@ -342,24 +341,10 @@ def run(parser, args):
             args.ont = True
 
         if args.ont:
-            args.expected_error_rate = 0.15
-            args.ploidy = "haploid"
-            args.ignore_minor_calls = True
-            logger.warning("Setting ploidy to haploid (because --ont flag used)")
-            logger.warning("Setting ignore_minor_calls to True (because --ont flag was used)")
-            logger.warning(f"Setting expected_error_rate error rate to {args.expected_error_rate} (because --ont flag was used)")
-            args.model = "kmer_count"
-
-        # If the user didn't specify the conf_percent_cutoff, then set it
-        # depending on whether or not the --ont flag was used
-        if args.conf_percent_cutoff == -1:
-            if args.ont:
-                args.conf_percent_cutoff = 90
-                logger.warning("Setting conf_percent_cutoff to 90 (was not specified, and --ont flag was used)")
-            else:
-                args.conf_percent_cutoff = 100
-                logger.warning("Setting conf_percent_cutoff to 100 (was not specified, and --ont flag was not used)")
-
+            args.expected_error_rate = ONT_E_RATE
+            logger.info(f"Set expected error rate to {args.expected_error_rate} because --ont flag was used")
+            args.ploidy = ONT_PLOIDY
+            logger.info(f"Set ploidy to {args.ploidy} because --ont flag used")
 
         # conf_percent_cutoff == 100 means that we want to keep all variant calls,
         # in which case there is no need to run the simulations
