@@ -178,35 +178,40 @@ class VCF(object):
                         type="metadata",
                         variant_set=variant_set,
                     )
-            for k, v in self.vcf_reader.infos.items():
-                if not VariantSetMetadata.objects(key=k, variant_set=variant_set):
-                    vsm = VariantSetMetadata.create_and_save(
-                        key=k,
-                        value="infos",
-                        type=v.type,
-                        variant_set=variant_set,
-                        number=int(v.num),
-                        description=v.desc,
+            for hrec in self.vcf_reader.header_iter():
+                try:
+                    hrec_id = hrec["ID"]
+                    hdr_type = hrec["HeaderType"].upper()
+                except KeyError:  # cyvcf2's HREC doesn't have a `get` method
+                    continue
+
+                if not VariantSetMetadata.objects(key=hrec_id, variant_set=variant_set):
+                    try:
+                        desc = hrec["Description"]
+                    except KeyError:
+                        desc = ""
+
+                    params = dict(
+                        key=hrec_id, variant_set=variant_set, description=desc
                     )
-            for k, v in self.vcf_reader.filters.items():
-                if not VariantSetMetadata.objects(key=k, variant_set=variant_set):
-                    vsm = VariantSetMetadata.create_and_save(
-                        key=k,
-                        value="filters",
-                        type="filters",
-                        variant_set=variant_set,
-                        description=v.desc,
-                    )
-            for k, v in self.vcf_reader.formats.items():
-                if not VariantSetMetadata.objects(key=k, variant_set=variant_set):
-                    vsm = VariantSetMetadata.create_and_save(
-                        key=k,
-                        value="formats",
-                        type=v.type,
-                        variant_set=variant_set,
-                        number=int(v.num),
-                        description=v.desc,
-                    )
+                    if hdr_type in ("INFO", "FORMAT"):
+                        params["value"] = hdr_type.lower() + "s"
+                        for field in ("type", "number"):
+                            try:
+                                params[field] = hrec[field.capitalize()]
+                            except KeyError:
+                                raise KeyError(
+                                    "{} ID {} does not have field '{}'".format(
+                                        hdr_type, hrec_id, field.capitalize()
+                                    )
+                                )
+                    elif hdr_type == "FILTER":
+                        params["value"] = "filters"
+                        params["type"] = "filters"
+                    else:
+                        continue
+
+                    vsm = VariantSetMetadata.create_and_save(**params)
 
     @staticmethod
     def _read_meta_hash(meta_string: str) -> Tuple[str, Dict[str, str]]:
