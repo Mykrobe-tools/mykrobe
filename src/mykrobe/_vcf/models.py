@@ -170,7 +170,7 @@ class VCF(object):
 
     def _create_variant_set_meta_data(self):
         for variant_set in self.variant_sets:
-            for k, v in self.vcf_reader.metadata.items():
+            for k, v in self._metadata_from_header(self.vcf_reader.raw_header).items():
                 if not VariantSetMetadata.objects(key=k, variant_set=variant_set):
                     vsm = VariantSetMetadata.create_and_save(
                         key=k,
@@ -208,7 +208,8 @@ class VCF(object):
                         description=v.desc,
                     )
 
-    def _read_meta_hash(self, meta_string: str) -> Tuple[str, Dict[str, str]]:
+    @staticmethod
+    def _read_meta_hash(meta_string: str) -> Tuple[str, Dict[str, str]]:
         """Taken from pyvcf
         https://github.com/jamescasbon/PyVCF/blob/476169cd457ba0caa6b998b301a4d91e975251d9/vcf/parser.py#L184-L220
         """
