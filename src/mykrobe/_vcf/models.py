@@ -67,8 +67,10 @@ class VCF(object):
         for record in self.vcf_reader:
             if not record.FILTER and self._is_record_valid(record):
                 v = self._get_or_create_variant(record)
-                for call in record.samples:
-                    genotype_likelihoods = self._get_genotype_likelihoods(call)
+                for sample_idx in range(len(record.genotypes)):
+                    genotype_likelihoods = self._get_genotype_likelihoods(
+                        record, sample_idx
+                    )
                     c = VariantCall.create(
                         variant=v,
                         call_set=self.call_sets[call.sample],
@@ -299,9 +301,13 @@ class VCF(object):
                     # which is analogous to 1/1 in a diploid. Cortex produces diploid
                     # calls, so this is just for completeness
                     alleles.append(1)
-                if any(a < 0 for a in alleles):  # todo: this copies the previous implementation, we basically say anything that has a null GT '.', even if HET is invalid
+                if any(
+                    a < 0 for a in alleles
+                ):  # todo: this copies the previous implementation, we basically say anything that has a null GT '.', even if HET is invalid
                     valid = False
-                if sum(alleles) < 2:  # todo: is the goal here to exclude HETs? If so, this will fail with a GT of 0/2
+                if (
+                    sum(alleles) < 2
+                ):  # todo: is the goal here to exclude HETs? If so, this will fail with a GT of 0/2
                     valid = False
             try:
                 gt_conf = record.format("GT_CONF")[i][0]
@@ -311,12 +317,14 @@ class VCF(object):
                 pass
         return valid
 
-    def _get_genotype_likelihoods(self, sample):
+    def _get_genotype_likelihoods(
+        self, record: cyvcf2.Variant, sample_idx: int
+    ) -> List[float]:
         try:
-            genotype_likelihoods = [float(i) for i in sample["GL"]]
-        except:
+            genotype_likelihoods = record.format("GL")[sample_idx]
+        except KeyError:
+            gt_conf = record.format("GT_CONF")[sample_idx][0]
             genotype_likelihoods = [0, 0, 0]
-            genotype_likelihoods[
-                sum([int(i) for i in sample["GT"].split("/")])
-            ] = sample["GT_CONF"]
+            genotype_likelihoods[sum(record.genotypes[sample_idx][:-1])] = gt_conf
+
         return genotype_likelihoods
