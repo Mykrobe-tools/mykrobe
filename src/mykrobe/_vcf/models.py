@@ -56,7 +56,7 @@ class VCF(object):
         return refs
 
     def add_to_database(self):
-        self.vcf_reader = cyvcf2.VCF(self.f)
+        self.vcf_reader = cyvcf2.VCF(self.f, gts012=True)
         self._create_new_variant_set()
         self._create_variant_set_meta_data()
         self._create_call_sets()
@@ -287,20 +287,27 @@ class VCF(object):
         return metadata
 
     def _is_record_valid(self, record):
+        # todo: review this method. There are some confusing assumptions about the number of alts we expect and whether HETs are valid or not
         valid = True
-        for sample in record.samples:
-            if sample["GT"] is None:
+        for i, gt in enumerate(record.genotypes):
+            if record.gt_types[i] == 3:  # null (unknown) genotype
                 valid = False
             else:
-                try:
-                    if sum([int(i) for i in split_GT(sample["GT"])]) < 2:
-                        valid = False
-                except ValueError:
+                alleles = [a for a in gt if type(a) is int]
+                if len(alleles) < 2:
+                    # we add 1 here in case the GT field is haploid and has a GT of 1
+                    # which is analogous to 1/1 in a diploid. Cortex produces diploid
+                    # calls, so this is just for completeness
+                    alleles.append(1)
+                if any(a < 0 for a in alleles):  # todo: this copies the previous implementation, we basically say anything that has a null GT '.', even if HET is invalid
+                    valid = False
+                if sum(alleles) < 2:  # todo: is the goal here to exclude HETs? If so, this will fail with a GT of 0/2
                     valid = False
             try:
-                if sample["GT_CONF"] <= 1:
+                gt_conf = record.format("GT_CONF")[i][0]
+                if gt_conf <= 1:  # todo: magic number.
                     valid = False
-            except AttributeError:
+            except AttributeError:  # todo: not sure what would trigger this. leaving before discussion
                 pass
         return valid
 
