@@ -21,13 +21,6 @@ from mykrobe import NON_METADATA_KEYS, SINGULAR_METADATA
 GLOBAL_VARIANT_SET_NAME = "global_atlas"
 
 
-def split_GT(GT):
-    if "|" in GT:
-        return GT.split("|")
-    else:
-        return GT.split("/")
-
-
 class VCF(object):
     def __init__(
         self,
@@ -68,14 +61,12 @@ class VCF(object):
             if not record.FILTER and self._is_record_valid(record):
                 v = self._get_or_create_variant(record)
                 for sample_idx in range(len(record.genotypes)):
-                    genotype_likelihoods = self._get_genotype_likelihoods(
-                        record, sample_idx
-                    )
+                    gt_likelihoods = self._get_genotype_likelihoods(record, sample_idx)
                     c = VariantCall.create(
                         variant=v,
-                        call_set=self.call_sets[call.sample],
-                        genotype=call["GT"],
-                        genotype_likelihoods=genotype_likelihoods,
+                        call_set=self.call_sets[self.vcf_reader.samples[sample_idx]],
+                        genotype=str(Genotype(record.genotypes[sample_idx])),
+                        genotype_likelihoods=gt_likelihoods,
                     )
                     self.calls.append(c)
 
@@ -91,7 +82,7 @@ class VCF(object):
         except DoesNotExist:
             try:
                 reference = self.references[record.CHROM]
-            except KeyError as e:
+            except KeyError:
                 raise KeyError(
                     "Reference %s cannot be found in reference set %s (%s). Please add it to the database."
                     % (record.CHROM, self.reference_set.id, self.reference_set.name)
@@ -288,7 +279,8 @@ class VCF(object):
 
         return metadata
 
-    def _is_record_valid(self, record):
+    @staticmethod
+    def _is_record_valid(record: cyvcf2.Variant) -> bool:
         # todo: review this method. There are some confusing assumptions about the number of alts we expect and whether HETs are valid or not
         valid = True
         for i, gt in enumerate(record.genotypes):
@@ -317,8 +309,9 @@ class VCF(object):
                 pass
         return valid
 
+    @staticmethod
     def _get_genotype_likelihoods(
-        self, record: cyvcf2.Variant, sample_idx: int
+        record: cyvcf2.Variant, sample_idx: int
     ) -> List[float]:
         try:
             genotype_likelihoods = record.format("GL")[sample_idx]
@@ -328,3 +321,18 @@ class VCF(object):
             genotype_likelihoods[sum(record.genotypes[sample_idx][:-1])] = gt_conf
 
         return genotype_likelihoods
+
+
+# this small class makes it easier to go from a cyvcf2 genotype array to a string
+class Genotype(object):
+    __slots__ = ("alleles", "phased")
+
+    def __init__(self, li):
+        self.alleles = li[:-1]
+        self.phased = li[-1]
+
+    def __str__(self):
+        sep = "/|"[int(self.phased)]
+        return sep.join("0123."[a] for a in self.alleles)
+
+    __repr__ = __str__
