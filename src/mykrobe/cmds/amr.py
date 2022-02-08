@@ -268,6 +268,12 @@ def run(parser, args):
     if args.tmp is None:
         args.tmp = tempfile.mkdtemp() + "/"
 
+    if args.ont:
+        args.expected_error_rate = ONT_E_RATE
+        logger.info(f"Set expected error rate to {args.expected_error_rate} because --ont flag was used")
+        args.ploidy = ONT_PLOIDY
+        logger.info(f"Set ploidy to {args.ploidy} because --ont flag used")
+
     # Run Cortex
     cp = CoverageParser(
         sample=args.sample,
@@ -338,13 +344,11 @@ def run(parser, args):
         )
         if args.guess_sequence_method and kmer_count_error_rate > 0.001:
             logger.warning("Guess sequence method is on, and we've guessed ONT")
-            args.ont = True
-
-        if args.ont:
+            # this is duplicated from the if args.ont statement above
             args.expected_error_rate = ONT_E_RATE
-            logger.info(f"Set expected error rate to {args.expected_error_rate} because --ont flag was used")
+            logger.info(f"Set expected error rate to {args.expected_error_rate}")
             args.ploidy = ONT_PLOIDY
-            logger.info(f"Set ploidy to {args.ploidy} because --ont flag used")
+            logger.info(f"Set ploidy to {args.ploidy}")
 
         # conf_percent_cutoff == 100 means that we want to keep all variant calls,
         # in which case there is no need to run the simulations
