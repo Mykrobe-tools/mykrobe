@@ -42,7 +42,7 @@ install:
   - '%BASH% -lc "python3 ./ci/windows_file_fixes.py"'
   - '%BASH%  -lc "cd mccortex && make all && make tests"'
   - '%BASH% -lc "pip3 install wheel"'
-  - '%BASH% -lc "pip3 install tox requests numpy==1.15"'
+  - '%BASH% -lc "pip3 install tox requests numpy"'
 
 
 build: off
@@ -55,7 +55,7 @@ after_test:
   - set HOME=.
   - SET PATH=%PYTHON%;%PATH%
   - python -m ensurepip
-  - python -m pip install pypiwin32 numpy==1.15
+  - python -m pip install pypiwin32 numpy
   - python -m pip install pyinstaller
   - python -m pip install -r requirements.txt
   - '%BASH% -lc "pip3 install -r requirements.txt"'
