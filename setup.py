@@ -124,15 +124,13 @@ setup(
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Utilities",
     ],
-    keywords=[
-        # eg: 'keyword1', 'keyword2', 'keyword3',
-    ],
     install_requires=[
         "anytree",
         "Biopython",
         "cyvcf2",
         "mongoengine",
         "requests",
+        "numpy",
     ],
     entry_points={
         "console_scripts": [
