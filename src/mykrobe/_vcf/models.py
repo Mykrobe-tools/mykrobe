@@ -1,4 +1,5 @@
 from __future__ import print_function
+
 import os.path
 import re
 from collections import OrderedDict
@@ -7,16 +8,15 @@ from typing import Dict, Union, List, Tuple
 import cyvcf2
 from mongoengine import DoesNotExist
 from mongoengine import NotUniqueError
-from mykrobe.variants.schema.models import VariantCallSet
-from mykrobe.variants.schema.models import Variant
-from mykrobe.variants.schema.models import VariantSet
-from mykrobe.variants.schema.models import VariantSetMetadata
-from mykrobe.variants.schema.models import VariantCall
-from mykrobe.variants.schema.models import Reference
-from mykrobe.variants.schema.models import ReferenceSet
-from mykrobe.utils import make_var_hash
 
 from mykrobe import NON_METADATA_KEYS, SINGULAR_METADATA
+from mykrobe.utils import make_var_hash
+from mykrobe.variants.schema.models import ReferenceSet
+from mykrobe.variants.schema.models import Variant
+from mykrobe.variants.schema.models import VariantCall
+from mykrobe.variants.schema.models import VariantCallSet
+from mykrobe.variants.schema.models import VariantSet
+from mykrobe.variants.schema.models import VariantSetMetadata
 
 GLOBAL_VARIANT_SET_NAME = "global_atlas"
 
@@ -281,32 +281,17 @@ class VCF(object):
 
     @staticmethod
     def _is_record_valid(record: cyvcf2.Variant) -> bool:
-        # todo: review this method. There are some confusing assumptions about the number of alts we expect and whether HETs are valid or not
         valid = True
-        for i, gt in enumerate(record.genotypes):
-            if record.gt_types[i] == 3:  # null (unknown) genotype
+        for i, gt in enumerate(map(Genotype, record.genotypes)):
+            if not gt.is_hom_alt():
                 valid = False
-            else:
-                alleles = [a for a in gt if type(a) is int]
-                if len(alleles) < 2:
-                    # we add 1 here in case the GT field is haploid and has a GT of 1
-                    # which is analogous to 1/1 in a diploid. Cortex produces diploid
-                    # calls, so this is just for completeness
-                    alleles.append(1)
-                if any(
-                    a < 0 for a in alleles
-                ):  # todo: this copies the previous implementation, we basically say anything that has a null GT '.', even if HET is invalid
-                    valid = False
-                if (
-                    sum(alleles) < 2
-                ):  # todo: is the goal here to exclude HETs? If so, this will fail with a GT of 0/2
-                    valid = False
-            try:
-                gt_conf = record.format("GT_CONF")[i][0]
-                if gt_conf <= 1:  # todo: magic number.
-                    valid = False
-            except AttributeError:  # todo: not sure what would trigger this. leaving before discussion
-                pass
+                break
+
+            gt_conf = record.format("GT_CONF")[i][0]
+            if gt_conf <= 1:  # todo: magic number.
+                valid = False
+                break
+
         return valid
 
     @staticmethod
@@ -323,16 +308,38 @@ class VCF(object):
         return genotype_likelihoods
 
 
-# this small class makes it easier to go from a cyvcf2 genotype array to a string
 class Genotype(object):
+    """This small class makes it easier to go from a cyvcf2 genotype array to a string"""
+
     __slots__ = ("alleles", "phased")
 
-    def __init__(self, li):
-        self.alleles = li[:-1]
-        self.phased = li[-1]
+    def __init__(self, genotype):
+        """genotype is a numpy array whose first element is an int, and last element
+        is a bool. There are a variable number of ints. The actual type is
+        List[int, ..., bool], but this doesn't seem to be supported
+        https://stackoverflow.com/q/71042017/5299417
+        """
+        self.alleles = genotype[:-1]
+        self.phased = genotype[-1]
 
     def __str__(self):
         sep = "/|"[int(self.phased)]
-        return sep.join("0123."[a] for a in self.alleles)
+        # return sep.join(["." if a == -1 else str(a) for a in self.alleles])
+        return sep.join(map(self._allele_to_str, self.alleles))
+        # return sep.join("0123."[a] for a in self.alleles)
+
+    @staticmethod
+    def _allele_to_str(a: int) -> str:
+        return "." if a == -1 else str(a)
+
+    def is_het(self) -> bool:
+        return len(set(self.alleles)) > 1
+
+    def is_null(self) -> bool:
+        return sum(self.alleles) < 0
+
+    def is_hom_alt(self) -> bool:
+        """Is genotype homozygous alternate?"""
+        return not self.is_het() and self.alleles[0] > 0
 
     __repr__ = __str__
