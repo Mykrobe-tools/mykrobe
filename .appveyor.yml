@@ -41,8 +41,10 @@ install:
   - '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
   - '%BASH% -lc "python3 ./ci/windows_file_fixes.py"'
   - '%BASH% -lc "cd mccortex && make all && make tests"'
+  - '%BASH% -lc "python3 -V"'
   - '%BASH% -lc "python3 -m pip install wheel"'
   - '%BASH% -lc "python3 -m pip install tox requests numpy"'
+  - '%BASH% -lc "python3 -m pip install -vv cyvcf2"'
 
 
 build: off
