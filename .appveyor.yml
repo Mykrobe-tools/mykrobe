@@ -42,7 +42,9 @@ install:
   - '%BASH% -lc "python3 ./ci/windows_file_fixes.py"'
   - '%BASH%  -lc "cd mccortex && make all && make tests"'
   - '%BASH% -lc "pip3 install wheel"'
-  - '%BASH% -lc "pip3 install tox requests numpy"'
+  - '%BASH% -lc "cd mccortex && make all && make tests"'
+  - '%BASH% -lc "python3 -m pip install wheel"'
+  - '%BASH% -lc "python3 -m pip install tox requests numpy"'
 
 
 build: off
@@ -59,8 +61,8 @@ after_test:
   - python -m pip install pypiwin32 numpy
   - python -m pip install pyinstaller
   - python -m pip install -r requirements.txt
-  - '%BASH% -lc "pip3 install -r requirements.txt"'
-  - '%BASH% -lc "pip3 install ."'
+  - '%BASH% -lc "python3 -m pip install -r requirements.txt"'
+  - '%BASH% -lc "python3 -m pip install ."'
   - '%BASH% -lc "mykrobe panels update_metadata --panels_dir src/mykrobe/data"'
   - '%BASH% -lc "mykrobe panels update_species --panels_dir src/mykrobe/data --debug all"'
   - '%BASH% -lc "cd dist && /cygdrive/c/Python36/Scripts/pyinstaller --workpath=./pyinstaller_build/binary_cache --distpath=./pyinstaller_build mykrobe_atlas_pyinstaller_windows.spec"'
