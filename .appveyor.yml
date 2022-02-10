@@ -49,6 +49,7 @@ build: off
 
 test_script:
   - set HOME=.
+  - SET PATH=%PYTHON%;%PATH%
   - '%BASH% -lc "tox -e py3"'
 
 after_test:
