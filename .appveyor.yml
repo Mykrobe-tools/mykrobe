@@ -50,7 +50,7 @@ build: off
 test_script:
   - set HOME=.
   - SET PATH=%PYTHON%;%PATH%
-  - '%BASH% -lc "tox --discover $(which python3)"'
+  - '%BASH% -lc "tox --discover %PYTHON%"'
 
 after_test:
   - set HOME=.
