@@ -16,7 +16,7 @@ environment:
     CYG_ROOT: C:\cygwin64
     CYG_CACHE: C:\cygwin64\var\cache\setup
     CYG_SETUP: setup-x86_64.exe
-    BASH: C:\msys64\mingw64\bin\bash
+    BASH: bash
 #    BASH: C:\cygwin64\bin\bash
     CC: gcc
     PYTHON: "C:\\Python36"
