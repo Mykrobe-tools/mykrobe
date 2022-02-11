@@ -19,7 +19,7 @@ environment:
     BASH: bash
 #    BASH: C:\cygwin64\bin\bash
     CC: gcc
-    PYTHON: "C:\\Python36"
+    PYTHON: "C:\\Python38"
 
 
 # Cache Cygwin/MSYS files to speed up build
@@ -36,9 +36,10 @@ install:
   - set MSYSTEM=MINGW64
   - set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
   - set MINGWPREFIX=x86_64-w64-mingw32
-  - "sh -lc \"pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-autotools mingw-w64-x86_64-zlib mingw-w64-x86_64-bzip2 mingw-w64-x86_64-xz mingw-w64-x86_64-curl mingw-w64-x86_64-tools-git\""
+  - "sh -lc \"pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-autotools mingw-w64-x86_64-zlib mingw-w64-x86_64-bzip2 mingw-w64-x86_64-xz mingw-w64-x86_64-curl mingw-w64-x86_64-tools-git mingw-w64-python-pip\""
 #  - ps: if (Test-Path Env:\CYG_ROOT) { Start-FileDownload "https://cygwin.com/$env:CYG_SETUP" -FileName "$env:CYG_SETUP" }
 #  - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
+  - '%BASH% -lc "python3 -V"'
   - '%BASH% -lc "python3 -m pip install --upgrade pip"'
   - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex"'
   - '%BASH% -lc "cd mccortex/libs/htslib && git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc"'
@@ -46,7 +47,6 @@ install:
   - '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
   - '%BASH% -lc "python3 ./ci/windows_file_fixes.py"'
   - '%BASH% -lc "cd mccortex && make all && make tests"'
-  - '%BASH% -lc "python3 -V"'
   - '%BASH% -lc "python3 -m pip install wheel"'
   - '%BASH% -lc "python3 -m pip install tox requests numpy"'
   - '%BASH% -lc "python3 -m pip install -vv cyvcf2"'
