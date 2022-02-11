@@ -11,20 +11,19 @@ services:
   - mongodb
 
 environment:
-    CYG_MIRROR: http://cygwin.mirror.constant.com
-    CYG_PACKAGES: make,unzip,automake,automake1.16,autoconf,autoconf2.5,zip,libbz2-devel,bzip2,xz,zlib,zlib-devel,python3,libtool,wget,liblzma-devel,libcurl-devel,R,libncurses-devel,python3-cython,python3-devel,openssl,libssl-devel
-    CYG_ROOT: C:\cygwin64
-    CYG_CACHE: C:\cygwin64\var\cache\setup
-    CYG_SETUP: setup-x86_64.exe
-    BASH: bash
-#    BASH: C:\cygwin64\bin\bash
-    CC: gcc
-    PYTHON: "C:\\Python38"
+  CYG_MIRROR: http://cygwin.mirror.constant.com
+  CYG_PACKAGES: make,unzip,automake,automake1.16,autoconf,autoconf2.5,zip,libbz2-devel,bzip2,xz,zlib,zlib-devel,python3,libtool,wget,liblzma-devel,libcurl-devel,R,libncurses-devel,python3-cython,python3-devel,openssl,libssl-devel
+  CYG_ROOT: C:\cygwin64
+  CYG_CACHE: C:\cygwin64\var\cache\setup
+  CYG_SETUP: setup-x86_64.exe
+  BASH: C:\cygwin64\bin\bash
+  CC: gcc
+  PYTHON: "C:\\Python36"
 
 
 # Cache Cygwin/MSYS files to speed up build
 cache:
-    - '%CYG_CACHE%'
+  - '%CYG_CACHE%'
 clone_depth: 1
 
 init:
@@ -33,23 +32,28 @@ init:
 install:
   - set HOME=.
   - SET PATH=%PYTHON%;%PATH%
-  - set MSYSTEM=MINGW64
-  - set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
-  - set MINGWPREFIX=x86_64-w64-mingw32
-  - "sh -lc \"pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-autotools mingw-w64-x86_64-zlib mingw-w64-x86_64-bzip2 mingw-w64-x86_64-xz mingw-w64-x86_64-curl mingw-w64-x86_64-tools-git mingw-w64-x86_64-python-pip\""
-#  - ps: if (Test-Path Env:\CYG_ROOT) { Start-FileDownload "https://cygwin.com/$env:CYG_SETUP" -FileName "$env:CYG_SETUP" }
-#  - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
-  - '%BASH% -lc "python3 -V"'
+  - ps: if (Test-Path Env:\CYG_ROOT) { Start-FileDownload "https://cygwin.com/$env:CYG_SETUP" -FileName "$env:CYG_SETUP" }
+  - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
   - '%BASH% -lc "python3 -m pip install --upgrade pip"'
   - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex"'
   - '%BASH% -lc "cd mccortex/libs/htslib && git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc"'
   - '%BASH% -lc "cd mccortex/libs/bcftools && git checkout b406a3906b153faa8bec0a53df07b2adf18a3052"'
   - '%BASH% -lc "cd mccortex/libs/samtools && git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c"'
-#  - '%BASH% -lc "python3 ./ci/windows_file_fixes.py"'
+  - '%BASH% -lc "python3 ./ci/windows_file_fixes.py"'
   - '%BASH% -lc "cd mccortex && make all && make tests"'
+  - '%BASH% -lc "python3 -V"'
   - '%BASH% -lc "python3 -m pip install wheel"'
-  - '%BASH% -lc "python3 -m pip install tox requests numpy"'
-  - '%BASH% -lc "python3 -m pip install -vv cyvcf2"'
+  - '%BASH% -lc "python3 -m pip install tox requests numpy cython"'
+  - '%BASH% -lc "git clone --recursive https://github.com/brentp/cyvcf2"'
+  - '%BASH% -lc "cd cyvcf2 && git checkout v0.30.14"'
+  - '%BASH% -lc "cd htslib"'
+  - '%BASH% -lc "autoheader"'
+  - '%BASH% -lc "autoconf"'
+  - '%BASH% -lc "./configure --enable-libcurl"'
+  - '%BASH% -lc "make"'
+  - '%BASH% -lc "cd ../"'
+  - '%BASH% -lc "python3 -m pip install -r requirements.txt"'
+  - '%BASH% -lc "CYTHONIZE=1 python3 -m pip install -e ."'
 
 
 build: off
@@ -83,7 +87,7 @@ artifacts:
 deploy:
   provider: GitHub
   auth_token:
-      secure: 3DyaU0V4K58oeRoR6XM2eHP8CGzDhY6qlB9b6CHOApbHfGvi8e85/d9BUvoVm4tR
+    secure: 3DyaU0V4K58oeRoR6XM2eHP8CGzDhY6qlB9b6CHOApbHfGvi8e85/d9BUvoVm4tR
   artifact: mykrobe.command_line.windows.${APPVEYOR_REPO_TAG_NAME}.tar.gz
   draft: true
   prerelease: false
