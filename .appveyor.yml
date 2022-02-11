@@ -16,7 +16,8 @@ environment:
     CYG_ROOT: C:\cygwin64
     CYG_CACHE: C:\cygwin64\var\cache\setup
     CYG_SETUP: setup-x86_64.exe
-    BASH: C:\cygwin64\bin\bash
+    BASH: C:/msys64/mingw64/bin/bash
+#    BASH: C:\cygwin64\bin\bash
     CC: gcc
     PYTHON: "C:\\Python36"
 
@@ -32,8 +33,12 @@ init:
 install:
   - set HOME=.
   - SET PATH=%PYTHON%;%PATH%
-  - ps: if (Test-Path Env:\CYG_ROOT) { Start-FileDownload "https://cygwin.com/$env:CYG_SETUP" -FileName "$env:CYG_SETUP" }
-  - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
+  - set MSYSTEM=MINGW64
+  - set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
+  - set MINGWPREFIX=x86_64-w64-mingw32
+  - "sh -lc \"pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-autotools mingw-w64-x86_64-zlib mingw-w64-x86_64-bzip2 mingw-w64-x86_64-xz mingw-w64-x86_64-curl mingw-w64-x86_64-tools-git\""
+#  - ps: if (Test-Path Env:\CYG_ROOT) { Start-FileDownload "https://cygwin.com/$env:CYG_SETUP" -FileName "$env:CYG_SETUP" }
+#  - '%CYG_SETUP% --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages "%CYG_PACKAGES%" --upgrade-also'
   - '%BASH% -lc "python3 -m pip install --upgrade pip"'
   - '%BASH% -lc "git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex"'
   - '%BASH% -lc "cd mccortex/libs/htslib && git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc"'
