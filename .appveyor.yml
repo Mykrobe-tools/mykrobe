@@ -46,7 +46,9 @@ install:
   - '%BASH% -lc "python3 -m pip install tox requests numpy cython"'
   - '%BASH% -lc "git clone --recursive https://github.com/brentp/cyvcf2"'
   - '%BASH% -lc "cd cyvcf2 && git checkout v0.30.14"'
-  - '%BASH% -lc "cd cyvcf2/htslib && autoheader && autoconf && PATH_SEPARATOR=";" ./configure --enable-libcurl && make"'
+  - '%BASH% -lc "cd cyvcf2/htslib && autoreconf"'
+  - '%BASH% -lc "cd cyvcf2/htslib && ./configure --enable-libcurl --prefix=$(pwd)"'
+  - '%BASH% -lc "cd cyvcf2/htslib && make"'
   - '%BASH% -lc "cd cyvcf2 && python3 -m pip install -r requirements.txt"'
   - '%BASH% -lc "cd cyvcf2 && CYTHONIZE=1 python3 -m pip install -e ."'
 
