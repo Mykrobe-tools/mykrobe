@@ -50,7 +50,7 @@ install:
 #  - '%BASH% -lc "cd cyvcf2/htslib && ./configure --enable-libcurl --prefix=$(pwd)"'
   - '%BASH% -lc "cd cyvcf2/htslib && make PREFIX=$(pwd)"'
   - '%BASH% -lc "cd cyvcf2 && python3 -m pip install -r requirements.txt"'
-  - '%BASH% -lc "cd cyvcf2 && CYTHONIZE=1 python3 -m pip install -e ."'
+  - '%BASH% -lc "cd cyvcf2 && CYTHONIZE=1 python3 -m pip install -v ."'
 
 
 build: off
