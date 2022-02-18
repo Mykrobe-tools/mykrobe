@@ -11,6 +11,7 @@ Currently supports _Mycobacterium tuberculosis_, _Staphylococcus aureus_, _Shige
 ## Documentation
 
 Please see the [mykrobe wiki](https://github.com/Mykrobe-tools/mykrobe/wiki) for documentation.
+For _S. typhi_ also see https://github.com/katholt/genotyphi 
 
 
 ## Quick start
