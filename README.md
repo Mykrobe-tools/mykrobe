@@ -3,7 +3,7 @@
 # Mykrobe
 Antibiotic resistance prediction in minutes. 
 
-Currently supports _M. tuberculosis_, _S. aureus_, _S. sonnei_.
+Currently supports _Mycobacterium tuberculosis_, _Staphylococcus aureus_, _Shigella sonnei_, _Salmonella typhi_.
 
 <http://www.mykrobe.com>
 
