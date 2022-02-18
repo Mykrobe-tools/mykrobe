@@ -1,6 +1,9 @@
 [![Travis build Status](https://travis-ci.com/Mykrobe-tools/mykrobe.svg?branch=master)](https://travis-ci.com/Mykrobe-tools/mykrobe)
 
 # Mykrobe
+Antibiotic resistance prediction in minutes. 
+
+Currently supports _M. tuberculosi_s, _S. aureus_, _S. sonnei_.
 
 <http://www.mykrobe.com>
 
