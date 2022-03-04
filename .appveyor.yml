@@ -46,7 +46,7 @@ install:
   - '%BASH% -lc "python3 -m pip install tox requests numpy cython"'
   - '%BASH% -lc "git clone https://github.com/brentp/cyvcf2"'
   - '%BASH% -lc "cd cyvcf2 && git checkout v0.30.14"'
-  - '%BASH% -lc "cd cyvcf2 && git clone --recurse-submodules https://github.com/samtools/htslib.git && cd htslib && git checkout 1.15'
+  - '%BASH% -lc "cd cyvcf2 && git clone https://github.com/samtools/htslib.git && cd htslib && git checkout 1.13'
   - '%BASH% -lc "cd cyvcf2/htslib && autoreconf -i && ./configure --prefix=$(pwd)"'
   - '%BASH% -lc "cd cyvcf2/htslib && make PREFIX=$(pwd)"'
   - '%BASH% -lc "cd cyvcf2 && python3 -m pip install -r requirements.txt"'
