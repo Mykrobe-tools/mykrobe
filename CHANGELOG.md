@@ -21,6 +21,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Default kmer size (21) made consistent across all subcommands [[#141][141]]
 - Nanopore preset `--ont` defaults to an expected error rate of 0.08 and ploidy
   'haploid' [[#134][134]]
+- VCF interface from pyvcf to cyvcf2 [[#142][142]]
 
 ### Fixed
 - Improved error messaging when an X amino acid resolves to a mutation already present
@@ -68,6 +69,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 [134]: https://github.com/Mykrobe-tools/mykrobe/issues/134
 [140]: https://github.com/Mykrobe-tools/mykrobe/issues/140
 [141]: https://github.com/Mykrobe-tools/mykrobe/issues/141
+[142]: https://github.com/Mykrobe-tools/mykrobe/issues/142
 [Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.10.0...HEAD
 [mkdtemp]: https://docs.python.org/3.6/library/tempfile.html#tempfile.mkdtemp
 
