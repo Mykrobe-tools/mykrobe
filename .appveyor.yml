@@ -4,6 +4,7 @@ image:
 branches:
   only:
     - master
+    - pyvcf
     - /v\d*\.\d*\.\d*/
 
 
