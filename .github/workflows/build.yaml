@@ -189,6 +189,11 @@ jobs:
       env:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
+        rm -rf mccortex
+        git clone --recursive -b geno_kmer_count https://github.com/Mykrobe-tools/mccortex mccortex
+        cd mccortex
+        make
+        cd ..
         echo "mongod start"
         mkdir $HOME/mongodb_data
         mongod --dbpath=$HOME/mongodb_data &
