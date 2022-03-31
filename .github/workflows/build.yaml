@@ -166,12 +166,11 @@ jobs:
     name: Build Windows command line
     runs-on: windows-2019
     steps:
-    - uses: msys2/setup-msys2@v2
 
     - name: Install dependencies
       run: |
         pip3 install cython requests wheel tox pyinstaller
-      shell: msys2 {0}
+      shell: bash
 
     - name: Check out code for the build
       uses: actions/checkout@v2
@@ -179,12 +178,12 @@ jobs:
     - name: Set release version if is a release
       if: startsWith(github.event.ref, 'refs/tags/v')
       run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      shell: msys2 {0}
+      shell: bash
 
     - name: Set release version if not a release
       if: false == startsWith(github.event.ref, 'refs/tags/v')
       run: echo "RELEASE_VERSION=test" >> $GITHUB_ENV
-      shell: msys2 {0}
+      shell: bash
 
     - name: Test and build command line tarball
       env:
@@ -226,7 +225,7 @@ jobs:
         pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller_windows.spec
         cd pyinstaller_build
         tar cvfz ../../${OUTPUT_TARBALL} mykrobe_atlas/
-      shell: msys2 {0}
+      shell: bash
 
     - name: Release
       if: startsWith(github.event.ref, 'refs/tags/v')
