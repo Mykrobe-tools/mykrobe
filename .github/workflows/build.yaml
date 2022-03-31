@@ -193,10 +193,17 @@ jobs:
         mkdir $HOME/mongodb_data
         mongod --dbpath=$HOME/mongodb_data &
         sleep 3s
+        echo "which pip3"
         which pip3
+        echo "pip3 cache dir"
+        pip3 cache dir
+        echo "pip3 cache purge"
+        pip3 cache purge
         pip3 install cython requests wheel tox pyinstaller
         rm -rf .tox
+        echo "tox"
         tox
+        echo "pip3 install ."
         pip3 install .
         mykrobe panels update_metadata --panels_dir src/mykrobe/data
         mykrobe panels update_species --panels_dir src/mykrobe/data --debug all
