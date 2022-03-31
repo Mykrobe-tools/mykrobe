@@ -144,6 +144,7 @@ jobs:
         chown -R `id -un` $HOME/mongodb_data
         sudo mongod --dbpath=$HOME/mongodb_data --quiet &> /dev/null &
         sleep 3s
+        rm -rf .tox
         sudo tox
         sudo pip3 install .
         mykrobe panels update_metadata --panels_dir src/mykrobe/data
@@ -194,6 +195,7 @@ jobs:
         sleep 3s
         which pip3
         pip3 install cython requests wheel tox pyinstaller
+        rm -rf .tox
         tox
         pip3 install .
         mykrobe panels update_metadata --panels_dir src/mykrobe/data
