@@ -175,7 +175,10 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip3 install cython requests wheel tox pyinstaller pefile pypiwin32
+        pip3 install cython requests wheel tox pypiwin32
+        pip3 install pyinstaller
+        echo "which pyinstaller"
+        which pyinstaller
       shell: msys2 {0}
 
     - name: Check out code for the build
