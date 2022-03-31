@@ -175,7 +175,19 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip3 install cython requests wheel tox
+        echo "uninstall pyinstaller"
+        pip uninstall -y pyinstaller
+        pip3 uninstall -y pyinstaller
+        echo "pip3 install wheel"
+        pip3 install wheel
+        echo "pip3 install cython requests tox numpy==1.15"
+        pip3 install cython requests tox numpy==1.15
+        echo "pip3 install pypiwin32"
+        pip3 install pypiwin32
+        echo "pip3 install pyinstaller"
+        pip3 install pyinstaller
+        echo "which pyinstaller"
+        which pyinstaller
       shell: msys2 {0}
 
     - name: Check out code for the build
@@ -195,8 +207,6 @@ jobs:
       env:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
-        echo "which cc"
-        which cc
         echo "clone mccortex"
         rm -rf mccortex
         git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
@@ -211,26 +221,23 @@ jobs:
         cd mccortex
         echo "make mccortex"
         make all
+        echo "make tests mccortex"
         make tests
         cd ..
-        #echo "mongod start"
-        #mkdir $HOME/mongodb_data
-        #mongod --dbpath=$HOME/mongodb_data &
-        #sleep 3s
-        echo "which pip3"
-        which pip3
-        echo "pip3 cache dir"
-        pip3 cache dir
-        echo "pip3 cache purge"
-        pip3 cache purge
-        rm -rf .tox
+        #echo "which pip3"
+        #which pip3
+        #echo "pip3 cache dir"
+        #pip3 cache dir
+        #echo "pip3 cache purge"
+        #pip3 cache purge
+        #rm -rf .tox
         echo "tox"
         tox
-        echo "python install eunsurepip etc"
-        python -m ensurepip
-        python -m pip install pypiwin32 numpy==1.15
-        python -m pip install pyinstaller
-        python -m pip install -r requirements.txt
+        #echo "python install eunsurepip etc"
+        #python -m ensurepip
+        #python -m pip install pypiwin32 numpy==1.15
+        #python -m pip install pyinstaller
+        #python -m pip install -r requirements.txt
         echo "pip3 install requirements"
         pip3 install -r requirements.txt
         echo "pip3 install ."
