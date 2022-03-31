@@ -1,46 +1,12 @@
-BootStrap: debootstrap
-OSVersion: focal
-MirrorURL: http://us.archive.ubuntu.com/ubuntu/
+BootStrap: library
+From: ubuntu:20.04
+
+%setup
+    mkdir $SINGULARITY_ROOTFS/mykrobe
+    rsync -a . $SINGULARITY_ROOTFS/mykrobe/
 
 %post
-    apt-get install -y software-properties-common
-    apt-add-repository universe
-    apt-get update
-
-    apt-get install -y \
-      build-essential \
-      git \
-      mongodb \
-      python3-pip \
-      python3-setuptools \
-      wget
-
-    pip3 install tox
-
-    mykrobe_version=0.10.0
-    wget https://github.com/Mykrobe-tools/mykrobe/archive/v${mykrobe_version}.tar.gz
-    tar xf v${mykrobe_version}.tar.gz
-    cd mykrobe-${mykrobe_version}
-    git clone --recursive -b geno_kmer_count https://github.com/Mykrobe-tools/mccortex mccortex
-    cd mccortex
-    make
-    cd ..
-    mkdir -p /data/db
-    mongod --logpath mongo.log --quiet &>/dev/null &
-    sleep 3s
-    tox
-    mongod --shutdown
-    rm mongo.log
-    pip3 install .
-    # For whatever reason, mccortex is not getting put in the install location.
-    # Do it manually.
-    myk_dir=$(pip3 show mykrobe | awk '/^Location/ {print $NF}')
-    echo $myk_dir
-    cp mccortex/bin/mccortex31 $myk_dir/mykrobe/cortex/mccortex31
-    cd ..
-    rm -r v${mykrobe_version}.tar.gz mykrobe-${mykrobe_version}
-    mykrobe panels update_metadata --debug
-    mykrobe panels update_species --debug all
+    $SINGULARITY_ROOTFS/mykrobe/ci/install_mykrobe_linux.sh $SINGULARITY_ROOTFS/mykrobe
 
 %runscript
     mykrobe "$@"
