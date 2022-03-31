@@ -170,7 +170,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip3 install cython requests wheel tox pyinstaller
-      shell: bash
+      shell: msys2 {0}
 
     - name: Check out code for the build
       uses: actions/checkout@v2
@@ -178,12 +178,12 @@ jobs:
     - name: Set release version if is a release
       if: startsWith(github.event.ref, 'refs/tags/v')
       run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      shell: bash
+      shell: msys2 {0}
 
     - name: Set release version if not a release
       if: false == startsWith(github.event.ref, 'refs/tags/v')
       run: echo "RELEASE_VERSION=test" >> $GITHUB_ENV
-      shell: bash
+      shell: msys2 {0}
 
     - name: Test and build command line tarball
       env:
@@ -225,7 +225,7 @@ jobs:
         pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller_windows.spec
         cd pyinstaller_build
         tar cvfz ../../${OUTPUT_TARBALL} mykrobe_atlas/
-      shell: bash
+      shell: msys2 {0}
 
     - name: Release
       if: startsWith(github.event.ref, 'refs/tags/v')
