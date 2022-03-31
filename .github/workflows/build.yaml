@@ -182,13 +182,13 @@ jobs:
         pip3 install wheel
         echo "pip3 install cython requests tox"
         pip3 install cython requests tox
-        python3 -m pip install -U wslwinreg
-        echo "git clone https://github.com/mhammond/pywin32"
-        git clone https://github.com/mhammond/pywin32
-        cd pywin32
-        echo "install pywin32"
-        python3 setup.py install
-        cd ..
+        #pip3 install -U wslwinreg
+        #echo "git clone https://github.com/mhammond/pywin32"
+        #git clone https://github.com/mhammond/pywin32
+        #cd pywin32
+        #echo "install pywin32"
+        #python3 setup.py install
+        #cd ..
         echo "pip3 install pyinstaller"
         pip3 install pyinstaller
         echo "which pyinstaller"
