@@ -166,6 +166,7 @@ jobs:
     name: Build Windows command line
     runs-on: windows-2019
     steps:
+    - uses: msys2/setup-msys2@v2
 
     - name: Install dependencies
       run: |
