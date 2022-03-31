@@ -182,8 +182,8 @@ jobs:
         pip3 install wheel
         echo "pip3 install cython requests tox"
         pip3 install cython requests tox
-        echo "pip3 install pypiwin32"
-        pip3 install pypiwin32
+        echo "pip3 install piwin32"
+        pip3 install piwin32
         echo "pip3 install pyinstaller"
         pip3 install pyinstaller
         echo "which pyinstaller"
