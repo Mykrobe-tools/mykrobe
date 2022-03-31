@@ -1,6 +1,6 @@
 anytree
 Biopython
-cyvcf2
+pyvcf
 requests
 mongoengine
 cython
