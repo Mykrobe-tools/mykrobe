@@ -180,8 +180,8 @@ jobs:
         pip3 uninstall -y pyinstaller
         echo "pip3 install wheel"
         pip3 install wheel
-        echo "pip3 install cython requests tox numpy==1.15"
-        pip3 install cython requests tox numpy==1.15
+        echo "pip3 install cython requests tox"
+        pip3 install cython requests tox
         echo "pip3 install pypiwin32"
         pip3 install pypiwin32
         echo "pip3 install pyinstaller"
