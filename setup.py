@@ -127,7 +127,7 @@ setup(
     install_requires=[
         "anytree",
         "Biopython",
-        "cyvcf2",
+        "PyVCF3",
         "mongoengine",
         "requests",
         "numpy",
