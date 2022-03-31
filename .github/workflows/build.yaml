@@ -189,6 +189,9 @@ jobs:
       env:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
+        echo "which cc"
+        which cc
+        echo "clone mccortex"
         rm -rf mccortex
         git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
         cd mccortex/libs/htslib
@@ -200,6 +203,7 @@ jobs:
         cd ../../../
         python3 ./ci/windows_file_fixes.py
         cd mccortex
+        echo "make mccortex"
         make all
         make tests
         cd ..
