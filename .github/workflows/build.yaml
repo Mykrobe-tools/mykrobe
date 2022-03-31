@@ -175,7 +175,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip3 install cython requests wheel tox pyinstaller pefile
+        pip3 install cython requests wheel tox pyinstaller pefile pypiwin32
       shell: msys2 {0}
 
     - name: Check out code for the build
@@ -223,7 +223,6 @@ jobs:
         pip3 cache dir
         echo "pip3 cache purge"
         pip3 cache purge
-        pip3 install cython requests wheel tox pyinstaller
         rm -rf .tox
         echo "tox"
         tox
