@@ -180,8 +180,9 @@ jobs:
         pip3 uninstall -y pyinstaller
         echo "pip3 install wheel"
         pip3 install wheel
-        echo "pip3 install cython requests tox wslwinreg"
-        pip3 install cython requests tox wslwinreg
+        echo "pip3 install cython requests tox"
+        pip3 install cython requests tox
+        python3 -m pip install -U wslwinreg
         echo "git clone https://github.com/mhammond/pywin32"
         git clone https://github.com/mhammond/pywin32
         cd pywin32
