@@ -213,10 +213,10 @@ jobs:
         make all
         make tests
         cd ..
-        echo "mongod start"
-        mkdir $HOME/mongodb_data
-        mongod --dbpath=$HOME/mongodb_data &
-        sleep 3s
+        #echo "mongod start"
+        #mkdir $HOME/mongodb_data
+        #mongod --dbpath=$HOME/mongodb_data &
+        #sleep 3s
         echo "which pip3"
         which pip3
         echo "pip3 cache dir"
