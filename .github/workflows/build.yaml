@@ -215,8 +215,8 @@ jobs:
         echo "make tests mccortex"
         make tests
         cd ..
-        # echo "tox"
-        # /usr/bin/python3 -m tox
+        echo "tox"
+        /usr/bin/python3 -m tox
         echo "pip3 install requirements"
         /usr/bin/python3 -m pip install -r requirements.txt
         echo "pip3 install ."
