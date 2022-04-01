@@ -176,8 +176,8 @@ jobs:
     - name: Install dependencies
       run: |
         pip3 install wheel
-        echo "pip3 install cython requests tox pefile pywin32-ctypes pyinstaller"
-        pip3 install cython requests tox pefile pywin32-ctypes pyinstaller
+        echo "pip3 install cython requests tox pefile pyinstaller==4.9"
+        pip3 install cython requests tox pefile pyinstaller==4.9
 
       shell: msys2 {0}
 
