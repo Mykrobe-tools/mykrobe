@@ -170,7 +170,7 @@ jobs:
       with:
         update: true
         install: >-
-          python python-pip
+          mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip
 
 
     - name: Install dependencies
