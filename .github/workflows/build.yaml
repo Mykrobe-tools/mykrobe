@@ -170,7 +170,7 @@ jobs:
       with:
         update: true
         install: >-
-          autotools git gcc python python-pip python-devel zlib-devel libcurl-devel bzip2 liblzma zip libbz2-devel xz zlib zlib-devel libtool wget liblzma-devel ncurses-devel base-devel openssl-devel mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip mingw64/mingw-w64-x86_64-python-devel
+          autotools git gcc python python-pip python-devel zlib-devel libcurl-devel bzip2 liblzma zip libbz2-devel xz zlib zlib-devel libtool wget liblzma-devel ncurses-devel base-devel openssl-devel mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip mingw-w64-x86_64-python-numpy
 
 
     - name: Install dependencies
