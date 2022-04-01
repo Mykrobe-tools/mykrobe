@@ -175,6 +175,8 @@ jobs:
 
     - name: Install dependencies
       run: |
+        ls C:\\msys64\\mingw64\\bin\\
+        exit 1
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install pefile pywin32-ctypes pyinstaller 
         pip3 install cython requests tox 
