@@ -230,7 +230,7 @@ jobs:
         #python -m pip install pyinstaller
         #python -m pip install -r requirements.txt
         echo "pip3 install requirements"
-        pip3 -m pip install -r requirements.txt
+        pip3 install -r requirements.txt
         echo "pip3 install ."
         pip3 install .
         echo "update panels"
