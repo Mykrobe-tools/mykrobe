@@ -175,6 +175,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        cat /usr/lib/python3.9/ctypes/__init__.py
         pip3 -v install cython pywin32-ctypes
         python3 -c "from win32ctypes.pywin32 import pywintypes; from win32ctypes.pywin32 import win32api"
         #pip3 install wheel
