@@ -176,7 +176,7 @@ jobs:
     - name: Install dependencies
       run: |
         echo "ls C:\\msys64\\usr\\bin\"
-        ls C:\\msys64\\usr\\bin\
+        ls C:\\msys64\\usr\\bin
         echo "ls C:\\msys64"
         ls C:\\msys64
         python3 -c "import os; print(os.name)"
