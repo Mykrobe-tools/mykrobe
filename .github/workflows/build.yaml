@@ -170,12 +170,11 @@ jobs:
       with:
         update: true
         install: >-
-          autotools git gcc python python-pip python-devel zlib-devel libcurl-devel bzip2 liblzma zip libbz2-devel xz zlib zlib-devel libtool wget liblzma-devel ncurses-devel base-devel openssl-devel mingw-w64-x86_64-python-pywin32
+          python python-pip
 
 
     - name: Install dependencies
       run: |
-        ls C:\\msys2
         pip -v install pywin32-ctypes
         pywin32_postinstall.py -install
         python -c "from win32ctypes.pywin32 import pywintypes; from win32ctypes.pywin32 import win32api"
