@@ -170,12 +170,15 @@ jobs:
       with:
         update: true
         install: >-
-          autotools
+          python python-pip python-devel mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip mingw-w64-x86_64-python-numpy
 
 
     - name: Install dependencies
       run: |
+        echo "bin"
         ls /usr/bin
+        echo "mingw bin"
+        ls C:\\msys64\\mingw64\\bin
         exit 1
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install pefile pywin32-ctypes pyinstaller 
