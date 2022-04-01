@@ -191,8 +191,8 @@ jobs:
         pip3 install pyinstaller
         echo "which pyinstaller"
         which pyinstaller
-        echo "find pywin32.pth in /usr/lib/python3.9"
-        find /usr/lib/python3.9 -name pywin32.pth
+        echo "find pywin32 in /usr/lib/python3.9"
+        find /usr/lib/python3.9 -name *pywin32*
         echo "ls -lh /usr/lib/python3.9/site-packages/"
         ls -lh /usr/lib/python3.9/site-packages/
         echo "cat /usr/lib/python3.9/site-packages/pywin32.pth"
