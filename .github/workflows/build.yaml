@@ -175,6 +175,9 @@ jobs:
 
     - name: Install dependencies
       run: |
+        python3 -c "import sys; print(sys.platform)"
+        python -c "import sys; print(sys.platform)"
+        python --version
         pip3 install wheel
         echo "pip3 install cython requests tox pefile pyinstaller==4.9"
         pip3 install cython requests tox pefile pyinstaller==4.9
