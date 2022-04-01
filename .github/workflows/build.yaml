@@ -175,6 +175,10 @@ jobs:
 
     - name: Install dependencies
       run: |
+        echo "ls C:\\msys64\\usr\\bin\"
+        ls C:\\msys64\\usr\\bin\
+        echo "ls C:\\msys64"
+        ls C:\\msys64
         python3 -c "import os; print(os.name)"
         cat /usr/lib/python3.9/ctypes/__init__.py
         pip3 -v install cython pywin32-ctypes
