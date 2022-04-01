@@ -178,8 +178,8 @@ jobs:
         pip3 install wheel
         echo "pip3 install cython requests tox pefile pyinstaller"
         echo $PATH
-        which pyinstaller
         pip3 install cython requests tox pefile pyinstaller pywin32-ctypes
+        which pyinstaller
         python3 -c "from win32ctypes.pywin32 import pywintypes; from win32ctypes.pywin32 import win32api"
         exit 1
 
