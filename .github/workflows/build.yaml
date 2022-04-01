@@ -175,18 +175,22 @@ jobs:
 
     - name: Install dependencies
       run: |
+        echo "which pip"
+        which pip
+        echo "which pip3"
+        which pip3
         pip3 install wheel
         echo "pip3 install cython requests tox pefile"
         pip3 install cython requests tox pefile
         #pip3 install -U wslwinreg
         echo "git clone https://github.com/mhammond/pywin32"
         git clone https://github.com/mhammond/pywin32
+        cd pywin32
+        echo "install pywin32"
+        pip3 install .
+        cd ..
         echo "python3 pywin32/pywin32_postinstall.py -install"
         python3 pywin32/pywin32_postinstall.py -install
-        #cd pywin32
-        #echo "install pywin32"
-        #python3 setup.py install
-        #cd ..
         echo "pip3 install pyinstaller"
         pip3 install pyinstaller
         echo "which pyinstaller"
