@@ -175,8 +175,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        find C:\\msys64\\mingw64 -name *pip*
         C:\\msys64\\mingw64\\bin\\python3.exe -c "import os; print(os.name)"
+        C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install cython pywin32-ctypes
         C:\\msys64\\mingw64\\bin\\python3.exe -c "from win32ctypes.pywin32 import pywintypes; from win32ctypes.pywin32 import win32api"
         #pip3 install wheel
