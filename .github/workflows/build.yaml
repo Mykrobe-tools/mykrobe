@@ -177,7 +177,8 @@ jobs:
       run: |
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install cython requests tox pefile pywin32-ctypes pyinstaller 
-        which pyinstaller
+        C:\\msys64\\mingw64\\bin\\pyinstaller -h
+        find C:\\msys64\\mingw64 -name *pyinstaller*
         exit 1
         
 
