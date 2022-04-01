@@ -176,7 +176,8 @@ jobs:
       run: |
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install pefile pywin32-ctypes pyinstaller 
-        /usr/bin/python3 -m pip install cython requests tox 
+        /usr/bin/python3 -m pip install wheel
+        /usr/bin/python3 -m pip install cython requests tox
 
       shell: msys2 {0}
 
