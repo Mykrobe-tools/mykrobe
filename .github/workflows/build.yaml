@@ -191,6 +191,11 @@ jobs:
         pip3 install pyinstaller
         echo "which pyinstaller"
         which pyinstaller
+        echo "ls -lh /usr/lib/python3.9/site-packages/"
+        ls -lh /usr/lib/python3.9/site-packages/
+        echo "cat /usr/lib/python3.9/site-packages/pywin32.pth"
+        cat /usr/lib/python3.9/site-packages/pywin32.pth
+
       shell: msys2 {0}
 
     - name: Check out code for the build
