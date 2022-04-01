@@ -198,11 +198,6 @@ jobs:
       env:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
-        echo "pip3 install requirements"
-        /usr/bin/python3 -m pip install -r requirements.txt
-        echo "Works!"
-        exit 1
-
         echo "clone mccortex"
         rm -rf mccortex
         git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
@@ -213,31 +208,19 @@ jobs:
         cd ../samtools
         git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c
         cd ../../../
-        C:\\msys64\\mingw64\\bin\\python3.exe ./ci/windows_file_fixes.py
+        /usr/bin/python3 ./ci/windows_file_fixes.py
         cd mccortex
         echo "make mccortex"
         make all
         echo "make tests mccortex"
         make tests
         cd ..
-        #echo "which pip3"
-        #which pip3
-        #echo "pip3 cache dir"
-        #pip3 cache dir
-        #echo "pip3 cache purge"
-        #pip3 cache purge
-        #rm -rf .tox
         echo "tox"
-        python3 -m tox
-        #echo "python install eunsurepip etc"
-        #python -m ensurepip
-        #python -m pip install pypiwin32 numpy==1.15
-        #python -m pip install pyinstaller
-        #python -m pip install -r requirements.txt
+        /usr/bin/python3 -m tox
         echo "pip3 install requirements"
-        pip3 install -r requirements.txt
+        /usr/bin/python3 -m pip install -r requirements.txt
         echo "pip3 install ."
-        pip3 install .
+        /usr/bin/python3 -m pip install .
         echo "update panels"
         mykrobe panels update_metadata --panels_dir src/mykrobe/data
         mykrobe panels update_species --panels_dir src/mykrobe/data --debug all
