@@ -179,7 +179,7 @@ jobs:
         exit 1
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install pefile pywin32-ctypes pyinstaller 
-        pip3 install cython requests tox 
+        python3 -m pip install cython requests tox 
 
       shell: msys2 {0}
 
@@ -201,7 +201,7 @@ jobs:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
         echo "pip3 install requirements"
-        pip3 install -r requirements.txt
+        python3 -m pip install -r requirements.txt
         echo "Works!"
         exit 1
 
