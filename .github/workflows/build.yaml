@@ -175,15 +175,13 @@ jobs:
 
     - name: Install dependencies
       run: |
+        pip3 install wheel
+        echo "pip3 install cython requests tox pefile pyinstaller"
+        pip3 install cython requests tox pefile pyinstaller
         python3 -c "from win32ctypes.pywin32 import pywintypes; from win32ctypes.pywin32 import win32api"
         echo $PATH
         which pyinstaller
         exit 1
-        echo "ls -lh /usr/bin/"
-        ls -lh /usr/bin/
-        pip3 install wheel
-        echo "pip3 install cython requests tox pefile pyinstaller==4.9"
-        pip3 install cython requests tox pefile pyinstaller==4.9
 
       shell: msys2 {0}
 
