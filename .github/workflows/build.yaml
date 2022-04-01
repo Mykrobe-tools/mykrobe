@@ -170,22 +170,17 @@ jobs:
       with:
         update: true
         install: >-
-          mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip
+          autotools git gcc zlib-devel libcurl-devel bzip2 liblzma zip libbz2-devel xz zlib zlib-devel libtool wget liblzma-devel ncurses-devel mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip
 
 
     - name: Install dependencies
       run: |
-        C:\\msys64\\mingw64\\bin\\python3.exe -c "import os; print(os.name)"
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
-        C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install cython pywin32-ctypes
-        C:\\msys64\\mingw64\\bin\\python3.exe -c "from win32ctypes.pywin32 import pywintypes; from win32ctypes.pywin32 import win32api; print('worked!')"
-        #pip3 install wheel
-        #echo "pip3 install cython requests tox pefile pyinstaller"
-        #echo $PATH
-        #pip3 install cython requests tox pefile pyinstaller pywin32-ctypes
-        #which pyinstaller
-        
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install cython requests tox pefile pywin32-ctypes pyinstaller 
+        which pyinstaller
         exit 1
+        
+
 
       shell: msys2 {0}
 
@@ -216,7 +211,7 @@ jobs:
         cd ../samtools
         git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c
         cd ../../../
-        python3 ./ci/windows_file_fixes.py
+        C:\\msys64\\mingw64\\bin\\python3.exe ./ci/windows_file_fixes.py
         cd mccortex
         echo "make mccortex"
         make all
@@ -238,9 +233,9 @@ jobs:
         #python -m pip install pyinstaller
         #python -m pip install -r requirements.txt
         echo "pip3 install requirements"
-        pip3 install -r requirements.txt
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip install -r requirements.txt
         echo "pip3 install ."
-        pip3 install .
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip install .
         echo "update panels"
         mykrobe panels update_metadata --panels_dir src/mykrobe/data
         mykrobe panels update_species --panels_dir src/mykrobe/data --debug all
