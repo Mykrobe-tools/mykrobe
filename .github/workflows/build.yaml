@@ -177,11 +177,6 @@ jobs:
       run: |
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install cython requests tox pefile pywin32-ctypes pyinstaller 
-        C:\\msys64\\mingw64\\bin\\pyinstaller -h
-        find C:\\msys64\\mingw64 -name *pyinstaller*
-        exit 1
-        
-
 
       shell: msys2 {0}
 
@@ -202,6 +197,10 @@ jobs:
       env:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
+        cat <(echo "print('Hello world')") >test.py
+        C:\\msys64\\mingw64\\bin\\pyinstaller test.py
+        echo "worked!"
+        exit 0
         echo "clone mccortex"
         rm -rf mccortex
         git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
