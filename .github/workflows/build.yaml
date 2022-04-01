@@ -175,8 +175,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip -v install cython pywin32-ctypes
-        python -c "from win32ctypes.pywin32 import pywintypes; from win32ctypes.pywin32 import win32api"
+        pip3 -v install cython pywin32-ctypes
+        python3 -c "from win32ctypes.pywin32 import pywintypes; from win32ctypes.pywin32 import win32api"
         #pip3 install wheel
         #echo "pip3 install cython requests tox pefile pyinstaller"
         #echo $PATH
