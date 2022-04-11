@@ -1,5 +1,6 @@
 FROM ubuntu:20.04
 
+ENV DEBIAN_FRONTEND=noninteractive
 ARG PKGS=" \
   build-essential \
   ca-certificates \
@@ -11,6 +12,7 @@ ARG PKGS=" \
   liblzma-dev \
   python-is-python3 \
   python3-pip \
+  tzdata \
   wget \
   zlib1g-dev \
 "
@@ -20,7 +22,6 @@ RUN apt update \
     && update-ca-certificates -f \
 
 # install mongodb - https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
-ENV DEBIAN_FRONTEND=noninteractive
 
 RUN wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | apt-key add -
 RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-5.0.list
