@@ -151,9 +151,9 @@ jobs:
     - name: Install dependencies
       run: |
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
-        C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install pefile pywin32-ctypes pyinstaller
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install "pefile>=2021.9.3" "pywin32-ctypes>=0.2.0" "pyinstaller>=4.10"
         /usr/bin/python3 -m pip install wheel
-        /usr/bin/python3 -m pip install cython requests tox
+        /usr/bin/python3 -m pip install "cython>=0.29.28" requests tox
 
       shell: msys2 {0}
 
