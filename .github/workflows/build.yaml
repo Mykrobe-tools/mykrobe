@@ -88,6 +88,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: mykrobe*.img
+        draft: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -135,6 +136,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: mykrobe.command_line.osx.*.tar.gz
+        draft: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -215,6 +217,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: mykrobe.command_line.windows.*.tar.gz
+        draft: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
