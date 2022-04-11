@@ -19,7 +19,7 @@ ARG PKGS=" \
 
 RUN apt update \
     && apt-get install --no-install-recommends -y $PKGS \
-    && update-ca-certificates -f \
+    && update-ca-certificates -f
 
 # install mongodb - https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
 
