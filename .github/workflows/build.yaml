@@ -15,8 +15,8 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build_containers:
-    name: Build containers
+  linux_build:
+    name: Build linux and singularity image
     runs-on: ubuntu-20.04
     steps:
 
