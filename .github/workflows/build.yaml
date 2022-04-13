@@ -153,6 +153,14 @@ jobs:
     - name: Install dependencies
       run: |
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip install --upgrade pip setuptools wheel
+        C:\\msys64\\mingw64\\bin\\python3.exe -m venv venv
+        venv\\Scripts\\activate
+        which python
+        which python3
+        which python.exe
+        which python3.exe
+        exit 1
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install "pefile>=2021.9.3" "pywin32-ctypes>=0.2.0" "pyinstaller>=4.10"
         /usr/bin/python3 -m pip install wheel
         /usr/bin/python3 -m pip install "cython>=0.29.28" requests tox
