@@ -179,15 +179,15 @@ jobs:
         echo 1
         echo 1
         echo 1
-        ls C:\\msys64\\mingw64\\
+        ls C:\\msys64\\mingw64\\x86_64-w64-mingw32
         echo 2
         echo 2
         echo 2
-        ls C:\\msys64\\mingw64\\lib
+        ls C:\\msys64\\mingw64\\include
         echo 3
         echo 3
         echo 3
-        ls C:\\msys64\\mingw64\\lib\\python*
+        ls C:\\msys64\\mingw64\\bin
         exit 1
         echo "clone mccortex"
         rm -rf mccortex
