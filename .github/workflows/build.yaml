@@ -155,7 +155,7 @@ jobs:
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install --upgrade pip setuptools wheel
         C:\\msys64\\mingw64\\bin\\python3.exe -m venv venv
-        ls venv
+        venv\\bin\\activate
         which python
         which python3
         which python.exe
