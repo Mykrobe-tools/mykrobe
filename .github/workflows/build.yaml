@@ -163,6 +163,8 @@ jobs:
         /usr/bin/python3 -m pip install "cython>=0.29.28" requests tox
         echo "/usr/bin/python3 -m pip install pyinstaller"
         /usr/bin/python3 -m pip install pyinstaller
+        echo "which pyinstaller"
+        which pyinstaller
 
       shell: msys2 {0}
 
@@ -210,7 +212,10 @@ jobs:
         mykrobe panels update_metadata --panels_dir src/mykrobe/data
         mykrobe panels update_species --panels_dir src/mykrobe/data --debug all
         cd dist
-        C:\\msys64\\mingw64\\bin\\pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller_windows.spec
+        //C:\\msys64\\mingw64\\bin\\pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller_windows.spec
+        echo "which pyinstaller"
+        which pyinstaller
+        pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller_windows.spec
         cd pyinstaller_build
         tar cvfz ../../${OUTPUT_TARBALL} mykrobe_atlas/
         echo "python3.exe pip freeze"
