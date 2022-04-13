@@ -173,7 +173,14 @@ jobs:
         source venv\\bin\\activate
         which python
         python -m pip -v install "pefile>=2021.9.3" "pywin32-ctypes>=0.2.0" "pyinstaller>=4.10" "cython>=0.29.28" requests tox
-        
+
+        echo "tox"
+        python -m tox
+        echo "pip3 install requirements"
+        python -m pip install -r requirements.txt
+        echo "pip3 install ."
+        python -m pip install .
+
         echo "clone mccortex"
         rm -rf mccortex
         git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
@@ -191,12 +198,7 @@ jobs:
         echo "make tests mccortex"
         make tests
         cd ..
-        echo "tox"
-        python -m tox
-        echo "pip3 install requirements"
-        python -m pip install -r requirements.txt
-        echo "pip3 install ."
-        python -m pip install .
+        
         echo "update panels"
         mykrobe panels update_metadata --panels_dir src/mykrobe/data
         mykrobe panels update_species --panels_dir src/mykrobe/data --debug all
