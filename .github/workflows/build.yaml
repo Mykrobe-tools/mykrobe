@@ -157,8 +157,7 @@ jobs:
         C:\\msys64\\mingw64\\bin\\python3.exe -m venv venv
         cat venv\\bin\\activate
         ls venv\\bin
-        venv\\bin\\activate
-        which py
+        source venv\\bin\\activate
         which python
         which python3
         which python.exe
