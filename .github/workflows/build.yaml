@@ -150,16 +150,6 @@ jobs:
         install: >-
           autotools git gcc python python-pip python-devel zlib-devel libcurl-devel bzip2 liblzma zip libbz2-devel xz zlib zlib-devel libtool wget liblzma-devel ncurses-devel base-devel openssl-devel mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip mingw-w64-x86_64-python-numpy
 
-    - name: Install dependencies
-      run: |
-        C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
-        C:\\msys64\\mingw64\\bin\\python3.exe -m pip install --upgrade pip setuptools wheel
-        C:\\msys64\\mingw64\\bin\\python3.exe -m venv venv
-        source venv\\bin\\activate
-        python -m pip -v install "pefile>=2021.9.3" "pywin32-ctypes>=0.2.0" "pyinstaller>=4.10" "cython>=0.29.28" requests tox
-
-      shell: msys2 {0}
-
     - name: Check out code for the build
       uses: actions/checkout@v2
 
@@ -177,9 +167,13 @@ jobs:
       env:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
+        C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip install --upgrade pip setuptools wheel
+        C:\\msys64\\mingw64\\bin\\python3.exe -m venv venv
         source venv\\bin\\activate
         which python
-        exit 1
+        python -m pip -v install "pefile>=2021.9.3" "pywin32-ctypes>=0.2.0" "pyinstaller>=4.10" "cython>=0.29.28" requests tox
+        
         echo "clone mccortex"
         rm -rf mccortex
         git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
