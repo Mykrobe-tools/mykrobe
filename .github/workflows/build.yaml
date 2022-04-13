@@ -161,6 +161,8 @@ jobs:
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install tox requests
         /usr/bin/python3 -m pip install wheel
         /usr/bin/python3 -m pip install "cython>=0.29.28" requests tox
+        echo "/usr/bin/python3 -m pip install pyinstaller"
+        /usr/bin/python3 -m pip install pyinstaller
 
       shell: msys2 {0}
 
