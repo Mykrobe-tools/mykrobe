@@ -155,17 +155,8 @@ jobs:
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install --upgrade pip setuptools wheel
         C:\\msys64\\mingw64\\bin\\python3.exe -m venv venv
-        cat venv\\bin\\activate
-        ls venv\\bin
         source venv\\bin\\activate
-        which python
-        which python3
-        which python.exe
-        which python3.exe
-        exit 1
-        C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install "pefile>=2021.9.3" "pywin32-ctypes>=0.2.0" "pyinstaller>=4.10"
-        /usr/bin/python3 -m pip install wheel
-        /usr/bin/python3 -m pip install "cython>=0.29.28" requests tox
+        python -m pip -v install "pefile>=2021.9.3" "pywin32-ctypes>=0.2.0" "pyinstaller>=4.10" "cython>=0.29.28" requests tox
 
       shell: msys2 {0}
 
@@ -186,18 +177,8 @@ jobs:
       env:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
-        echo 1
-        echo 1
-        echo 1
-        ls C:\\msys64\\mingw64\\x86_64-w64-mingw32
-        echo 2
-        echo 2
-        echo 2
-        ls C:\\msys64\\mingw64\\include
-        echo 3
-        echo 3
-        echo 3
-        ls C:\\msys64\\mingw64\\bin
+        source venv\\bin\\activate
+        which python
         exit 1
         echo "clone mccortex"
         rm -rf mccortex
@@ -209,7 +190,7 @@ jobs:
         cd ../samtools
         git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c
         cd ../../../
-        /usr/bin/python3 ./ci/windows_file_fixes.py
+        python ./ci/windows_file_fixes.py
         cd mccortex
         echo "make mccortex"
         make all
@@ -217,22 +198,18 @@ jobs:
         make tests
         cd ..
         echo "tox"
-        /usr/bin/python3 -m tox
+        python -m tox
         echo "pip3 install requirements"
-        /usr/bin/python3 -m pip install -r requirements.txt
+        python -m pip install -r requirements.txt
         echo "pip3 install ."
-        /usr/bin/python3 -m pip install .
+        python -m pip install .
         echo "update panels"
         mykrobe panels update_metadata --panels_dir src/mykrobe/data
         mykrobe panels update_species --panels_dir src/mykrobe/data --debug all
         cd dist
-        C:\\msys64\\mingw64\\bin\\pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller_windows.spec --paths 
+        python -m pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller_windows.spec --paths 
         cd pyinstaller_build
         tar cvfz ../../${OUTPUT_TARBALL} mykrobe_atlas/
-        echo "python3.exe pip freeze"
-        C:\\msys64\\mingw64\\bin\\python3.exe -m pip freeze
-        echo "/usr/bin/python3 -m pip freeze"
-        /usr/bin/python3 -m pip freeze
       shell: msys2 {0}
 
     - name: Release
