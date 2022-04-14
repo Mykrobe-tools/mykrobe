@@ -173,6 +173,9 @@ jobs:
         which python
         python -m pip -v install "pefile>=2021.9.3" "pywin32-ctypes>=0.2.0" "pyinstaller>=4.10" "cython>=0.29.28" requests tox
 
+        python -m pip uninstall setuptools
+        pacman -S mingw-w64-x86_64-python-setuptools
+
         echo "tox"
         python -m tox
         echo "pip3 install requirements"
