@@ -15,8 +15,8 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build_containers:
-    name: Build containers
+  linux_build:
+    name: Build linux and singularity image
     runs-on: ubuntu-20.04
     steps:
 
@@ -148,7 +148,25 @@ jobs:
       with:
         update: true
         install: >-
-          autotools git gcc python python-pip python-devel zlib-devel libcurl-devel bzip2 liblzma zip libbz2-devel xz zlib zlib-devel libtool wget liblzma-devel ncurses-devel base-devel openssl-devel mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip mingw-w64-x86_64-python-numpy mingw-w64-x86_64-python-setuptools
+          autotools git gcc python python-pip python-devel python-setuptools zlib-devel libcurl-devel bzip2 liblzma zip libbz2-devel xz zlib zlib-devel libtool wget liblzma-devel ncurses-devel base-devel openssl-devel mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip mingw-w64-x86_64-python-numpy mingw-w64-x86_64-python-setuptools
+
+    - name: Install dependencies
+      run: |
+        C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install six
+        #C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install --upgrade setuptools
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install "pefile>=2021.9.3" "pywin32-ctypes>=0.2.0"
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install "pyinstaller>=4.10"
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install wheel
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install tox requests
+        /usr/bin/python3 -m pip install wheel
+        /usr/bin/python3 -m pip install "cython>=0.29.28" requests tox "pefile>=2021.9.3" "pywin32-ctypes>=0.2.0"
+        echo "/usr/bin/python3 -m pip install pyinstaller"
+        /usr/bin/python3 -m pip install pyinstaller
+        echo "which pyinstaller"
+        which pyinstaller
+
+      shell: msys2 {0}
 
     - name: Check out code for the build
       uses: actions/checkout@v2
@@ -167,22 +185,6 @@ jobs:
       env:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
-        C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
-        C:\\msys64\\mingw64\\bin\\python3.exe -m venv venv
-        source venv\\bin\\activate
-        which python
-        python -m pip -v install "pefile>=2021.9.3" "pywin32-ctypes>=0.2.0" "pyinstaller>=4.10" "cython>=0.29.28" requests tox
-
-        python -m pip uninstall setuptools
-        pacman -S mingw-w64-x86_64-python-setuptools
-
-        echo "tox"
-        python -m tox
-        echo "pip3 install requirements"
-        python -m pip install -r requirements.txt
-        echo "pip3 install ."
-        python -m pip install .
-
         echo "clone mccortex"
         rm -rf mccortex
         git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
@@ -193,21 +195,33 @@ jobs:
         cd ../samtools
         git checkout 2d4907cf9a34ccf7cde60143158b39e1cb40ac0c
         cd ../../../
-        python ./ci/windows_file_fixes.py
+        /usr/bin/python3 ./ci/windows_file_fixes.py
         cd mccortex
         echo "make mccortex"
         make all
         echo "make tests mccortex"
         make tests
         cd ..
-        
+        echo "tox"
+        /usr/bin/python3 -m tox
+        echo "pip3 install requirements"
+        /usr/bin/python3 -m pip install -r requirements.txt
+        echo "pip3 install ."
+        /usr/bin/python3 -m pip install .
         echo "update panels"
         mykrobe panels update_metadata --panels_dir src/mykrobe/data
         mykrobe panels update_species --panels_dir src/mykrobe/data --debug all
         cd dist
-        python -m pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller_windows.spec --paths 
+        #C:\\msys64\\mingw64\\bin\\pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller_windows.spec
+        echo "which pyinstaller"
+        which pyinstaller
+        pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller_windows.spec
         cd pyinstaller_build
         tar cvfz ../../${OUTPUT_TARBALL} mykrobe_atlas/
+        echo "python3.exe pip freeze"
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip freeze
+        echo "/usr/bin/python3 -m pip freeze"
+        /usr/bin/python3 -m pip freeze
       shell: msys2 {0}
 
     - name: Release
@@ -218,3 +232,4 @@ jobs:
         draft: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
