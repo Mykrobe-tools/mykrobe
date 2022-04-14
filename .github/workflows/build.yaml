@@ -152,6 +152,11 @@ jobs:
 
     - name: Install dependencies
       run: |
+        echo "which docker"
+        docker --help
+        docker pull ghcr.io/white-gecko/docker-pyinstaller:feature-buildWithGA-py3-win64
+        docker run 82c0952068e2
+        exit
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install six
         #C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install --upgrade setuptools
