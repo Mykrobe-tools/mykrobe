@@ -169,8 +169,7 @@ jobs:
       run: |
         export PYTHONPATH="/mingw64/lib/python3.9/:/mingw64/lib/python3.9/site-packages:${PYTHONPATH}"
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install pyinstaller
-        C:\\msys64/mingw64/bin/pyinstaller.exe -h
-        exit 1
+        
         echo "clone mccortex"
         rm -rf mccortex
         git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
