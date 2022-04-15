@@ -183,6 +183,11 @@ jobs:
         cd mccortex
         echo "make mccortex"
         make all
+        echo "pwd"
+        pwd
+        ls
+        ls bin
+        exit 1
         echo "make tests mccortex"
         make tests
         cd ..
