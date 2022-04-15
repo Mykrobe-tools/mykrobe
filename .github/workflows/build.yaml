@@ -198,6 +198,8 @@ jobs:
         C:\\msys64/mingw64/bin/mykrobe.exe panels update_metadata --panels_dir src/mykrobe/data
         C:\\msys64/mingw64/bin/mykrobe.exe panels update_species --panels_dir src/mykrobe/data --debug all
         cd dist
+        find C:\\msys64 -name pyinstaller.exe
+        find C:\\msys64 -name pyinstaller
         C:\\msys64\\mingw64\\bin\\python3.exe -m pyinstaller --workpath='./pyinstaller_build/binary_cache' --distpath='./pyinstaller_build' mykrobe_atlas_pyinstaller_windows.spec
         cd pyinstaller_build
         tar cvfz ../../${OUTPUT_TARBALL} mykrobe_atlas/
