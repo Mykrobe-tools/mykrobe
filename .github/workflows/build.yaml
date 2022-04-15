@@ -168,6 +168,7 @@ jobs:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
         echo "y" | pacman -S mingw-w64-x86_64-python3-numpy
+        pacman -Ql mingw-w64-x86_64-python3-numpy
         echo "finding numpy"
         find C:/msys64/ -name numpy
         exit 1
