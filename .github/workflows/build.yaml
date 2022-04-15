@@ -189,6 +189,7 @@ jobs:
 
         # echo "tox" 
         # C:\\msys64\\mingw64\\bin\\python3.exe -m tox
+        echo "y" | pacman -S mingw-w64-x86_64-gcc
         echo "pip3 install requirements"
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install -r requirements.txt
         echo "pip3 install ."
