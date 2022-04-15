@@ -169,7 +169,8 @@ jobs:
       run: |
         export PYTHONPATH="/mingw64/lib/python3.9/:/mingw64/lib/python3.9/site-packages:${PYTHONPATH}"
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install pyinstaller
-        pyinstaller.exe -h
+        find C:\\msys64 -name "*pyinstaller*"
+        find /mingw64 -name "*pyinstaller*"
         exit 1
         echo "clone mccortex"
         rm -rf mccortex
