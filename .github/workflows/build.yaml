@@ -192,11 +192,9 @@ jobs:
         #C:\\msys64\\mingw64\\bin\\python3.exe -m tox
         echo "pip3 install requirements"
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install -r requirements.txt
-        export PYTHONPATH=".src:${PYTHONPATH}"
-        C:\\msys64\\mingw64\\bin\\python3.exe -m pytest
-        exit 1
         echo "pip3 install ."
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install .
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pytest
         echo "update panels"
         C:\\msys64/mingw64/bin/mykrobe.exe panels update_metadata --panels_dir src/mykrobe/data
         C:\\msys64/mingw64/bin/mykrobe.exe panels update_species --panels_dir src/mykrobe/data --debug all
