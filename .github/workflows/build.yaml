@@ -194,6 +194,9 @@ jobs:
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install -r requirements.txt
         echo "pip3 install ."
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install .
+        find / -name "mykrobe.exe"
+        find / -name "mykrobe"
+        exit 1
         echo "update panels"
         C:\\msys64\\mingw64\\bin\\python3.exe -m mykrobe panels update_metadata --panels_dir src/mykrobe/data
         C:\\msys64\\mingw64\\bin\\python3.exe -m mykrobe panels update_species --panels_dir src/mykrobe/data --debug all
