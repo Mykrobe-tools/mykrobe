@@ -148,7 +148,7 @@ jobs:
       with:
         update: true
         install: >-
-          autotools git gcc python python-pip python-devel zlib-devel libcurl-devel bzip2 liblzma zip libbz2-devel xz zlib zlib-devel libtool wget liblzma-devel ncurses-devel base-devel openssl-devel mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip mingw-w64-x86_64-python-numpy mingw-w64-x86_64-python-setuptools
+          autotools git libcurl-devel bzip2 liblzma zip libbz2-devel xz zlib zlib-devel libtool wget liblzma-devel ncurses-devel base-devel openssl-devel mingw-w64-x86_64-gcc mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip mingw-w64-x86_64-python-numpy mingw-w64-x86_64-python-setuptools
 
     - name: Check out code for the build
       uses: actions/checkout@v2
@@ -171,10 +171,10 @@ jobs:
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install "pefile>=2021.9.3" "pywin32-ctypes>=0.2.0" "pyinstaller>=4.10" "cython>=0.29.28" requests tox
         C:\\msys64\\mingw64\\bin\\python3.exe -c "import sys; print(sys.path)"
 
-        echo "uninstalling setuptools"
-        echo "y" | pip uninstall setuptools
-        echo "installing setuptools"
-        echo "y" | pacman -S mingw-w64-x86_64-python-setuptools
+        # echo "uninstalling setuptools"
+        # echo "y" | pip uninstall setuptools
+        # echo "installing setuptools"
+        # echo "y" | pacman -S mingw-w64-x86_64-python-setuptools
         # echo "tox" 
         # C:\\msys64\\mingw64\\bin\\python3.exe -m tox
         echo "pip3 install requirements"
