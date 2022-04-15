@@ -175,7 +175,7 @@ jobs:
         echo "y" | pip uninstall setuptools
         echo "installing setuptools"
         echo "y" | pacman -S mingw-w64-x86_64-python-setuptools
-        echo "tox"
+        echo "tox" 
         C:\\msys64\\mingw64\\bin\\python3.exe -m tox
         echo "pip3 install requirements"
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install -r requirements.txt
