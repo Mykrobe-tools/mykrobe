@@ -73,7 +73,7 @@ class MyInstall(DistutilsInstall):
                 cwd=dir_of_this_file,
             )
 
-        mccortex_build_binary = os.path.join(mccortex_git_dir, "bin", "mccortex31")
+        mccortex_build_binary = os.path.join(mccortex_git_dir, "bin", "mccortex31.exe")
         if not os.path.exists(mccortex_build_binary):
             subprocess.call(["make", "clean"], cwd=mccortex_git_dir)
             subprocess.call(["make"], cwd=mccortex_git_dir)
@@ -81,7 +81,7 @@ class MyInstall(DistutilsInstall):
         mccortex_install_dir = os.path.join(
             dir_of_this_file, "src", "mykrobe", "cortex"
         )
-        mccortex_install_binary = os.path.join(mccortex_install_dir, "mccortex31")
+        mccortex_install_binary = os.path.join(mccortex_install_dir, "mccortex31.exe")
         assert os.path.exists(mccortex_install_dir)
         shutil.copy(mccortex_build_binary, mccortex_install_binary)
 
