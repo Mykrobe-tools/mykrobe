@@ -168,7 +168,7 @@ jobs:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
         export PYTHONPATH="/mingw64/lib/python3.9/:/mingw64/lib/python3.9/site-packages:${PYTHONPATH}"
-        C:\\msys64\\mingw64\\bin\\python3.exe -m pip install pyinstaller
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip install pyinstaller tox
         
         echo "clone mccortex"
         rm -rf mccortex
@@ -188,9 +188,8 @@ jobs:
         make tests
         cd ..
 
-        # echo "tox" 
-        # C:\\msys64\\mingw64\\bin\\python3.exe -m tox
-        # echo "y" | pacman -S mingw-w64-x86_64-gcc
+        echo "tox" 
+        C:\\msys64\\mingw64\\bin\\python3.exe -m tox
         echo "pip3 install requirements"
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install -r requirements.txt
         echo "pip3 install ."
