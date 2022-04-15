@@ -172,7 +172,7 @@ jobs:
         C:\\msys64\\mingw64\\bin\\python3.exe -c "import sys; print(sys.path)"
 
         /usr/bin/yes | pip uninstall setuptools
-        pacman -S mingw-w64-x86_64-python-setuptools
+        /usr/bin/yes | pacman -S mingw-w64-x86_64-python-setuptools
         echo "tox"
         C:\\msys64\\mingw64\\bin\\python3.exe -m tox
         echo "pip3 install requirements"
