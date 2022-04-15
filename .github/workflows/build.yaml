@@ -168,6 +168,8 @@ jobs:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip freeze
+        exit 1
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip -v install "pefile>=2021.9.3" "pywin32-ctypes>=0.2.0" "pyinstaller>=4.10" "cython>=0.29.28" requests tox wheel
         C:\\msys64\\mingw64\\bin\\python3.exe -c "import sys; print(sys.path)"
 
