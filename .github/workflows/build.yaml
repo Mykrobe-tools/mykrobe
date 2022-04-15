@@ -168,7 +168,7 @@ jobs:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
         export PYTHONPATH="/mingw64/lib/python3.9/:/mingw64/lib/python3.9/site-packages:${PYTHONPATH}"
-        C:\\msys64\\mingw64\\bin\\python3.exe -m pip install pyinstaller tox
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip install pyinstaller tox requests
         
         echo "clone mccortex"
         rm -rf mccortex
