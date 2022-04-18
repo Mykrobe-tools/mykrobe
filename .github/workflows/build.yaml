@@ -167,9 +167,6 @@ jobs:
       env:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
-        C:\\msys64\\mingw64\\bin\\python3.exe -c "import os; import sys; print(os.name); print(sys.platform); print(os.uname())"
-        exit 1
-
         export PYTHONPATH="/mingw64/lib/python3.9/:/mingw64/lib/python3.9/site-packages:${PYTHONPATH}"
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install pyinstaller requests pytest
         
