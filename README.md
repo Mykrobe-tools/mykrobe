@@ -1,5 +1,3 @@
-[![Travis build Status](https://travis-ci.com/Mykrobe-tools/mykrobe.svg?branch=master)](https://travis-ci.com/Mykrobe-tools/mykrobe)
-
 # Mykrobe
 Antibiotic resistance prediction in minutes. 
 
