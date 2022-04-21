@@ -31,12 +31,13 @@ ARG PROJECT="mykrobe"
 COPY . "/${PROJECT}"
 
 # install mccortex
-#WORKDIR "/tmp"
-#
-#RUN git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex \
-#    && cd mccortex \
-#    && make MAXK=31 \
-#    && cp bin/mccortex31 /${PROJECT}/src/mykrobe/cortex/
+WORKDIR "/tmp"
+
+RUN git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex \
+    && cd mccortex \
+    && make MAXK=31 \
+    && cp bin/mccortex31 /${PROJECT}/src/mykrobe/cortex/ \
+    && rm -rf /tmp/mccortex
 
 # install mykrobe
 WORKDIR "/${PROJECT}"

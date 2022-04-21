@@ -119,4 +119,5 @@ test-probes.txt
 z.test.pncA_T2ATAC.txt
 
 .idea
+src/mykrobe/cortex/mccortex31
 .mongodb
