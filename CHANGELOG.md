@@ -7,6 +7,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## 0.11.0
+
 ### Added
 - Support for including stop codons in the panel with the `*` character.
 - Panel version is now included in JSON output [[#119][119]]
