@@ -22,7 +22,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Default kmer size (21) made consistent across all subcommands [[#141][141]]
 - Nanopore preset `--ont` defaults to an expected error rate of 0.08 and ploidy
   'haploid' [[#134][134]]
-- VCF interface from pyvcf to cyvcf2 [[#142][142]]
+- VCF interface from pyvcf to pyvcf3
 - Automated tests/builds all (ie linux, windows, mac) moved to github actions.
   Turned off travis and appveyor.
 
