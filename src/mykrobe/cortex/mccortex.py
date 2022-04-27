@@ -5,7 +5,7 @@ import subprocess
 import logging
 import tempfile
 
-from mykrobe import K
+from mykrobe import K, MCCORTEX_BINARY_ENV_VAR
 
 logger = logging.getLogger(__name__)
 
@@ -43,8 +43,8 @@ def syscall(command):
 
 class McCortexRunner(object):
     def __init__(self):
-        if "MYKROBE_MCCORTEX" in os.environ:
-            self.mccortex31_path = os.environ["MYKROBE_MCCORTEX"]
+        if MCCORTEX_BINARY_ENV_VAR in os.environ:
+            self.mccortex31_path = os.environ[MCCORTEX_BINARY_ENV_VAR]
         else:
             dir_of_this_file = os.path.dirname(os.path.abspath(__file__))
             self.mccortex31_path = os.path.join(dir_of_this_file, "mccortex31")
