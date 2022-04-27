@@ -4,18 +4,15 @@ logger = logging.getLogger(__name__)
 from mykrobe.species_data import DataDir
 
 def describe(parser, args):
-    args = parser.parse_args()
     ddir = DataDir(args.panels_dir)
     print(f"Gathering data from {ddir.root_dir}")
     ddir.print_panels_summary()
 
 def update_metadata(parser, args):
-    args = parser.parse_args()
     ddir = DataDir(args.panels_dir)
     ddir.update_manifest(filename=args.filename)
 
 def update_species(parser, args):
-    args = parser.parse_args()
     ddir = DataDir(args.panels_dir)
     logger.info(f"Loaded panels metdata from {ddir.root_dir}")
 

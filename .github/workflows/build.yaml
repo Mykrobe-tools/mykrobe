@@ -193,6 +193,7 @@ jobs:
         echo "pip install ."
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install .
         echo "pytest"
+        export MYKROBE_MCCORTEX="${PWD}/mccortex/bin/mccortex31"
         C:\\msys64\\mingw64\\bin\\python3.exe -m pytest
         echo "update panels"
         C:\\msys64/mingw64/bin/mykrobe.exe panels update_metadata --panels_dir src/mykrobe/data

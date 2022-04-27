@@ -98,8 +98,10 @@ class ConfThresholder:
             ) + 0.01  #  see KmerCountGenotypeModel.depth_to_expected_kmer_count()
 
             correct_percent_coverage = 100
-            incorrect_percent_coverage = ConfThresholder._get_incorrect_kmer_percent_cov(
-                int(incorrect_k_count), self.incorrect_kmer_to_pc_cov
+            incorrect_percent_coverage = (
+                ConfThresholder._get_incorrect_kmer_percent_cov(
+                    int(incorrect_k_count), self.incorrect_kmer_to_pc_cov
+                )
             )
             correct_probe_coverage = ProbeCoverage(
                 correct_percent_coverage,
@@ -250,7 +252,6 @@ def fix_X_amino_acid_variants(sample_json):
 def run(parser, args):
     logger.info(f"Start runnning mykrobe predict. Command line: {' '.join(sys.argv)}")
     base_json = {args.sample: {}}
-    args = parser.parse_args()
     ref_data = ref_data_from_args(args)
     if (
         args.species == "custom"
@@ -270,7 +271,9 @@ def run(parser, args):
 
     if args.ont:
         args.expected_error_rate = ONT_E_RATE
-        logger.info(f"Set expected error rate to {args.expected_error_rate} because --ont flag was used")
+        logger.info(
+            f"Set expected error rate to {args.expected_error_rate} because --ont flag was used"
+        )
         args.ploidy = ONT_PLOIDY
         logger.info(f"Set ploidy to {args.ploidy} because --ont flag used")
 
@@ -285,7 +288,7 @@ def run(parser, args):
         verbose=False,
         tmp_dir=args.tmp,
         skeleton_dir=args.skeleton_dir,
-        memory=args.memory
+        memory=args.memory,
     )
     cp.run()
     logger.debug("CoverageParser complete")
@@ -435,7 +438,7 @@ def run(parser, args):
         "version": {
             "mykrobe-predictor": predictor_version,
             "mykrobe-atlas": atlas_version,
-            "panel": ref_data["version"]
+            "panel": ref_data["version"],
         },
         "genotype_model": args.model,
     }

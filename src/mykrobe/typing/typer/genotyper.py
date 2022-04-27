@@ -130,9 +130,14 @@ class CoverageParser(object):
         with open(self.mc_cortex_runner.covg_tmp_file_path, "r") as infile:
             self.reader = csv.reader(infile, delimiter="\t")
             for row in self.reader:
-                allele, median_depth, min_depth, percent_coverage, k_count, klen = self._parse_summary_covgs_row(
-                    row
-                )
+                (
+                    allele,
+                    median_depth,
+                    min_depth,
+                    percent_coverage,
+                    k_count,
+                    klen,
+                ) = self._parse_summary_covgs_row(row)
                 allele_name = allele.split("?")[0]
                 if self._is_variant_panel(allele_name):
                     self._parse_variant_panel(row)
@@ -147,9 +152,14 @@ class CoverageParser(object):
             return False
 
     def _parse_seq_panel(self, row):
-        allele, median_depth, min_depth, percent_coverage, k_count, klen = self._parse_summary_covgs_row(
-            row
-        )
+        (
+            allele,
+            median_depth,
+            min_depth,
+            percent_coverage,
+            k_count,
+            klen,
+        ) = self._parse_summary_covgs_row(row)
         probe_coverage = ProbeCoverage(
             percent_coverage=percent_coverage,
             median_depth=median_depth,
@@ -204,9 +214,14 @@ class CoverageParser(object):
                     self.covgs[panel_type][name]["median"] = []
 
     def _parse_variant_panel(self, row):
-        probe, median_depth, min_depth, percent_coverage, k_count, klen = self._parse_summary_covgs_row(
-            row
-        )
+        (
+            probe,
+            median_depth,
+            min_depth,
+            percent_coverage,
+            k_count,
+            klen,
+        ) = self._parse_summary_covgs_row(row)
         params = get_params(probe)
         probe_type = probe.split("-")[0]
         if "var_name" in params:
@@ -323,22 +338,35 @@ class Genotyper(object):
             self.sequence_calls_dict[gene_name] = [
                 gpc.to_mongo().to_dict() for gpc in self.gene_presence_covgs[gene_name]
             ]
+            if gene_name in self.lineage_variants:
+                for call in self.sequence_calls_dict[gene_name]:
+                    self._update_lineage_calls_dict(call, var_name=gene_name)
+
         self.out_json[self.sample]["sequence_calls"] = self.sequence_calls_dict
 
-
-    def _update_lineage_calls_dict(self, probe_name, call):
+    def _update_lineage_calls_dict(self, call, probe_name=None, var_name=None):
         if self.lineage_variants is None:
             return
-        params = get_params(probe_name)
-        try:
-            var_name = params["var_name"]
+        if probe_name is not None:
+            # probe_name is expected be of the form eg:
+            # ref-K43R?var_name=AAG781686AGA&num_alts=1&ref=NC_000962.3&enum=0&gene=rpsL&mut=K43R
+            # and we want the var_name entry from that
+            params = get_params(probe_name)
+            try:
+                var_name = params["var_name"]
+                lineage = self.lineage_variants[var_name]
+            except KeyError:
+                return
+        elif var_name is not None:
+            # We've been provided the var_name part of a probe_name, so no need to extract
+            # from a full probe_name
             lineage = self.lineage_variants[var_name]
-        except KeyError:
-            return
+        else:
+            raise Exception("Must provide probe_name or var_name")
+
         if lineage["name"] not in self.lineage_calls_dict:
             self.lineage_calls_dict[lineage["name"]] = {}
         self.lineage_calls_dict[lineage["name"]][var_name] = call
-
 
     def _type_variants(self):
         self.out_json[self.sample]["variant_calls"] = {}
@@ -372,7 +400,9 @@ class Genotyper(object):
                 self.variant_calls[probe_name] = call
                 self.variant_calls_dict[probe_id] = call
 
-            self._update_lineage_calls_dict(probe_coverages.var_name, call)
+            # note: here's an example probe_coverages.var_name:
+            # ref-K43R?var_name=AAG781686AGA&num_alts=1&ref=NC_000962.3&enum=0&gene=rpsL&mut=K43R
+            self._update_lineage_calls_dict(call, probe_name=probe_coverages.var_name)
 
         self.out_json[self.sample]["genotypes"] = genotypes
         self.out_json[self.sample]["filtered"] = filters

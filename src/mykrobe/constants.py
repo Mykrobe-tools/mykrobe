@@ -10,3 +10,4 @@ NON_METADATA_KEYS = {"INFO", "FILTER", "ALT", "FORMAT", "contig"}
 # Spec is a bit weak on which metadata lines are singular, like fileformat
 # and which can have repeats, like contig
 SINGULAR_METADATA = {'fileformat', 'fileDate', 'reference'}
+MCCORTEX_BINARY_ENV_VAR = "MYKROBE_MCCORTEX"
