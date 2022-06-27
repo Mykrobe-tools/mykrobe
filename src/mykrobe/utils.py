@@ -1,8 +1,9 @@
-import os
 import hashlib
-import re
 import json
-from typing import TextIO
+import os
+import re
+from pathlib import Path
+from typing import TextIO, Union
 
 from Bio.Seq import Seq
 
@@ -65,6 +66,12 @@ def median(lst):
         return sortedLst[index]
     else:
         return (sortedLst[index] + sortedLst[index + 1]) / 2.0
+
+
+def is_file_compressed(filepath: Union[str, Path]) -> bool:
+    """https://stackoverflow.com/a/47080739/5299417"""
+    with open(filepath, mode="rb") as fp:
+        return fp.read(2) == b"\x1f\x8b"
 
 
 def load_json(f):

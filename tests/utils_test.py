@@ -4,7 +4,7 @@ import pytest
 from Bio.Seq import Seq
 
 from mykrobe import utils
-from mykrobe.utils import get_first_chrom_name
+from mykrobe.utils import get_first_chrom_name, is_file_compressed
 
 
 # When we have an amino acid to any other amino mutation (eg I42X), we want to
@@ -99,3 +99,13 @@ def test_get_first_chrom_name_pointer_is_past_start_gets_first():
     expected = "ch1"
 
     assert actual == expected
+
+
+def test_is_compressed_file_file_is_not_compressed():
+    filepath = "tests/vcf_tests/test.vcf"
+    assert not is_file_compressed(filepath)
+
+
+def test_is_compressed_file_file_is_compressed():
+    filepath = "tests/species_data_tests/species1_data.20200101.tar.gz"
+    assert is_file_compressed(filepath)
