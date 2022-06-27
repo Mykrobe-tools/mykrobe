@@ -11,3 +11,4 @@ NON_METADATA_KEYS = {"INFO", "FILTER", "ALT", "FORMAT", "contig"}
 # and which can have repeats, like contig
 SINGULAR_METADATA = {'fileformat', 'fileDate', 'reference'}
 MCCORTEX_BINARY_ENV_VAR = "MYKROBE_MCCORTEX"
+MANIFEST_URL = "https://raw.githubusercontent.com/Mykrobe-tools/mykrobe-data/main/mykrobe_panels_manifest.json"
