@@ -7,20 +7,32 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+
+- This version is required to use the latest panel which combines the 2021 WHO
+  catalogue ([doi:10/h298](https://doi.org/10/h298)) with the previous default mykrobe
+  catalogue, as constructed in [doi:10/h299](https://doi.org/10/h299).
+
+### Changed
+
+- Loading JSON files will now handled (gzip) compressed files.
+
 ## 0.11.0
 
 ### Added
+
 - Support for including stop codons in the panel with the `*` character.
 - Panel version is now included in JSON output [[#119][119]]
 - Shorthand CLI versions for common/long options:
-  - `-D`: `--min_proportion_expected_depth`
-  - `-P`: `--custom_probe_set_path`
-  - `-R`: `--custom_variant_to_resistance_json`
-  - `-L`: `--custom_lineage_json`
-  - `-O`: `--format`
+    - `-D`: `--min_proportion_expected_depth`
+    - `-P`: `--custom_probe_set_path`
+    - `-R`: `--custom_variant_to_resistance_json`
+    - `-L`: `--custom_lineage_json`
+    - `-O`: `--format`
 - Singularity container automatically built and added to each new release.
 
 ### Changed
+
 - Default kmer size (21) made consistent across all subcommands [[#141][141]]
 - Nanopore preset `--ont` defaults to an expected error rate of 0.08 and ploidy
   'haploid' [[#134][134]]
@@ -28,8 +40,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Automated tests/builds all (ie linux, windows, mac) moved to github actions.
   Turned off travis and appveyor.
 
-
 ### Fixed
+
 - Improved error messaging when an X amino acid resolves to a mutation already present
   in the panel.
 - Do not assume reference fasta file name is the same as the chromosome [[#140][140]]
@@ -66,16 +78,25 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   eg `katG_S315X`. If gene is on reverse strand, then the wrong new amino
   acid change was being reported [[#127][127]].
 
-
 [113]: https://github.com/Mykrobe-tools/mykrobe/issues/113
+
 [114]: https://github.com/Mykrobe-tools/mykrobe/issues/114
+
 [119]: https://github.com/Mykrobe-tools/mykrobe/issues/119
+
 [123]: https://github.com/Mykrobe-tools/mykrobe/issues/123
+
 [127]: https://github.com/Mykrobe-tools/mykrobe/issues/127
+
 [134]: https://github.com/Mykrobe-tools/mykrobe/issues/134
+
 [140]: https://github.com/Mykrobe-tools/mykrobe/issues/140
+
 [141]: https://github.com/Mykrobe-tools/mykrobe/issues/141
+
 [142]: https://github.com/Mykrobe-tools/mykrobe/issues/142
+
 [Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.10.0...HEAD
+
 [mkdtemp]: https://docs.python.org/3.6/library/tempfile.html#tempfile.mkdtemp
 
