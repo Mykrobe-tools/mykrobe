@@ -1,18 +1,10 @@
-import os
-import json
 import logging
-
-from mykrobe.utils import unique
-from mykrobe.utils import flatten
-from mykrobe.utils import get_params
+import os
 
 from mykrobe.predict.models import MykrobePredictorSusceptibilityResult
-
-from mykrobe.variants.schema.models import VariantCall
-from mykrobe.variants.schema.models import SequenceCall
-
-from pprint import pprint
-
+from mykrobe.utils import flatten
+from mykrobe.utils import get_params
+from mykrobe.utils import unique, load_json
 
 logger = logging.getLogger(__name__)
 
@@ -53,9 +45,11 @@ def is_filtered(call):
 class BasePredictor(object):
 
     def __init__(self, variant_calls, called_genes,
-                 base_json={}, depth_threshold=3, ignore_filtered=True,
+                 base_json=None, depth_threshold=3, ignore_filtered=True,
                  ignore_minor_calls=False,
                  variant_to_resistance_json_fp=None):
+        if base_json is None:
+            base_json = {}
         if variant_to_resistance_json_fp:
             self.variant_or_gene_name_to_resistance_drug = load_json(
                 variant_to_resistance_json_fp)
@@ -212,11 +206,6 @@ class BasePredictor(object):
         return self.result
 
 
-def load_json(f):
-    with open(f, 'r') as infile:
-        return json.load(infile)
-
-
 class TBPredictor(BasePredictor):
 
     @property
@@ -227,9 +216,9 @@ class TBPredictor(BasePredictor):
                 '../data/predict/tb/'))
         return os.path.join(
             self.data_dir,
-            "variant_to_resistance_drug.json")
+            "variant_to_resistance_drug-202206.json.gz")
 
-    def __init__(self, variant_calls, called_genes, base_json={},
+    def __init__(self, variant_calls, called_genes, base_json=None,
                  depth_threshold=3, ignore_filtered=True, ignore_minor_calls=False,
                  variant_to_resistance_json_fp=None):
         super(
@@ -242,6 +231,8 @@ class TBPredictor(BasePredictor):
             ignore_filtered=ignore_filtered,
                 ignore_minor_calls=ignore_minor_calls,
                 variant_to_resistance_json_fp=variant_to_resistance_json_fp)
+        if base_json is None:
+            base_json = {}
 
 
 class StaphPredictor(BasePredictor):
@@ -256,7 +247,7 @@ class StaphPredictor(BasePredictor):
             self.data_dir,
             "variant_to_resistance_drug.json")
 
-    def __init__(self, variant_calls, called_genes, base_json={},
+    def __init__(self, variant_calls, called_genes, base_json=None,
                  depth_threshold=3, ignore_filtered=True, ignore_minor_calls=False,
                  variant_to_resistance_json_fp=None):
 
@@ -270,3 +261,5 @@ class StaphPredictor(BasePredictor):
             ignore_filtered=ignore_filtered,
                 ignore_minor_calls=ignore_minor_calls,
                 variant_to_resistance_json_fp=variant_to_resistance_json_fp)
+        if base_json is None:
+            base_json = {}

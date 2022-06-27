@@ -4,7 +4,7 @@ import pytest
 from Bio.Seq import Seq
 
 from mykrobe import utils
-from mykrobe.utils import get_first_chrom_name, is_file_compressed
+from mykrobe.utils import get_first_chrom_name, is_file_compressed, load_json
 
 
 # When we have an amino acid to any other amino mutation (eg I42X), we want to
@@ -109,3 +109,17 @@ def test_is_compressed_file_file_is_not_compressed():
 def test_is_compressed_file_file_is_compressed():
     filepath = "tests/species_data_tests/species1_data.20200101.tar.gz"
     assert is_file_compressed(filepath)
+
+
+def test_load_json_uncompressed():
+    filepath = "tests/ref_data/tb_variant_to_resistance_drug.json"
+    data = load_json(filepath)
+
+    assert data["katG_S315T"] == ["Isoniazid"]
+
+
+def test_load_json_compressed():
+    filepath = "tests/ref_data/tb_variant_to_resistance_drug.json.gz"
+    data = load_json(filepath)
+
+    assert data["katG_S315T"] == ["Isoniazid"]

@@ -1,3 +1,4 @@
+import gzip
 import hashlib
 import json
 import os
@@ -75,8 +76,12 @@ def is_file_compressed(filepath: Union[str, Path]) -> bool:
 
 
 def load_json(f):
-    with open(f, "r") as infile:
-        return json.load(infile)
+    if is_file_compressed(f):
+        with gzip.open(f, "rt", encoding="UTF-8") as infile:
+            return json.load(infile)
+    else:
+        with open(f, "r") as infile:
+            return json.load(infile)
 
 
 def lazyprop(fn):

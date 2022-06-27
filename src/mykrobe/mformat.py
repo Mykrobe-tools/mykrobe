@@ -1,7 +1,8 @@
-import io
-import json
 import csv
-import os
+import io
+
+from mykrobe.utils import load_json
+
 
 def get_drugs(drug_list):
     drugs = []
