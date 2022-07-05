@@ -151,7 +151,7 @@ class LineagePredictor:
                 path_leaf = path_leaf.parent
 
             number_good_nodes = len([x for x in path_genos if x[1] > 0])
-            if len(path_genos) == 0 or number_good_nodes / len(path_genos) < min_frac_called or path_leaf.name in paths:
+            if len(path_genos) == 0 or number_good_nodes / len(path_genos) <= min_frac_called or path_leaf.name in paths:
                 continue
 
             # We could end up having say [l1, l1.1, l1.1.2], and also just
