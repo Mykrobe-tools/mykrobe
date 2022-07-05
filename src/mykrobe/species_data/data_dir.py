@@ -6,11 +6,12 @@ import requests
 import shutil
 import tarfile
 
+from mykrobe import MANIFEST_URL
 from mykrobe.species_data import SpeciesDir
+from mykrobe.utils import load_json
 
 logger = logging.getLogger(__name__)
 
-MANIFEST_URL = "https://raw.githubusercontent.com/Mykrobe-tools/mykrobe-data/main/mykrobe_panels_manifest.json"
 
 class DataDir:
     def __init__(self, root_dir):
@@ -37,8 +38,7 @@ class DataDir:
 
     def load_manifest(self):
         if os.path.exists(self.manifest_json):
-            with open(self.manifest_json) as f:
-                self.manifest = json.load(f)
+            self.manifest = load_json(self.manifest_json)
         else:
             self.manifest = {}
 
@@ -58,8 +58,7 @@ class DataDir:
         self.start_lock(error_message)
         if filename is not None:
             logger.info(f"Getting latest panel information from file {filename}")
-            with open(filename) as f:
-                new_manifest = json.load(f)
+            new_manifest = load_json(filename)
         else:
             if url is None:
                 url = MANIFEST_URL
