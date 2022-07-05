@@ -161,15 +161,22 @@ def fix_amino_acid_X_variants_keys(dict_to_fix):
     know the actual change. This function changes all keys in dict_to_fix that
     have those variants, changing the X to the actual amino acid."""
     keys_to_replace = {}
+    # Can have a situation where we have an X variant but it resolves
+    # to a variant that is already in the panel. For example
+    # embB_M306X-ATG4247429ATA resolves to embB_M306I-ATG4247429ATA.
+    # Those are both in the Walker-2015 panel. We can remove the
+    # X mutation in this case.
+    keys_to_remove = set()
     for key in dict_to_fix:
         new_key = _x_mutation_fixed_var_name(key)
         if new_key is not None:
             if new_key in keys_to_replace or new_key in dict_to_fix:
-                raise KeyError(
-                    f"The 'X' amino acid in mutation {key}, resolves to {new_key}, "
-                    f"which already exists in the panel"
-                )
-            keys_to_replace[key] = new_key
+                keys_to_remove.add(key)
+            else:
+                keys_to_replace[key] = new_key
+
+    for key in keys_to_remove:
+        del dict_to_fix[key]
 
     for key, new_key in keys_to_replace.items():
         dict_to_fix[new_key] = dict_to_fix[key]

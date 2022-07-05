@@ -54,6 +54,8 @@ def test_fix_amino_acid_X_variants_keys():
         "katG_S315X-GCT2155167GGT": "baz",
         "katG_S315C-GCT2155167TTA": "baz",
         "katG_S315X-GCT2155167CTA": "baz",  # katG is on reverse strand so stop TAG is CTA
+        "embB_M306I-ATG4247429ATA": "value",
+        "embB_M306X-ATG4247429ATA": "value", # duplicate of previous, should remove
     }
 
     utils.fix_amino_acid_X_variants_keys(test_dict)
@@ -62,18 +64,8 @@ def test_fix_amino_acid_X_variants_keys():
         "katG_S315T-GCT2155167GGT": "baz",
         "katG_S315C-GCT2155167TTA": "baz",
         "katG_S315*-GCT2155167CTA": "baz",
+        "embB_M306I-ATG4247429ATA": "value",
     }
-
-
-def test_fix_amino_acid_X_variants_keys_duplicate_raises_error():
-    test_dict = {
-        "ddn_W88X-TGG3987105AGA": "value",
-        "ddn_W88R-TGG3987105AGA": "value",
-    }
-
-    with pytest.raises(KeyError) as err:
-        utils.fix_amino_acid_X_variants_keys(test_dict)
-        assert "ddn_W88X" in err
 
 
 def test_get_first_chrom_name_not_fasta_raises_error():
