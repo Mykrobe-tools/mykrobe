@@ -7,6 +7,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## 0.12.0
+
 ### Added
 
 - This version is required to use the latest panel which combines the 2021 WHO
@@ -99,7 +101,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 [142]: https://github.com/Mykrobe-tools/mykrobe/issues/142
 
-[Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.12.0...HEAD
 
 [mkdtemp]: https://docs.python.org/3.6/library/tempfile.html#tempfile.mkdtemp
 
