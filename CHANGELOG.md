@@ -16,6 +16,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 
 - Loading JSON files will now handled (gzip) compressed files.
+- When an X mutation resolves to an existing variant in the panel, instead of
+  raising an error, do not output the X mutation. This means can still use
+  Walker-2015 panel.
 
 ## 0.11.0
 
