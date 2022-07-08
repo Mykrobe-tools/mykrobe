@@ -7,6 +7,12 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## 0.12.1
+
+### Fixed
+
+-  output from `--version` flag (0.12.0 was reporting 0.11.0)
+
 ## 0.12.0
 
 ### Added
@@ -101,7 +107,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 [142]: https://github.com/Mykrobe-tools/mykrobe/issues/142
 
-[Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.12.1...HEAD
 
 [mkdtemp]: https://docs.python.org/3.6/library/tempfile.html#tempfile.mkdtemp
 
