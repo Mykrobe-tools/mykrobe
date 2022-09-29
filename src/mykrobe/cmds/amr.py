@@ -293,7 +293,7 @@ def run(parser, args):
     cp.run()
     logger.debug("CoverageParser complete")
 
-    if ref_data["species_phylo_group"] is None:
+    if ref_data["species_phylo_group"] is None or args.targeted:
         phylogenetics = {}
         depths = [cp.estimate_depth()]
     else:

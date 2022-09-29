@@ -196,6 +196,12 @@ parser_amr.add_argument(
     choices=["json", "csv", "json_and_csv"],
     default="csv",
 )
+parser_amr.add_argument(
+    "-T",
+    "--targeted",
+    action="store_true",
+    help=f"Sample is from targeted sequencing - not WGS",
+)
 parser_amr.set_defaults(func=run_subtool)
 
 
