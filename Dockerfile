@@ -46,3 +46,7 @@ RUN python -m pip install requests && python -m pip install . -vv
 # download panels
 RUN mykrobe panels update_metadata \
     && mykrobe panels update_species all
+
+# add combine script to path \
+COPY --chmod=755 ./scripts/combine.py "/${PROJECT}/scripts/combine.py"
+ENV PATH="/${PROJECT}/scripts:$PATH"
