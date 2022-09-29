@@ -202,6 +202,12 @@ parser_amr.add_argument(
     action="store_true",
     help=f"Sample is from targeted sequencing - not WGS",
 )
+parser_amr.add_argument(
+    "-z",
+    "--compress",
+    action="store_true",
+    help="Compress JSON output with gzip",
+)
 parser_amr.set_defaults(func=run_subtool)
 
 

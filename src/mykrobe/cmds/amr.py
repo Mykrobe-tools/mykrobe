@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import copy
+import gzip
 import json
 import logging
 import random
@@ -220,14 +221,6 @@ def write_outputs(args, base_json):
             del base_json[args.sample]["lineage_calls"]
         outputs["json"] = json.dumps(base_json, indent=4)
 
-    if len(outputs) == 0:
-        raise ValueError(
-            (
-                f"Output format must be one of: csv,json,json_and_csv. Got "
-                f"'{args.output_format}'"
-            )
-        )
-
     for output_type, output in outputs.items():
         # write to file is specified by user, otherwise send to stdout
         if args.output:
@@ -235,9 +228,17 @@ def write_outputs(args, base_json):
                 outfile = args.output + "." + output_type
             else:
                 outfile = args.output
-            with open(outfile, "w") as f:
-                f.write(output)
+
+            if args.compress and output_type == "json":
+                p = outfile if outfile.split(".")[-1] == "gz" else f"{outfile}.gz"
+                with gzip.open(p, "w") as fout:
+                    fout.write(output.encode("utf-8"))
+            else:
+                with open(outfile, "w") as f:
+                    f.write(output)
         else:
+            if args.compress and output_type == "json":
+                output = gzip.compress(output)
             print(output)
 
 
