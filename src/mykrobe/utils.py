@@ -1,12 +1,14 @@
 import gzip
 import hashlib
 import json
+import logging
 import os
 import re
 from pathlib import Path
 from typing import TextIO, Union
 
 from Bio.Seq import Seq
+from intervaltree import Interval, IntervalTree
 
 
 def check_args(args):
@@ -190,3 +192,35 @@ def get_first_chrom_name(fp: TextIO) -> str:
     if not header.startswith(">"):
         raise ValueError(f"Expected fasta file, but it did not start with '>'")
     return header[1:].split()[0]
+
+
+def load_bed(fpath: str) -> IntervalTree:
+    tree = IntervalTree()
+    with open(fpath) as fp:
+        for line in map(str.rstrip, fp):
+            # skip headers https://en.wikipedia.org/wiki/BED_(file_format)#Header
+            if line.startswith(("#", "browser", "track")):
+                continue
+            try:
+                start, end = line.split("\t")[1:3]
+            except IndexError as err:
+                logging.error(
+                    "BED file must contain at least three tab-separated columns: "
+                    "chromosome, start (zero-based inclusive), end (zero-based "
+                    "exclusive). There are less than three columns in this BED file"
+                )
+                raise err
+            try:
+                start = int(start)
+                end = int(end)
+            except ValueError as err:
+                logging.error(
+                    "BED file must contain at least three tab-separated columns: "
+                    "chromosome, start (zero-based inclusive), end (zero-based "
+                    "exclusive). We could not parse the start/end column into integers"
+                )
+                raise err
+            iv = Interval(start, end)
+            tree.add(iv)
+
+    return tree

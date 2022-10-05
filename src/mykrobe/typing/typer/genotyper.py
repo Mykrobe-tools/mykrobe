@@ -1,35 +1,32 @@
 from __future__ import print_function
-import os
-import json
+
 import csv
-import glob
 import logging
-import subprocess
-from copy import copy
-
-from mykrobe import K
-from mykrobe.metagenomics import LineagePredictor
-
-from mykrobe.typing import SequenceProbeCoverage
-from mykrobe.typing import VariantProbeCoverage
-from mykrobe.typing import ProbeCoverage
-from mykrobe.typing import Panel
-
-from mykrobe.typing.typer.presence import GeneCollectionTyper
-from mykrobe.typing.typer.variant import VariantTyper
-from mykrobe.typing.typer.base import DEFAULT_MINOR_FREQ
-from mykrobe.typing.typer.base import DEFAULT_ERROR_RATE
-
-from mykrobe.variants.schema.models import VariantCallSet
-from mykrobe.variants.schema.models import Variant
+import re
 
 from mykrobe.cortex import McCortexGenoRunner
+from mykrobe.metagenomics import LineagePredictor
+from mykrobe.typing import (
+    Panel,
+    ProbeCoverage,
+    SequenceProbeCoverage,
+    VariantProbeCoverage,
+)
+from mykrobe.typing.typer.base import DEFAULT_ERROR_RATE, DEFAULT_MINOR_FREQ
+from mykrobe.typing.typer.presence import GeneCollectionTyper
+from mykrobe.typing.typer.variant import VariantTyper
+from mykrobe.utils import get_params, load_bed, median, split_var_name
+from mykrobe.variants.schema.models import Variant
 
-from mykrobe.utils import get_params
-from mykrobe.utils import split_var_name
-from mykrobe.utils import median
+from mykrobe import K
+
+POS_REGEX = re.compile(r"var_name=[ACGT]+(?P<pos>\d+)[ACGT]+")
 
 logger = logging.getLogger(__name__)
+
+
+class EmptyBedFile(Exception):
+    pass
 
 
 class CoverageParser(object):
@@ -47,6 +44,7 @@ class CoverageParser(object):
         verbose=True,
         tmp_dir="tmp/",
         skeleton_dir="atlas/data/skeletons/",
+        targeted=None,
     ):
         self.sample = sample
         self.seq = seq
@@ -64,6 +62,13 @@ class CoverageParser(object):
         self.panels = []
         self.threads = threads
         self.memory = memory
+        if targeted:
+            self.targeted = load_bed(targeted)
+            if self.targeted.is_empty():
+                raise EmptyBedFile("Targeted BED file has no regions")
+            logging.info(f"Loaded {len(self.targeted)} regions from targeted BED file")
+        else:
+            self.targeted = None
         for panel_file_path in self.panel_file_paths:
             panel = Panel(panel_file_path)
             self.panels.append(panel)
@@ -95,10 +100,11 @@ class CoverageParser(object):
         for variant_covg in self.variant_covgs.values():
             if variant_covg.reference_coverage.median_depth > 0:
                 depth.append(variant_covg.reference_coverage.median_depth)
-        for spcs in self.gene_presence_covgs.values():
-            __median_depth = median([spc.median_depth for spc in spcs.values()])
-            if __median_depth > 0:
-                depth.append(__median_depth)
+        if not self.targeted:
+            for spcs in self.gene_presence_covgs.values():
+                __median_depth = median([spc.median_depth for spc in spcs.values()])
+                if __median_depth > 0:
+                    depth.append(__median_depth)
         _median = median(depth)
         if _median < 1:
             return 1
@@ -139,6 +145,10 @@ class CoverageParser(object):
                     klen,
                 ) = self._parse_summary_covgs_row(row)
                 allele_name = allele.split("?")[0]
+
+                if not self._allele_is_in_target_region(allele):
+                    continue
+
                 if self._is_variant_panel(allele_name):
                     self._parse_variant_panel(row)
                 else:
@@ -261,6 +271,17 @@ class CoverageParser(object):
             ]._choose_best_alternate_coverage()
         else:
             raise ValueError("probe_type must be ref or alt")
+
+    def _allele_is_in_target_region(self, allele: str) -> bool:
+        """Checks whether an allele falls within the targeted BED regions"""
+        if not self.targeted:
+            return True
+
+        match = POS_REGEX.search(allele)
+        if not match:  # no genome position, so it isn't a variant probe
+            return False
+        pos = int(match.group("pos")) - 1  # mykrobe panel is 1-based
+        return self.targeted.overlaps(pos)
 
 
 class Genotyper(object):

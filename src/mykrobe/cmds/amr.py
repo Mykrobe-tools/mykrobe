@@ -295,6 +295,7 @@ def run(parser, args):
         tmp_dir=args.tmp,
         skeleton_dir=args.skeleton_dir,
         memory=args.memory,
+        targeted=args.targeted,
     )
     cp.run()
     logger.debug("CoverageParser complete")

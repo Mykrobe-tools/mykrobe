@@ -7,6 +7,10 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+
+- option to compress JSON output (`-z`/`--compress`)
+
 ## 0.12.1
 
 ### Fixed

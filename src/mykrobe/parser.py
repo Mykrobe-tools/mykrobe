@@ -199,8 +199,8 @@ parser_amr.add_argument(
 parser_amr.add_argument(
     "-T",
     "--targeted",
-    action="store_true",
-    help=f"Sample is from targeted sequencing - not WGS",
+    help=f"BED file of regions that sequencing targeted",
+    type=str,
 )
 parser_amr.add_argument(
     "-z",
