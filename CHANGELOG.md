@@ -7,6 +7,12 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+
+- option to compress JSON output (`-z`/`--compress`)
+- specific support for targeted sequencing (`-T`/`--targeted`). Takes a BED file of the regions targeted to aid in the read depth estimation [[#28][28]]
+- The script `scripts/combine.py` to combine mykrobe reports into a single CSV file
+
 ## 0.12.1
 
 ### Fixed
@@ -88,6 +94,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Bug reporting variants that are "amino acid to any other amino acid" changes,
   eg `katG_S315X`. If gene is on reverse strand, then the wrong new amino
   acid change was being reported [[#127][127]].
+
+[28]: https://github.com/Mykrobe-tools/mykrobe/issues/28
 
 [113]: https://github.com/Mykrobe-tools/mykrobe/issues/113
 

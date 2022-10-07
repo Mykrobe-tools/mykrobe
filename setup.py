@@ -132,6 +132,7 @@ setup(
         "mongoengine",
         "requests",
         "numpy",
+        "intervaltree~=3.1"
     ],
     entry_points={
         "console_scripts": [

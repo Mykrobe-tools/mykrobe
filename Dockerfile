@@ -41,8 +41,13 @@ RUN git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
 
 # install mykrobe
 WORKDIR "/${PROJECT}"
-RUN python -m pip install requests && python -m pip install . -vv
+RUN python -m pip install requests \
+    && python -m pip install . -vv \
+    && chmod +x /${PROJECT}/scripts/combine.py
 
 # download panels
 RUN mykrobe panels update_metadata \
     && mykrobe panels update_species all
+
+# add combine script to path \
+ENV PATH="/${PROJECT}/scripts:$PATH"

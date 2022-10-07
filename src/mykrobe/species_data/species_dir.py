@@ -14,6 +14,7 @@ class SpeciesDir:
         if not os.path.exists(self.manifest_json):
             raise FileNotFoundError(f"Manifest file not found in species directory {self.root_dir}. Expected to find {self.manifest_json}.")
         self.panel = None
+        self.panel_name = None
         self.manifest = load_json(self.manifest_json)
         self.set_panel(self.default_panel())
 

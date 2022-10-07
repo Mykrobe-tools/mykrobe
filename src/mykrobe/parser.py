@@ -196,6 +196,18 @@ parser_amr.add_argument(
     choices=["json", "csv", "json_and_csv"],
     default="csv",
 )
+parser_amr.add_argument(
+    "-T",
+    "--targeted",
+    help=f"BED file of regions that sequencing targeted",
+    type=str,
+)
+parser_amr.add_argument(
+    "-z",
+    "--compress",
+    action="store_true",
+    help="Compress JSON output with gzip",
+)
 parser_amr.set_defaults(func=run_subtool)
 
 

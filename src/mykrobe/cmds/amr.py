@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import copy
+import gzip
 import json
 import logging
 import random
@@ -156,6 +157,7 @@ def ref_data_from_args(args):
             "kmer": args.kmer,
             "version": "custom",
             "species_phylo_group": None,
+            "panel_name": "custom",
         }
     else:
         data_dir = DataDir(args.panels_dir)
@@ -170,6 +172,7 @@ def ref_data_from_args(args):
             "kmer": species_dir.kmer(),
             "version": species_dir.version(),
             "species_phylo_group": species_dir.species_phylo_group(),
+            "panel_name": species_dir.panel_name,
         }
 
     if ref_data["lineage_json"] is None:
@@ -218,14 +221,6 @@ def write_outputs(args, base_json):
             del base_json[args.sample]["lineage_calls"]
         outputs["json"] = json.dumps(base_json, indent=4)
 
-    if len(outputs) == 0:
-        raise ValueError(
-            (
-                f"Output format must be one of: csv,json,json_and_csv. Got "
-                f"'{args.output_format}'"
-            )
-        )
-
     for output_type, output in outputs.items():
         # write to file is specified by user, otherwise send to stdout
         if args.output:
@@ -233,9 +228,17 @@ def write_outputs(args, base_json):
                 outfile = args.output + "." + output_type
             else:
                 outfile = args.output
-            with open(outfile, "w") as f:
-                f.write(output)
+
+            if args.compress and output_type == "json":
+                p = outfile if outfile.split(".")[-1] == "gz" else f"{outfile}.gz"
+                with gzip.open(p, "w") as fout:
+                    fout.write(output.encode("utf-8"))
+            else:
+                with open(outfile, "w") as f:
+                    f.write(output)
         else:
+            if args.compress and output_type == "json":
+                output = gzip.compress(output)
             print(output)
 
 
@@ -259,11 +262,13 @@ def run(parser, args):
         and ref_data["lineage_json"] is None
     ):
         logger.info(
-            "Forcing --report_all_calls because species is 'custom' and options --custom_variant_to_resistance_json,--custom_lineage_json were not used"
+            "Forcing --report_all_calls because species is 'custom' and options "
+            "--custom_variant_to_resistance_json,--custom_lineage_json were not used"
         )
         args.report_all_calls = True
     logger.info(
-        f"Running mykrobe predict using species {args.species}, and panel version {ref_data['version']}"
+        f"Running mykrobe predict using species {args.species}, panel version "
+        f"{ref_data['version']}, and panel {ref_data['panel_name']}"
     )
 
     if args.tmp is None:
@@ -272,10 +277,11 @@ def run(parser, args):
     if args.ont:
         args.expected_error_rate = ONT_E_RATE
         logger.info(
-            f"Set expected error rate to {args.expected_error_rate} because --ont flag was used"
+            f"Set expected error rate to {args.expected_error_rate} because --ont flag "
+            f"was used"
         )
         args.ploidy = ONT_PLOIDY
-        logger.info(f"Set ploidy to {args.ploidy} because --ont flag used")
+        logger.info(f"Set ploidy to {args.ploidy} because --ont flag was used")
 
     # Run Cortex
     cp = CoverageParser(
@@ -289,11 +295,12 @@ def run(parser, args):
         tmp_dir=args.tmp,
         skeleton_dir=args.skeleton_dir,
         memory=args.memory,
+        targeted=args.targeted,
     )
     cp.run()
     logger.debug("CoverageParser complete")
 
-    if ref_data["species_phylo_group"] is None:
+    if ref_data["species_phylo_group"] is None or args.targeted:
         phylogenetics = {}
         depths = [cp.estimate_depth()]
     else:
