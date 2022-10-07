@@ -20,7 +20,7 @@ from mykrobe.variants.schema.models import Variant
 
 from mykrobe import K
 
-POS_REGEX = re.compile(r"var_name=[ACGT]+(?P<pos>\d+)[ACGT]+")
+POS_REGEX = re.compile(r"[ACGT]+(?P<pos>\d+)[ACGT]+")
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +99,8 @@ class CoverageParser(object):
         depth = []
 
         for variant_name, variant_covg in self.variant_covgs.items():
-            if not self._allele_is_in_target_region(variant_name):
+            var = variant_name.split("-")[-1]
+            if not self._variant_is_in_target_region(var):
                 continue
             if variant_covg.reference_coverage.median_depth > 0:
                 depth.append(variant_covg.reference_coverage.median_depth)
@@ -109,10 +110,7 @@ class CoverageParser(object):
                 if __median_depth > 0:
                     depth.append(__median_depth)
         _median = median(depth)
-        if _median < 1:
-            return 1
-        else:
-            return _median
+        return max(1, _median)
 
     def remove_temporary_files(self):
         self.mc_cortex_runner.remove_temporary_files()
@@ -272,12 +270,12 @@ class CoverageParser(object):
         else:
             raise ValueError("probe_type must be ref or alt")
 
-    def _allele_is_in_target_region(self, allele: str) -> bool:
+    def _variant_is_in_target_region(self, variant: str) -> bool:
         """Checks whether an allele falls within the targeted BED regions"""
         if not self.targeted:
             return True
 
-        match = POS_REGEX.search(allele)
+        match = POS_REGEX.search(variant)
         if not match:  # no genome position, so it isn't a variant probe
             return False
         pos = int(match.group("pos")) - 1  # mykrobe panel is 1-based
