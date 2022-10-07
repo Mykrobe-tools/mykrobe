@@ -97,7 +97,10 @@ class CoverageParser(object):
 
     def estimate_depth(self):
         depth = []
-        for variant_covg in self.variant_covgs.values():
+
+        for variant_name, variant_covg in self.variant_covgs.items():
+            if not self._allele_is_in_target_region(variant_name):
+                continue
             if variant_covg.reference_coverage.median_depth > 0:
                 depth.append(variant_covg.reference_coverage.median_depth)
         if not self.targeted:
@@ -145,9 +148,6 @@ class CoverageParser(object):
                     klen,
                 ) = self._parse_summary_covgs_row(row)
                 allele_name = allele.split("?")[0]
-
-                if not self._allele_is_in_target_region(allele):
-                    continue
 
                 if self._is_variant_panel(allele_name):
                     self._parse_variant_panel(row)
