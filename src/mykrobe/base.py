@@ -5,6 +5,19 @@ import os
 
 from mykrobe import K, ONT_E_RATE, ONT_PLOIDY, ILLUMINA_E_RATE
 
+
+class ExtendAction(argparse.Action):
+    """Action 'extend' exists in python >=3.8. For supporting versions below this, we
+    define an extend action manually.
+    Taken from https://stackoverflow.com/a/41153081/5299417
+    """
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        items = getattr(namespace, self.dest) or []
+        items.extend(values)
+        setattr(namespace, self.dest, items)
+
+
 sequence_or_graph_parser_mixin = argparse.ArgumentParser(add_help=False)
 sequence_or_graph_parser_mixin.add_argument(
     "-s", "--sample", required=True, type=str, help="Sample identifier [REQUIRED]"
@@ -48,12 +61,14 @@ SEQUENCE_FILES_HELP_STRING = "Sequence files (fasta,fastq,bam)"
 sequence_or_binary_parser_mixin = argparse.ArgumentParser(
     parents=[sequence_or_graph_parser_mixin], add_help=False
 )
+sequence_or_binary_parser_mixin.register("action", "extend", ExtendAction)
 sequence_or_binary_parser_mixin.add_argument(
     "-1",
     "-i",
     "--seq",
     metavar="seq",
     type=str,
+    action="extend",
     nargs="+",
     help=SEQUENCE_FILES_HELP_STRING,
 )
