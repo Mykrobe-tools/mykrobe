@@ -23,23 +23,23 @@ python -m pip install -U pip
 
 cd $MYKROBE_ROOT_DIR
 rm -rf mccortex
+python -m pip install -r requirements.txt
+python -m pip install .
 git clone --recursive -b geno_kmer_count https://github.com/Mykrobe-tools/mccortex mccortex
 cd mccortex
 make
 cd ..
+# For whatever reason, mccortex is not getting put in the install location.
+# Do it manually.
+myk_dir=$(python -m pip show mykrobe | awk '/^Location/ {print $NF}')
+echo $myk_dir
+cp mccortex/bin/mccortex31 $myk_dir/mykrobe/cortex/mccortex31
 mkdir -p /data/db
-python -m pip install -r requirements.txt
-python -m pip install .
 mongod --logpath mongo.log --quiet &>/dev/null &
 sleep 3s
 pytest --cov-report term-missing --cov=mykrobe
 mongod --shutdown
 rm mongo.log
-# For whatever reason, mccortex is not getting put in the install location.
-# Do it manually.
-myk_dir=$(pip3 show mykrobe | awk '/^Location/ {print $NF}')
-echo $myk_dir
-cp mccortex/bin/mccortex31 $myk_dir/mykrobe/cortex/mccortex31
 cd ..
 mykrobe panels update_metadata --debug
 mykrobe panels update_species --debug all
