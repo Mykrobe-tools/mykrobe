@@ -23,12 +23,12 @@ python -m pip install -U pip
 
 cd $MYKROBE_ROOT_DIR
 rm -rf mccortex
-python -m pip install -r requirements.txt
-python -m pip install .
 git clone --recursive -b geno_kmer_count https://github.com/Mykrobe-tools/mccortex mccortex
 cd mccortex
 make
 cd ..
+python -m pip install -r requirements.txt
+python -m pip install .
 # For whatever reason, mccortex is not getting put in the install location.
 # Do it manually.
 myk_dir=$(python -m pip show mykrobe | awk '/^Location/ {print $NF}')
