@@ -6,6 +6,5 @@ mongoengine>=0.24.1
 cython>=0.29.28
 numpy>=1.22.0
 ## Testing
-tox
 pytest
 pytest-cov
