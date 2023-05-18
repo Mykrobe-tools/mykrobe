@@ -13,6 +13,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 - Use all input files when `-1/-i/--seq` is passed multiple times [[#168][168]]
 - When running on Staph, was throwing TypeError [[#170][170]]
+- Windows build [[#172][172]]
 
 ## 0.12.1
 
@@ -117,6 +118,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 [168]: https://github.com/Mykrobe-tools/mykrobe/issues/168
 
 [170]: https://github.com/Mykrobe-tools/mykrobe/issues/170
+
+[172]: https://github.com/Mykrobe-tools/mykrobe/issues/172
 
 [Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.12.1...HEAD
 [0.12.2]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.12.1...v0.12.2
