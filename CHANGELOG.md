@@ -7,6 +7,12 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.12.2]
+
+### Fixed
+
+- Use all input files when `-1/-i/--seq` is passed multiple times [[#168][168]]
+
 ## 0.12.1
 
 ### Fixed
@@ -107,7 +113,10 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 [142]: https://github.com/Mykrobe-tools/mykrobe/issues/142
 
+[168]: https://github.com/Mykrobe-tools/mykrobe/issues/168
+
 [Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.12.1...HEAD
+[0.12.2]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.12.1...v0.12.2
 
 [mkdtemp]: https://docs.python.org/3.6/library/tempfile.html#tempfile.mkdtemp
 
