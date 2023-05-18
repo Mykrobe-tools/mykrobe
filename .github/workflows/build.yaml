@@ -174,8 +174,7 @@ jobs:
       env:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
-        Set-Service mongodb -StartupType Automatic
-        Start-Service -Name mongodb
+        mongod &
         export PYTHONPATH="/mingw64/lib/python3.10/:/mingw64/lib/python3.10/site-packages:${PYTHONPATH}"
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install pyinstaller requests pytest
 
