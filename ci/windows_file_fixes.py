@@ -14,6 +14,16 @@ def fix_file(filename, to_replace):
         print(*lines, sep="", file=f)
 
 
+def fix_file_sed_style(filename, to_replace, replace_with):
+    lines = []
+    print("Replacing all", to_replace, "with", replace_with, "in file", filename)
+    with open(filename) as f:
+        for line in f:
+            lines.append(line.replace(to_replace, replace_with))
+
+    with open(filename, "w") as f:
+        print(*lines, sep="", file=f)
+
 filename = os.path.join("mccortex", "src", "global", "util.h")
 to_replace = {
     "const uint8_t rev_nibble_table[16];\n": "extern const uint8_t rev_nibble_table[16];\n"
@@ -77,3 +87,10 @@ to_replace = {
        "LIBS=-lz -lm -lpthread\n": "LIBS=-lpthread -lz -lm -lws2_32 -lz -llzma -lcurl -lbz2\n",
 }
 fix_file(filename, to_replace)
+
+
+bwa_files = ["bwtgap.c", "bwtgap.h", "bwtindex.c", "bwt_lite.c"]
+bwa_dir = os.path.join("mccortex", "libs", "bwa")
+for filename in bwa_files:
+    fix_file_sed_style(os.path.join(bwa_dir, filename), "u_int32_t", "uint32_t")
+
