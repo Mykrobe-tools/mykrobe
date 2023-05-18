@@ -106,8 +106,8 @@ jobs:
     - name: Install dependencies
       run: |
         git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex mccortex
-        cd mccortex 
-        make MAXK=31 
+        cd mccortex
+        make MAXK=31
         cd ..
         cp mccortex/bin/mccortex31 src/mykrobe/cortex/
         python -m pip install -r requirements.txt wheel pyinstaller
@@ -169,6 +169,11 @@ jobs:
       if: false == startsWith(github.event.ref, 'refs/tags/v')
       run: echo "RELEASE_VERSION=test" >> $GITHUB_ENV
       shell: msys2 {0}
+
+    - name: Start MongoDB service
+      run: |
+        sc.exe config MongoDB start= auto
+        sc.exe start MongoDB
 
     - name: Test and build command line tarball
       env:
