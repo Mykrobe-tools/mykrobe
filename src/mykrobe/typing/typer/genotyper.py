@@ -338,7 +338,7 @@ class Genotyper(object):
             self.sequence_calls_dict[gene_name] = [
                 gpc.to_mongo().to_dict() for gpc in self.gene_presence_covgs[gene_name]
             ]
-            if gene_name in self.lineage_variants:
+            if self.lineage_variants is not None and gene_name in self.lineage_variants:
                 for call in self.sequence_calls_dict[gene_name]:
                     self._update_lineage_calls_dict(call, var_name=gene_name)
 
