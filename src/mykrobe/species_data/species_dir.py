@@ -44,7 +44,7 @@ class SpeciesDir:
             logger.warning(f"No 'panels' section found in JSON file {self.manifest_json}")
             return False
         expect_keys = ["description", "reference_genome", "fasta_files", "json_files", "kmer", "species_phylo_group"]
-        json_types = ["amr", "lineage", "hierarchy"]
+        json_types = ["amr", "lineage", "hierarchy", "ncbi_names"]
 
         for panel_name in self.panel_names():
             logger.debug(f"Checking panel {panel_name} in {self.root_dir}")

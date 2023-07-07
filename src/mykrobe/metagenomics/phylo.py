@@ -1,4 +1,5 @@
 from __future__ import print_function
+import copy
 import json
 import os
 import operator
@@ -102,6 +103,55 @@ class SpeciesPredictor(object):
         else:
             return 0
 
+    def _copy_best_one_level_up(self, hierarchy_dict, parent_covgs, child_covgs):
+        for parent_name in hierarchy_dict:
+            if parent_name in parent_covgs:
+                continue
+
+            best_match = None
+
+            for child_name in hierarchy_dict[parent_name]["children"]:
+                if child_name in child_covgs:
+                    if best_match is None or best_match["percent_coverage"] < child_covgs[child_name]["percent_coverage"]:
+                        best_match = child_covgs[child_name]
+
+            if best_match is not None:
+                parent_covgs[parent_name] = copy.deepcopy(best_match)
+                parent_covgs[parent_name]["inferred_from_child"] = True
+
+    def _copy_all_hits_upwards(self):
+        # For new (June 2023) TB probes, we don't have probes that
+        # are in both NTM and Mtb complexes. Also no probes that are in
+        # all NTMs. And the probe tree structure is slightly different, as
+        # it has subspecies, species, complex, and no sub-complex.
+        # The result of this is
+        # that we need to push subspecies matches up to the phylo group
+        # level, because later the code starts at the top of the tree and
+        # works it way down. If it finds no match at any level, then it stops.
+        # Hence we need matches at the top level of the tree.
+        #
+        # New probes have a tree with this top-level structure:
+        # Non_tuberculosis_mycobacterium_complex (no probes)
+        #  - subNon_tuberculosis_mycobacterium_complex (no probes)
+        #     - Mycobacterium_abscessus
+        #     - ... lots more NTMs ...
+        # Mycobacterium_tuberculosis_complex (no probes)
+        #  - subMycobacterium_tuberculosis_complex (has probes)
+        #     - Mycobacterium_canettii
+        #     - Mycobacterium_mungi ... etc ...
+        #
+        # Keep that extra later of complexes so the hierarchy still has
+        # 4 levels, which is assumed throughout this python file
+        if not self.hierarchy:
+            return
+
+        # Push species level matches up to sub-complex
+        for complex_name in self.hierarchy.dict:
+            self._copy_best_one_level_up(self.hierarchy.dict[complex_name]["children"], self.sub_complex_covgs, self.species_covgs)
+
+        # Push sub-complex matches up to complex
+        self._copy_best_one_level_up(self.hierarchy.dict, self.phylo_group_covgs, self.sub_complex_covgs)
+
     def _aggregate_all(self):
         # Calculate expected coverage
         self.expected_depth = self.calc_expected_depth()
@@ -109,6 +159,7 @@ class SpeciesPredictor(object):
         self._aggregate(self.sub_complex_covgs, threshold=50)
         self._aggregate(self.species_covgs)
         self._aggregate(self.lineage_covgs)
+        self._copy_all_hits_upwards()
         self.out_json["phylogenetics"] = {}
         self.out_json["phylogenetics"]["phylo_group"] = self.phylo_group_covgs
         self.out_json["phylogenetics"]["sub_complex"] = self.sub_complex_covgs
@@ -125,6 +176,7 @@ class SpeciesPredictor(object):
             self.out_json["phylogenetics"]["species"])
         self._add_unknown_where_empty(
             self.out_json["phylogenetics"]["lineage"])
+
 
     def _bases_covered(self, percent_coverage, length):
         return sum([percent_coverage[i] * length[i]

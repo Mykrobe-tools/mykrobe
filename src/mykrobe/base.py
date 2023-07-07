@@ -174,6 +174,12 @@ genotyping_mixin.add_argument(
     help="File path to save output file as. Default is to stdout",
     default="",
 )
+genotyping_mixin.add_argument(
+    "--ncbi_names",
+    help="Report NCBI species names in addiition to the usual species names in the JSON output. Only applies when the species is tb",
+    action="store_true",
+    default=False,
+)
 
 
 panels_mixin = argparse.ArgumentParser(add_help=False)

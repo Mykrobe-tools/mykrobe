@@ -167,15 +167,17 @@ def ref_data_from_args(args):
             "var_to_res_json": species_dir.json_file("amr"),
             "hierarchy_json": species_dir.json_file("hierarchy"),
             "lineage_json": species_dir.json_file("lineage"),
+            "ncbi_names_json": species_dir.json_file("ncbi_names"),
             "kmer": species_dir.kmer(),
             "version": species_dir.version(),
             "species_phylo_group": species_dir.species_phylo_group(),
         }
 
-    if ref_data["lineage_json"] is None:
-        ref_data["lineage_dict"] = None
-    else:
-        ref_data["lineage_dict"] = load_json(ref_data["lineage_json"])
+    for key in ["lineage", "ncbi_names"]:
+        if ref_data[f"{key}_json"] is None:
+            ref_data[f"{key}_dict"] = None
+        else:
+            ref_data[f"{key}_dict"] = load_json(ref_data[f"{key}_json"])
 
     return ref_data
 
@@ -247,6 +249,13 @@ def fix_X_amino_acid_variants(sample_json):
 
     if "variant_calls" in sample_json:
         fix_amino_acid_X_variants_keys(sample_json["variant_calls"])
+
+
+def add_ncbi_species_names_to_phylo_dict(phylo, ncbi_names):
+    if "species" not in phylo or ncbi_names is None:
+        return
+    for species, species_d in phylo["species"].items():
+        species_d["ncbi_names"] = ncbi_names.get(species, "UNKNOWN")
 
 
 def run(parser, args):
@@ -450,5 +459,7 @@ def run(parser, args):
 
     logger.info("Progress: writing output")
     fix_X_amino_acid_variants(base_json[args.sample])
+    if args.ncbi_names and ref_data["ncbi_names_dict"] is not None:
+        add_ncbi_species_names_to_phylo_dict(base_json[args.sample]["phylogenetics"], ref_data["ncbi_names_dict"])
     write_outputs(args, base_json)
     logger.info("Progress: finished")
