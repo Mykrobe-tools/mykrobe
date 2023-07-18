@@ -206,8 +206,6 @@ class SpeciesPredictor(object):
                 _median = [_median[i] for i in _index]
                 total_percent_covered = round(bases_covered / total_bases, 3)
             if total_percent_covered > threshold:
-                if phylo_group == "Mycobacterium_llatzerense":  # Mistake in panel
-                    phylo_group = "Mycobacterium_mucogenicum"
                 covgs[phylo_group] = {
                     "percent_coverage": total_percent_covered,
                     "median_depth": median(_median)}
