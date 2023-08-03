@@ -1,5 +1,6 @@
 from __future__ import print_function
 import json
+import logging
 import os
 import operator
 from mykrobe.utils import median
@@ -8,6 +9,7 @@ from mykrobe.utils import flatten
 from mykrobe.metagenomics.models import MykrobePredictorPhylogeneticsResult
 from mykrobe.stats import percent_coverage_from_expected_coverage
 
+logger = logging.getLogger(__name__)
 
 DEFAULT_THRESHOLD = 30
 
@@ -141,8 +143,10 @@ class SpeciesPredictor(object):
             _median = covg_dict.get("median", [0])
             minimum_percentage_coverage_required = percent_coverage_from_expected_coverage(
                 self.expected_depth) * self.threshold.get(phylo_group, DEFAULT_THRESHOLD)
+            logger.debug(f"Probe coverage. probe={phylo_group} percent_covered={total_percent_covered} median_cov={median(_median)}")
             if total_percent_covered < minimum_percentage_coverage_required or median(
                     _median) < 0.1 * self.expected_depth:
+                logger.debug(f"Probe rejected. probe={phylo_group}, total percent covered={total_percent_covered} < {minimum_percentage_coverage_required}=min required, or median depth={median(_median)} < {round(0.1 * self.expected_depth, 1)} = 10% of expected depth of {self.expected_depth}")
                 # Remove low coverage nodes
                 _index = [
                     i for i,
