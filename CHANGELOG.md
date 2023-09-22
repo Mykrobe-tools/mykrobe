@@ -7,6 +7,11 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+
+- When using `--debug` flag, log species probe coverage/depth info and also each
+  time a probe is rejected due to low coverage and/or depth.
+
 ## [0.12.2]
 
 ### Fixed
