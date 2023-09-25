@@ -201,7 +201,7 @@ jobs:
         make tests
         cd ..
 
-        C:\\msys64\\mingw64\\bin\\python3.exe -m pip uninstall numpy
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip uninstall -y numpy
         echo "pip install requirements"
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install -r requirements.txt
         echo "pip install ."
