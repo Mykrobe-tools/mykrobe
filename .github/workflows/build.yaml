@@ -155,7 +155,7 @@ jobs:
       with:
         update: true
         install: >-
-          autotools gcc git libcurl-devel bzip2 liblzma zip libbz2-devel xz zlib zlib-devel libtool wget liblzma-devel ncurses-devel base-devel openssl-devel mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip mingw-w64-x86_64-python3-setuptools mingw-w64-x86_64-python3-wheel mingw-w64-x86_64-python-biopython
+          autotools gcc git libcurl-devel bzip2 liblzma zip libbz2-devel xz zlib zlib-devel libtool wget liblzma-devel ncurses-devel base-devel openssl-devel mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip mingw-w64-x86_64-python3-numpy mingw-w64-x86_64-python3-setuptools mingw-w64-x86_64-python3-wheel mingw-w64-x86_64-python-biopython
 
     - name: Check out code for the build
       uses: actions/checkout@v3
@@ -182,6 +182,7 @@ jobs:
         export PYTHONPATH="/mingw64/lib/python3.11/:/mingw64/lib/python3.11/site-packages:${PYTHONPATH}"
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip --upgrade
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install pyinstaller requests pytest
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip install numpy --upgrade
 
         echo "clone mccortex"
         rm -rf mccortex
@@ -201,7 +202,6 @@ jobs:
         make tests
         cd ..
 
-        C:\\msys64\\mingw64\\bin\\python3.exe -m pip uninstall -y numpy
         echo "pip install requirements"
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install -r requirements.txt
         echo "pip install ."
