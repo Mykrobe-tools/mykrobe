@@ -182,6 +182,11 @@ jobs:
         export PYTHONPATH="/mingw64/lib/python3.11/:/mingw64/lib/python3.11/site-packages:${PYTHONPATH}"
         echo "PATH:"
         echo "${PATH}"
+        echo "ls /mingw64/lib/python3.11/"
+        ls /mingw64/lib/python3.11/
+        echo "ls /mingw64/lib/python3.11/site-packages"
+        ls /mingw64/lib/python3.11/site-packages
+
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip --upgrade
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install pyinstaller requests pytest
 
