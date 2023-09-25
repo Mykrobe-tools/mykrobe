@@ -182,7 +182,7 @@ def ref_data_from_args(args):
     return ref_data
 
 
-def detect_species_and_get_depths(cov_parser, hierarchy_json, wanted_phylo_group):
+def detect_species_and_get_depths(cov_parser, hierarchy_json, wanted_phylo_group, probe_cov_json=None):
     depths = []
     if wanted_phylo_group is None:
         return {}, depths
@@ -195,6 +195,7 @@ def detect_species_and_get_depths(cov_parser, hierarchy_json, wanted_phylo_group
         species_covgs=cov_parser.covgs["species"],
         lineage_covgs=cov_parser.covgs.get("sub-species", {}),
         hierarchy_json_file=hierarchy_json,
+        probe_cov_json_file=probe_cov_json,
     )
     phylogenetics = species_predictor.run()
 
@@ -307,7 +308,7 @@ def run(parser, args):
         depths = [cp.estimate_depth()]
     else:
         phylogenetics, depths = detect_species_and_get_depths(
-            cp, ref_data["hierarchy_json"], ref_data["species_phylo_group"]
+            cp, ref_data["hierarchy_json"], ref_data["species_phylo_group"], probe_cov_json=args.dump_species_covgs,
         )
 
     # Genotype

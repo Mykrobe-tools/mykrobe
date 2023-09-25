@@ -136,6 +136,11 @@ genotyping_mixin.add_argument(
     default=False,
 )
 genotyping_mixin.add_argument(
+    "--dump_species_covgs",
+    help="Dump species probes coverage information to a JSON file",
+    metavar="FILENAME"
+)
+genotyping_mixin.add_argument(
     "-e",
     "--expected_error_rate",
     help="Expected sequencing error rate (default: %(default).3f)",

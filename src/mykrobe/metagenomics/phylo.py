@@ -63,7 +63,8 @@ class SpeciesPredictor(object):
             species_covgs,
             lineage_covgs,
             verbose=False,
-            hierarchy_json_file=None):
+            hierarchy_json_file=None,
+            probe_cov_json_file=None):
         self.phylo_group_covgs = phylo_group_covgs
         self.sub_complex_covgs = sub_complex_covgs
         self.species_covgs = species_covgs
@@ -75,6 +76,7 @@ class SpeciesPredictor(object):
             self.hierarchy = Hierarchy(load_json(hierarchy_json_file))
         except TypeError:
             self.hierarchy = {}
+        self.probe_cov_json_file = probe_cov_json_file
 
     def run(self):
         self._load_taxon_thresholds()
@@ -157,10 +159,25 @@ class SpeciesPredictor(object):
     def _aggregate_all(self):
         # Calculate expected coverage
         self.expected_depth = self.calc_expected_depth()
-        self._aggregate(self.phylo_group_covgs)
-        self._aggregate(self.sub_complex_covgs, threshold=50)
-        self._aggregate(self.species_covgs)
-        self._aggregate(self.lineage_covgs)
+        # The self.*_covgs dictionaries have lists of probe lengths
+        # and coverages. Then when self.__aggregate is run, the dicionaries
+        # are changed to only store the "aggregated" results, which is
+        # total length and median coverage. If we want a debug dump of
+        # the coverages, then need to copy the dicts before they get
+        # changed. Then afterwards add in the aggregated data to the copies
+        if self.probe_cov_json_file is None:
+            debug_probe_covs = {x: None for x in ["phylo_group", "sub_complex", "species", "lineage"]}
+        else:
+            debug_probe_covs = {
+                "phylo_group": copy.deepcopy(self.phylo_group_covgs),
+                "sub_complex": copy.deepcopy(self.sub_complex_covgs),
+                "species": copy.deepcopy(self.species_covgs),
+                "lineage": copy.deepcopy(self.lineage_covgs),
+            }
+        self._aggregate(self.phylo_group_covgs, debug_covgs=debug_probe_covs["phylo_group"])
+        self._aggregate(self.sub_complex_covgs, threshold=50, debug_covgs=debug_probe_covs["sub_complex"])
+        self._aggregate(self.species_covgs, debug_covgs=debug_probe_covs["species"])
+        self._aggregate(self.lineage_covgs, debug_covgs=debug_probe_covs["lineage"])
         self._copy_all_hits_upwards()
         self.out_json["phylogenetics"] = {}
         self.out_json["phylogenetics"]["phylo_group"] = self.phylo_group_covgs
@@ -179,12 +196,16 @@ class SpeciesPredictor(object):
         self._add_unknown_where_empty(
             self.out_json["phylogenetics"]["lineage"])
 
+        if self.probe_cov_json_file is not None:
+            with open(self.probe_cov_json_file, "w") as f:
+                json.dump(debug_probe_covs, f, indent=2, sort_keys=True)
+
 
     def _bases_covered(self, percent_coverage, length):
         return sum([percent_coverage[i] * length[i]
                     for i in range(len(length))])
 
-    def _aggregate(self, covgs, threshold=5):
+    def _aggregate(self, covgs, threshold=5, debug_covgs=None):
         del_phylo_groups = []
         for phylo_group, covg_dict in covgs.items():
             percent_coverage = covg_dict["percent_coverage"]
@@ -196,6 +217,9 @@ class SpeciesPredictor(object):
             minimum_percentage_coverage_required = percent_coverage_from_expected_coverage(
                 self.expected_depth) * self.threshold.get(phylo_group, DEFAULT_THRESHOLD)
             logger.debug(f"Probe coverage. probe={phylo_group} percent_covered={total_percent_covered} median_cov={median(_median)}")
+            aggregated = {
+                "percent_coverage": total_percent_covered,
+                "median_depth": median(_median)}
             if total_percent_covered < minimum_percentage_coverage_required or median(
                     _median) < 0.1 * self.expected_depth:
                 logger.debug(f"Probe rejected. probe={phylo_group}, total percent covered={total_percent_covered} < {minimum_percentage_coverage_required}=min required, or median depth={median(_median)} < {round(0.1 * self.expected_depth, 1)} = 10% of expected depth of {self.expected_depth}")
@@ -210,11 +234,18 @@ class SpeciesPredictor(object):
                 _median = [_median[i] for i in _index]
                 total_percent_covered = round(bases_covered / total_bases, 3)
             if total_percent_covered > threshold:
-                covgs[phylo_group] = {
-                    "percent_coverage": total_percent_covered,
-                    "median_depth": median(_median)}
+                covgs[phylo_group] = copy.deepcopy(aggregated)
+                aggregated["pass"] = True
+                #covgs[phylo_group] = {
+                #    "percent_coverage": total_percent_covered,
+                #    "median_depth": median(_median)}
             else:
                 del_phylo_groups.append(phylo_group)
+                aggregated["pass"] = False
+
+            if debug_covgs is not None:
+                debug_covgs[phylo_group]["aggregated"] = aggregated
+
         for phylo_group in del_phylo_groups:
             del covgs[phylo_group]
 
@@ -299,7 +330,8 @@ class AMRSpeciesPredictor(SpeciesPredictor):
             species_covgs,
             lineage_covgs,
             verbose=False,
-            hierarchy_json_file=None):
+            hierarchy_json_file=None,
+            probe_cov_json_file=None):
         super(
             AMRSpeciesPredictor,
             self).__init__(
@@ -308,7 +340,8 @@ class AMRSpeciesPredictor(SpeciesPredictor):
             species_covgs,
             lineage_covgs,
             verbose=verbose,
-            hierarchy_json_file=hierarchy_json_file)
+            hierarchy_json_file=hierarchy_json_file,
+            probe_cov_json_file=probe_cov_json_file)
 
     def is_saureus_present(self):
         return "Staphaureus" in self.out_json["phylogenetics"]["phylo_group"]
