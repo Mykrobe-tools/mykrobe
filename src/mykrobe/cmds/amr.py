@@ -182,7 +182,9 @@ def ref_data_from_args(args):
     return ref_data
 
 
-def detect_species_and_get_depths(cov_parser, hierarchy_json, wanted_phylo_group, probe_cov_json=None):
+def detect_species_and_get_depths(
+    cov_parser, hierarchy_json, wanted_phylo_group, probe_cov_json=None
+):
     depths = []
     if wanted_phylo_group is None:
         return {}, depths
@@ -308,7 +310,10 @@ def run(parser, args):
         depths = [cp.estimate_depth()]
     else:
         phylogenetics, depths = detect_species_and_get_depths(
-            cp, ref_data["hierarchy_json"], ref_data["species_phylo_group"], probe_cov_json=args.dump_species_covgs,
+            cp,
+            ref_data["hierarchy_json"],
+            ref_data["species_phylo_group"],
+            probe_cov_json=args.dump_species_covgs,
         )
 
     # Genotype
@@ -461,6 +466,8 @@ def run(parser, args):
     logger.info("Progress: writing output")
     fix_X_amino_acid_variants(base_json[args.sample])
     if args.ncbi_names and ref_data["ncbi_names_dict"] is not None:
-        add_ncbi_species_names_to_phylo_dict(base_json[args.sample]["phylogenetics"], ref_data["ncbi_names_dict"])
+        add_ncbi_species_names_to_phylo_dict(
+            base_json[args.sample]["phylogenetics"], ref_data["ncbi_names_dict"]
+        )
     write_outputs(args, base_json)
     logger.info("Progress: finished")

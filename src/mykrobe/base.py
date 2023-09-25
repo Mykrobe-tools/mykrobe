@@ -138,7 +138,7 @@ genotyping_mixin.add_argument(
 genotyping_mixin.add_argument(
     "--dump_species_covgs",
     help="Dump species probes coverage information to a JSON file",
-    metavar="FILENAME"
+    metavar="FILENAME",
 )
 genotyping_mixin.add_argument(
     "-e",

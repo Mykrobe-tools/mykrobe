@@ -3,6 +3,7 @@ import pytest
 
 from mykrobe import amr
 
+
 def test_add_ncbi_species_names_to_phylo_dict():
     phylo_expect = {
         "phylo_group": {
