@@ -155,7 +155,7 @@ jobs:
       with:
         update: true
         install: >-
-          autotools gcc git libcurl-devel bzip2 liblzma zip libbz2-devel xz zlib zlib-devel libtool wget liblzma-devel ncurses-devel base-devel openssl-devel mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip mingw-w64-x86_64-python3-numpy mingw-w64-x86_64-python3-setuptools mingw-w64-x86_64-python3-wheel mingw-w64-x86_64-python-biopython
+          autotools gcc git libcurl-devel bzip2 liblzma zip libbz2-devel xz zlib zlib-devel libtool wget liblzma-devel ncurses-devel base-devel openssl-devel mingw64/mingw-w64-x86_64-python3 mingw64/mingw-w64-x86_64-python3-pip mingw-w64-x86_64-python3-setuptools mingw-w64-x86_64-python3-wheel mingw-w64-x86_64-python-biopython
 
     - name: Check out code for the build
       uses: actions/checkout@v3
