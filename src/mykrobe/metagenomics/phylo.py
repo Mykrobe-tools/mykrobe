@@ -236,9 +236,6 @@ class SpeciesPredictor(object):
             if total_percent_covered > threshold:
                 covgs[phylo_group] = copy.deepcopy(aggregated)
                 aggregated["pass"] = True
-                #covgs[phylo_group] = {
-                #    "percent_coverage": total_percent_covered,
-                #    "median_depth": median(_median)}
             else:
                 del_phylo_groups.append(phylo_group)
                 aggregated["pass"] = False
