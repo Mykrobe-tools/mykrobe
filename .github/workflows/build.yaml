@@ -180,10 +180,9 @@ jobs:
         OUTPUT_TARBALL: mykrobe.command_line.windows.${{env.RELEASE_VERSION}}.tar.gz
       run: |
         export PYTHONPATH="/mingw64/lib/python3.11/:/mingw64/lib/python3.11/site-packages:${PYTHONPATH}"
-        "echo PATH:"
-        echo "${PATH}"
         C:\\msys64\\mingw64\\bin\\python3.exe -m ensurepip --upgrade
         C:\\msys64\\mingw64\\bin\\python3.exe -m pip install pyinstaller requests pytest
+        C:\\msys64\\mingw64\\bin\\python3.exe -m pip install numpy --upgrade
 
         echo "clone mccortex"
         rm -rf mccortex
