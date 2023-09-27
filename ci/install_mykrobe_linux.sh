@@ -23,7 +23,7 @@ python -m pip install -U pip
 
 cd $MYKROBE_ROOT_DIR
 rm -rf mccortex
-git clone --recursive -b geno_kmer_count https://github.com/Mykrobe-tools/mccortex mccortex
+git clone -b v0.0.5 --recursive https://github.com/Mykrobe-tools/mccortex mccortex
 cd mccortex
 make
 cd ..

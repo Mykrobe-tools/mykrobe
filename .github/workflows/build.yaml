@@ -105,7 +105,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex mccortex
+        git clone -b v0.0.5 --recursive https://github.com/Mykrobe-tools/mccortex mccortex
         cd mccortex
         make MAXK=31
         cd ..
@@ -185,7 +185,7 @@ jobs:
 
         echo "clone mccortex"
         rm -rf mccortex
-        git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex
+        git clone -b v0.0.5 --recursive https://github.com/Mykrobe-tools/mccortex mccortex
         cd mccortex/libs/htslib
         git checkout bcf9bff178f81c9c1cf3a052aeb6cbe32fe5fdcc
         cd ../bcftools
