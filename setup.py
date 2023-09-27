@@ -131,6 +131,7 @@ setup(
         "PyVCF3",
         "mongoengine",
         "requests",
+        "numpy",
     ],
     entry_points={
         "console_scripts": [
