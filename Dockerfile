@@ -33,7 +33,7 @@ COPY . "/${PROJECT}"
 # install mccortex
 WORKDIR "/tmp"
 
-RUN git clone --recursive -b geno_kmer_count https://github.com/phelimb/mccortex \
+RUN git clone -b v0.0.5 --recursive https://github.com/Mykrobe-tools/mccortex mccortex \
     && cd mccortex \
     && make MAXK=31 \
     && cp bin/mccortex31 /${PROJECT}/src/mykrobe/cortex/ \
