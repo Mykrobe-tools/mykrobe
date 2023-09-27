@@ -12,6 +12,24 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - When using `--debug` flag, log species probe coverage/depth info and also each
   time a probe is rejected due to low coverage and/or depth.
 
+- Added flag `--ncbi_names`. This is for soon to be updated tb probes for
+  species calling, where the JSON file will also report alternative NCBI taxon
+  names, as well as the default GTBD names.
+
+- Added option `--dump_species_covgs`, to dump a JSON file of all the species
+  probe coverage information. This includes the raw coverage info from mccortex,
+  before it is aggregated into a single call that you see in the usual
+  mykrobe output.
+
+### Changed
+
+- The tb species probes are going to be updated after the next release of
+  mykrobe. Code changed to handle these new probes, specifically where a node in
+  the taxon tree has no probes. If a child node is called as present from the
+  reads, then push that call up to the parent node. Code still works as normal
+  on the existing (soon to be old) panels.
+
+
 ## [0.12.2]
 
 ### Fixed

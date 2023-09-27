@@ -1,4 +1,5 @@
 from __future__ import print_function
+import copy
 import json
 import logging
 import os
@@ -14,22 +15,22 @@ logger = logging.getLogger(__name__)
 DEFAULT_THRESHOLD = 30
 
 TAXON_THRESHOLDS = {
-    "Saureus" : 30,
-    "Sepidermidis" : 30,
-    "Shaemolyticus" : 30,
-    "Sother" : 15,
-    "Coagneg" : 30,
-    "Staphaureus" : 30,
-    "Escherichia_coli" : 15,
-    "Klebsiella_pneumoniae" : 15,
+    "Saureus": 30,
+    "Sepidermidis": 30,
+    "Shaemolyticus": 30,
+    "Sother": 15,
+    "Coagneg": 30,
+    "Staphaureus": 30,
+    "Escherichia_coli": 15,
+    "Klebsiella_pneumoniae": 15,
     "Ecoli_Shigella": 90,
     "Shigella_sonnei": 90,
     "Salmonella_enterica": 90,
     "Salmonella_Typhi": 90,
 }
 
-class Hierarchy(object):
 
+class Hierarchy(object):
     def __init__(self, _dict):
         self.dict = _dict
 
@@ -54,15 +55,16 @@ class Hierarchy(object):
 
 
 class SpeciesPredictor(object):
-
     def __init__(
-            self,
-            phylo_group_covgs,
-            sub_complex_covgs,
-            species_covgs,
-            lineage_covgs,
-            verbose=False,
-            hierarchy_json_file=None):
+        self,
+        phylo_group_covgs,
+        sub_complex_covgs,
+        species_covgs,
+        lineage_covgs,
+        verbose=False,
+        hierarchy_json_file=None,
+        probe_cov_json_file=None,
+    ):
         self.phylo_group_covgs = phylo_group_covgs
         self.sub_complex_covgs = sub_complex_covgs
         self.species_covgs = species_covgs
@@ -74,23 +76,26 @@ class SpeciesPredictor(object):
             self.hierarchy = Hierarchy(load_json(hierarchy_json_file))
         except TypeError:
             self.hierarchy = {}
+        self.probe_cov_json_file = probe_cov_json_file
 
     def run(self):
         self._load_taxon_thresholds()
         self._aggregate_all()
-        return MykrobePredictorPhylogeneticsResult(phylogenetics=self.out_json["phylogenetics"])
+        return MykrobePredictorPhylogeneticsResult(
+            phylogenetics=self.out_json["phylogenetics"]
+        )
 
     def _add_unknown_where_empty(self, covgs):
         if not covgs:
             covgs["Unknown"] = {"percent_coverage": -1, "median_depth": -1}
 
     def _load_taxon_thresholds(self):
-        #taxon_coverage_threshold_file = os.path.realpath(
+        # taxon_coverage_threshold_file = os.path.realpath(
         #    os.path.join(
         #        os.path.dirname(__file__),
         #        "..",
         #        "data/predict/taxon_coverage_threshold.json"))
-        #with open(taxon_coverage_threshold_file, "r") as infile:
+        # with open(taxon_coverage_threshold_file, "r") as infile:
         #    self.threshold = json.load(infile)
         self.threshold = TAXON_THRESHOLDS
 
@@ -104,13 +109,96 @@ class SpeciesPredictor(object):
         else:
             return 0
 
+    def _copy_best_one_level_up(self, hierarchy_dict, parent_covgs, child_covgs):
+        for parent_name in hierarchy_dict:
+            if parent_name in parent_covgs:
+                continue
+
+            best_match = None
+
+            for child_name in hierarchy_dict[parent_name]["children"]:
+                if child_name in child_covgs:
+                    if (
+                        best_match is None
+                        or best_match["percent_coverage"]
+                        < child_covgs[child_name]["percent_coverage"]
+                    ):
+                        best_match = child_covgs[child_name]
+
+            if best_match is not None:
+                parent_covgs[parent_name] = copy.deepcopy(best_match)
+                parent_covgs[parent_name]["inferred_from_child"] = True
+
+    def _copy_all_hits_upwards(self):
+        # For new (June 2023) TB probes, we don't have probes that
+        # are in both NTM and Mtb complexes. Also no probes that are in
+        # all NTMs. And the probe tree structure is slightly different, as
+        # it has subspecies, species, complex, and no sub-complex.
+        # The result of this is
+        # that we need to push subspecies matches up to the phylo group
+        # level, because later the code starts at the top of the tree and
+        # works it way down. If it finds no match at any level, then it stops.
+        # Hence we need matches at the top level of the tree.
+        #
+        # New probes have a tree with this top-level structure:
+        # Non_tuberculosis_mycobacterium_complex (no probes)
+        #  - subNon_tuberculosis_mycobacterium_complex (no probes)
+        #     - Mycobacterium_abscessus
+        #     - ... lots more NTMs ...
+        # Mycobacterium_tuberculosis_complex (no probes)
+        #  - subMycobacterium_tuberculosis_complex (has probes)
+        #     - Mycobacterium_canettii
+        #     - Mycobacterium_mungi ... etc ...
+        #
+        # Keep that extra later of complexes so the hierarchy still has
+        # 4 levels, which is assumed throughout this python file
+        if not self.hierarchy:
+            return
+
+        # Push species level matches up to sub-complex
+        for complex_name in self.hierarchy.dict:
+            self._copy_best_one_level_up(
+                self.hierarchy.dict[complex_name]["children"],
+                self.sub_complex_covgs,
+                self.species_covgs,
+            )
+
+        # Push sub-complex matches up to complex
+        self._copy_best_one_level_up(
+            self.hierarchy.dict, self.phylo_group_covgs, self.sub_complex_covgs
+        )
+
     def _aggregate_all(self):
         # Calculate expected coverage
         self.expected_depth = self.calc_expected_depth()
-        self._aggregate(self.phylo_group_covgs)
-        self._aggregate(self.sub_complex_covgs, threshold=50)
-        self._aggregate(self.species_covgs)
-        self._aggregate(self.lineage_covgs)
+        # The self.*_covgs dictionaries have lists of probe lengths
+        # and coverages. Then when self.__aggregate is run, the dicionaries
+        # are changed to only store the "aggregated" results, which is
+        # total length and median coverage. If we want a debug dump of
+        # the coverages, then need to copy the dicts before they get
+        # changed. Then afterwards add in the aggregated data to the copies
+        if self.probe_cov_json_file is None:
+            debug_probe_covs = {
+                x: None for x in ["phylo_group", "sub_complex", "species", "lineage"]
+            }
+        else:
+            debug_probe_covs = {
+                "phylo_group": copy.deepcopy(self.phylo_group_covgs),
+                "sub_complex": copy.deepcopy(self.sub_complex_covgs),
+                "species": copy.deepcopy(self.species_covgs),
+                "lineage": copy.deepcopy(self.lineage_covgs),
+            }
+        self._aggregate(
+            self.phylo_group_covgs, debug_covgs=debug_probe_covs["phylo_group"]
+        )
+        self._aggregate(
+            self.sub_complex_covgs,
+            threshold=50,
+            debug_covgs=debug_probe_covs["sub_complex"],
+        )
+        self._aggregate(self.species_covgs, debug_covgs=debug_probe_covs["species"])
+        self._aggregate(self.lineage_covgs, debug_covgs=debug_probe_covs["lineage"])
+        self._copy_all_hits_upwards()
         self.out_json["phylogenetics"] = {}
         self.out_json["phylogenetics"]["phylo_group"] = self.phylo_group_covgs
         self.out_json["phylogenetics"]["sub_complex"] = self.sub_complex_covgs
@@ -118,21 +206,21 @@ class SpeciesPredictor(object):
         self.out_json["phylogenetics"]["lineage"] = self.lineage_covgs
         if not self.verbose:
             self.out_json["phylogenetics"] = self.choose_best(
-                self.out_json["phylogenetics"])
-        self._add_unknown_where_empty(
-            self.out_json["phylogenetics"]["phylo_group"])
-        self._add_unknown_where_empty(
-            self.out_json["phylogenetics"]["sub_complex"])
-        self._add_unknown_where_empty(
-            self.out_json["phylogenetics"]["species"])
-        self._add_unknown_where_empty(
-            self.out_json["phylogenetics"]["lineage"])
+                self.out_json["phylogenetics"]
+            )
+        self._add_unknown_where_empty(self.out_json["phylogenetics"]["phylo_group"])
+        self._add_unknown_where_empty(self.out_json["phylogenetics"]["sub_complex"])
+        self._add_unknown_where_empty(self.out_json["phylogenetics"]["species"])
+        self._add_unknown_where_empty(self.out_json["phylogenetics"]["lineage"])
+
+        if self.probe_cov_json_file is not None:
+            with open(self.probe_cov_json_file, "w") as f:
+                json.dump(debug_probe_covs, f, indent=2, sort_keys=True)
 
     def _bases_covered(self, percent_coverage, length):
-        return sum([percent_coverage[i] * length[i]
-                    for i in range(len(length))])
+        return sum([percent_coverage[i] * length[i] for i in range(len(length))])
 
-    def _aggregate(self, covgs, threshold=5):
+    def _aggregate(self, covgs, threshold=5, debug_covgs=None):
         del_phylo_groups = []
         for phylo_group, covg_dict in covgs.items():
             percent_coverage = covg_dict["percent_coverage"]
@@ -141,56 +229,75 @@ class SpeciesPredictor(object):
             total_bases = covg_dict["total_bases"]
             total_percent_covered = round(bases_covered / total_bases, 3)
             _median = covg_dict.get("median", [0])
-            minimum_percentage_coverage_required = percent_coverage_from_expected_coverage(
-                self.expected_depth) * self.threshold.get(phylo_group, DEFAULT_THRESHOLD)
-            logger.debug(f"Probe coverage. probe={phylo_group} percent_covered={total_percent_covered} median_cov={median(_median)}")
-            if total_percent_covered < minimum_percentage_coverage_required or median(
-                    _median) < 0.1 * self.expected_depth:
-                logger.debug(f"Probe rejected. probe={phylo_group}, total percent covered={total_percent_covered} < {minimum_percentage_coverage_required}=min required, or median depth={median(_median)} < {round(0.1 * self.expected_depth, 1)} = 10% of expected depth of {self.expected_depth}")
+            minimum_percentage_coverage_required = (
+                percent_coverage_from_expected_coverage(self.expected_depth)
+                * self.threshold.get(phylo_group, DEFAULT_THRESHOLD)
+            )
+            logger.debug(
+                f"Probe coverage. probe={phylo_group} percent_covered={total_percent_covered} median_cov={median(_median)}"
+            )
+            aggregated = {
+                "percent_coverage": total_percent_covered,
+                "median_depth": median(_median),
+            }
+            if (
+                total_percent_covered < minimum_percentage_coverage_required
+                or median(_median) < 0.1 * self.expected_depth
+            ):
+                logger.debug(
+                    f"Probe rejected. probe={phylo_group}, total percent covered={total_percent_covered} < {minimum_percentage_coverage_required}=min required, or median depth={median(_median)} < {round(0.1 * self.expected_depth, 1)} = 10% of expected depth of {self.expected_depth}"
+                )
                 # Remove low coverage nodes
                 _index = [
-                    i for i,
-                    d in enumerate(_median) if d > 0.1 *
-                    self.expected_depth]
+                    i for i, d in enumerate(_median) if d > 0.1 * self.expected_depth
+                ]
                 percent_coverage = [percent_coverage[i] for i in _index]
                 length = [length[i] for i in _index]
                 bases_covered = self._bases_covered(percent_coverage, length)
                 _median = [_median[i] for i in _index]
                 total_percent_covered = round(bases_covered / total_bases, 3)
             if total_percent_covered > threshold:
-                if phylo_group == "Mycobacterium_llatzerense":  # Mistake in panel
-                    phylo_group = "Mycobacterium_mucogenicum"
-                covgs[phylo_group] = {
-                    "percent_coverage": total_percent_covered,
-                    "median_depth": median(_median)}
+                covgs[phylo_group] = copy.deepcopy(aggregated)
+                aggregated["pass"] = True
             else:
                 del_phylo_groups.append(phylo_group)
+                aggregated["pass"] = False
+
+            if debug_covgs is not None:
+                debug_covgs[phylo_group]["aggregated"] = aggregated
+
         for phylo_group in del_phylo_groups:
             del covgs[phylo_group]
 
     def choose_best(self, phylogenetics):
         # Get all the phylo_groups present.
-        phylo_groups = self._get_present_phylo_groups(
-            phylogenetics["phylo_group"])
+        phylo_groups = self._get_present_phylo_groups(phylogenetics["phylo_group"])
         phylogenetics["phylo_group"] = phylo_groups
         sub_complexes = self._get_present_phylo_groups(
-            phylogenetics["sub_complex"],
-            mix_threshold=90)
+            phylogenetics["sub_complex"], mix_threshold=90
+        )
         phylogenetics["sub_complex"] = sub_complexes
         # for each phylo_group, get the best species in the phylo_group (using
         # sub_complex info where possible)
         species = {}
         for pg in phylo_groups.keys():
             if self.hierarchy:
-                allowed_species = flatten([self.hierarchy.dict[pg]["children"][subc]["children"].keys(
-                ) for subc in self.hierarchy.dict[pg]["children"].keys() if subc != "Unknown"])
-                species_to_consider = {k: phylogenetics["species"].get(
-                    k, {"percent_coverage": 0}) for k in allowed_species}
+                allowed_species = flatten(
+                    [
+                        self.hierarchy.dict[pg]["children"][subc]["children"].keys()
+                        for subc in self.hierarchy.dict[pg]["children"].keys()
+                        if subc != "Unknown"
+                    ]
+                )
+                species_to_consider = {
+                    k: phylogenetics["species"].get(k, {"percent_coverage": 0})
+                    for k in allowed_species
+                }
             else:
                 species_to_consider = phylogenetics["species"]
             best_species = self._get_present_phylo_groups(
-                species_to_consider,
-                mix_threshold=90)
+                species_to_consider, mix_threshold=90
+            )
             species.update(best_species)
         phylogenetics["species"] = species
         # For each species, get the best sub species where applicable
@@ -198,12 +305,13 @@ class SpeciesPredictor(object):
         for s in species.keys():
             if self.hierarchy:
                 allowed_sub_species = self.hierarchy.get_children(s)
-                sub_species_to_consider = {k: phylogenetics["lineage"].get(
-                    k, {"percent_coverage": 0}) for k in allowed_sub_species}
+                sub_species_to_consider = {
+                    k: phylogenetics["lineage"].get(k, {"percent_coverage": 0})
+                    for k in allowed_sub_species
+                }
             else:
                 sub_species_to_consider = phylogenetics.get("lineage", {})
-            best_sub_species = self._get_best_coverage_dict(
-                sub_species_to_consider)
+            best_sub_species = self._get_best_coverage_dict(sub_species_to_consider)
             sub_species.update(best_sub_species)
         phylogenetics["lineage"] = sub_species
         return phylogenetics
@@ -214,12 +322,16 @@ class SpeciesPredictor(object):
         if not phylo_groups:
             return phylo_groups
         high_confidence_phylo_groups = [
-            pg for pg,
-            d in phylo_groups.items() if d["percent_coverage"] > mix_threshold]
+            pg
+            for pg, d in phylo_groups.items()
+            if d["percent_coverage"] > mix_threshold
+        ]
         if len(high_confidence_phylo_groups) > 1:
             # high_confidence_phylo_groups
-            return {k: phylo_groups.get(k, {"percent_coverage": 0})
-                    for k in high_confidence_phylo_groups}
+            return {
+                k: phylo_groups.get(k, {"percent_coverage": 0})
+                for k in high_confidence_phylo_groups
+            }
         else:
             # Otherwise return best hit
             return self._get_best_coverage_dict(phylo_groups)
@@ -231,9 +343,9 @@ class SpeciesPredictor(object):
             return coverage_dict
         sorted_coverage_dict = sorted(
             coverage_dict.items(),
-            key=lambda x: (x[1]["percent_coverage"], x[
-                           1].get("median_depth", 0)),
-            reverse=True)
+            key=lambda x: (x[1]["percent_coverage"], x[1].get("median_depth", 0)),
+            reverse=True,
+        )
         if (sorted_coverage_dict[0][1]["percent_coverage"]) > 0:
             return {sorted_coverage_dict[0][0]: sorted_coverage_dict[0][1]}
         else:
@@ -241,43 +353,49 @@ class SpeciesPredictor(object):
 
 
 class AMRSpeciesPredictor(SpeciesPredictor):
-
     def __init__(
-            self,
-            phylo_group_covgs,
-            sub_complex_covgs,
-            species_covgs,
-            lineage_covgs,
-            verbose=False,
-            hierarchy_json_file=None):
-        super(
-            AMRSpeciesPredictor,
-            self).__init__(
+        self,
+        phylo_group_covgs,
+        sub_complex_covgs,
+        species_covgs,
+        lineage_covgs,
+        verbose=False,
+        hierarchy_json_file=None,
+        probe_cov_json_file=None,
+    ):
+        super(AMRSpeciesPredictor, self).__init__(
             phylo_group_covgs,
             sub_complex_covgs,
             species_covgs,
             lineage_covgs,
             verbose=verbose,
-            hierarchy_json_file=hierarchy_json_file)
+            hierarchy_json_file=hierarchy_json_file,
+            probe_cov_json_file=probe_cov_json_file,
+        )
 
     def is_saureus_present(self):
         return "Staphaureus" in self.out_json["phylogenetics"]["phylo_group"]
 
     def is_mtbc_present(self):
-        return "Mycobacterium_tuberculosis_complex" in self.out_json[
-            "phylogenetics"]["phylo_group"]
+        return (
+            "Mycobacterium_tuberculosis_complex"
+            in self.out_json["phylogenetics"]["phylo_group"]
+        )
 
     def is_ntm_present(self):
-        return "Non_tuberculosis_mycobacterium_complex" in self.out_json[
-            "phylogenetics"]["phylo_group"]
+        return (
+            "Non_tuberculosis_mycobacterium_complex"
+            in self.out_json["phylogenetics"]["phylo_group"]
+        )
 
     def is_gram_neg_present(self):
-        return self.is_klebsiella_pneumoniae_present(
-        ) or self.is_escherichia_coli_present()
+        return (
+            self.is_klebsiella_pneumoniae_present()
+            or self.is_escherichia_coli_present()
+        )
 
     def is_klebsiella_pneumoniae_present(self):
-        return "Klebsiella_pneumoniae" in self.out_json[
-            "phylogenetics"]["species"]
+        return "Klebsiella_pneumoniae" in self.out_json["phylogenetics"]["species"]
 
     def is_escherichia_coli_present(self):
         return "Escherichia_coli" in self.out_json["phylogenetics"]["species"]
