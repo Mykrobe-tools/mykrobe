@@ -1,9 +1,7 @@
 import gzip
 import hashlib
 import json
-import math
 import os
-import random
 import re
 from pathlib import Path
 from typing import TextIO, Union
@@ -192,37 +190,3 @@ def get_first_chrom_name(fp: TextIO) -> str:
     if not header.startswith(">"):
         raise ValueError(f"Expected fasta file, but it did not start with '>'")
     return header[1:].split()[0]
-
-
-def poisson_random(lam):
-    # see https://en.wikipedia.org/wiki/Poisson_distribution#Random_variate_generation
-    L = math.exp(-lam)
-    k = 0
-    p = 1
-    while p > L:
-        k += 1
-        p *= random.uniform(0, 1)
-    return k - 1
-
-
-def poisson_random_sample(lam, size):
-    return [poisson_random(lam) for _ in range(size)]
-
-
-def binomial_random(n, p):
-    if not 0 <= p <= 1:
-        raise ValueError(f"Must have  0<=p<=1. p={p}")
-    if n <= 0:
-        raise ValueError(f"Must have n>0. n={n}")
-
-    successes = 0
-
-    for _ in range(n):
-        if random.random() < p:
-            successes += 1
-
-    return successes
-
-
-def binomial_random_sample(n, p, size):
-    return [binomial_random(n, p) for _ in range(size)]

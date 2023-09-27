@@ -3,11 +3,12 @@ from __future__ import print_function
 import copy
 import json
 import logging
-import math
 import random
 import sys
 import tempfile
 import time
+
+import numpy as np
 
 from mykrobe import ONT_E_RATE, ONT_PLOIDY
 from mykrobe.metagenomics import AMRSpeciesPredictor
@@ -22,8 +23,6 @@ from mykrobe.typing.models.variant import VariantProbeCoverage
 from mykrobe.typing.typer.variant import VariantTyper
 from mykrobe.utils import fix_amino_acid_X_variants_keys
 from mykrobe.utils import load_json
-from mykrobe.utils import binomial_random_sample
-from mykrobe.utils import poisson_random_sample
 from mykrobe.version import __version__ as atlas_version
 from mykrobe.version import __version__ as predictor_version
 
@@ -76,9 +75,9 @@ class ConfThresholder:
         return 0
 
     def _simulate_snps(self):
-        correct_covg = poisson_random_sample(self.mean_depth, self.iterations)
-        incorrect_covg = binomial_random_sample(
-            self.mean_depth, self.error_rate, self.iterations
+        correct_covg = np.random.poisson(lam=self.mean_depth, size=self.iterations)
+        incorrect_covg = np.random.binomial(
+            self.mean_depth, self.error_rate, size=self.iterations
         )
         probe_coverage_list = []
         vtyper = VariantTyper(
@@ -123,7 +122,7 @@ class ConfThresholder:
             )
             call = vtyper.type(vpc)
 
-            cov = math.log10(correct_covg[i] + incorrect_covg[i])
+            cov = np.log10(correct_covg[i] + incorrect_covg[i])
             conf = call["info"]["conf"]
             self.log_conf_and_covg.append((conf, cov))
 
