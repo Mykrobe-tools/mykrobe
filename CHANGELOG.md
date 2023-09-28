@@ -29,6 +29,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   reads, then push that call up to the parent node. Code still works as normal
   on the existing (soon to be old) panels.
 
+- When reporting panel version in JSON file and stderr logging, only had
+  the "main" version of the collection of panels, eg "20220705" for tb.
+  Changed to also report the specific panel used, eg "20220705/202206".
 
 ## [0.12.2]
 
