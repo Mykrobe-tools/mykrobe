@@ -169,7 +169,7 @@ def ref_data_from_args(args):
             "lineage_json": species_dir.json_file("lineage"),
             "ncbi_names_json": species_dir.json_file("ncbi_names"),
             "kmer": species_dir.kmer(),
-            "version": species_dir.version(),
+            "version": species_dir.version() + "/" + species_dir.panel_name,
             "species_phylo_group": species_dir.species_phylo_group(),
         }
 
