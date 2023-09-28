@@ -7,6 +7,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+
+## [0.13.0]
+
 ### Added
 
 - When using `--debug` flag, log species probe coverage/depth info and also each
@@ -147,8 +150,11 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 [172]: https://github.com/Mykrobe-tools/mykrobe/issues/172
 
-[Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.12.1...HEAD
+[Unreleased]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.13.0...HEAD
+
 [0.12.2]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.12.1...v0.12.2
+
+[0.13.0]: https://github.com/Mykrobe-tools/mykrobe/compare/v0.12.2...v0.13.0
 
 [mkdtemp]: https://docs.python.org/3.6/library/tempfile.html#tempfile.mkdtemp
 
