@@ -9,6 +9,7 @@ from mykrobe.species_data import DataDir
 
 data_dir = os.path.dirname(os.path.abspath(__file__))
 
+
 def test_data_dir():
     # This is a long test that runs through the entire reference data process
     # that a user might do: update metadata, install a species, update a
@@ -62,7 +63,9 @@ def test_data_dir():
     assert ddir.species_is_installed("species1")
     assert ddir.installed_species() == ["species1"]
     expect_manifest_with_species1 = copy.deepcopy(expect_manifest)
-    expect_manifest_with_species1["species1"]["installed"] = copy.copy(manifest_data["species1"])
+    expect_manifest_with_species1["species1"]["installed"] = copy.copy(
+        manifest_data["species1"]
+    )
     assert ddir.manifest == expect_manifest_with_species1
 
     # Want to test we can get species1 from the data dir.
@@ -104,8 +107,12 @@ def test_data_dir():
 
     # Now update species1 with the force option and check it worked.
     ddir.add_or_replace_species_data(species1_tarball, force=True)
-    expect_manifest_with_species1["species1"]["latest"] = copy.copy(manifest_data["species1"])
-    expect_manifest_with_species1["species1"]["installed"] = copy.copy(manifest_data["species1"])
+    expect_manifest_with_species1["species1"]["latest"] = copy.copy(
+        manifest_data["species1"]
+    )
+    expect_manifest_with_species1["species1"]["installed"] = copy.copy(
+        manifest_data["species1"]
+    )
     assert ddir.manifest == expect_manifest_with_species1
     assert ddir.species_is_installed("species1")
     assert ddir.installed_species() == ["species1"]

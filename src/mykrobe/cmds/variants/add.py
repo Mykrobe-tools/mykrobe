@@ -48,7 +48,7 @@ def run(parser, args):
     else:
         logger.setLevel(logging.INFO)
     DBNAME = "%s-%s" % (DB_PREFIX, args.db_name)
-    connect(DBNAME, host=args.db_uri)
+    connect(DBNAME, host=args.db_uri, uuidRepresentation="pythonLegacy")
     logger.debug("Using DB %s" % DBNAME)
 
     with open(args.reference_set) as fp:
@@ -58,7 +58,7 @@ def run(parser, args):
         reference_set = ReferenceSet.objects.get(name=reference_set_name)
     except DoesNotExist:
         reference_set = ReferenceSet.create_and_save(name=reference_set_name)
-        
+
     try:
         reference = Reference.create_and_save(
             name=reference_set_name, reference_sets=[reference_set], md5checksum="NA"

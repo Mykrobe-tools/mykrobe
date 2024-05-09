@@ -1,5 +1,4 @@
 import copy
-import pytest
 
 from mykrobe import amr
 

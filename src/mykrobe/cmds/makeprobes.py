@@ -39,7 +39,7 @@ def run(parser, args):
         logger.info("Not connecting to database, because --no-backgrounds option used")
         DB = None
     else:
-        DB = connect("%s-%s" % (DB_PREFIX, args.db_name), host=args.db_uri)
+        DB = connect("%s-%s" % (DB_PREFIX, args.db_name), host=args.db_uri, uuidRepresentation="pythonLegacy")
 
     if DB is not None:
         try:

@@ -32,7 +32,7 @@ def get_non_singelton_variants(db_name):
 
 def run(parser, args):
     db_name = '%s-%s' % (DB_PREFIX, args.db_name)
-    DB = connect(db_name, host=args.db_uri)
+    DB = connect(db_name, host=args.db_uri, uuidRepresentation="pythonLegacy")
     if args.verbose:
         logger.setLevel(level=logging.DEBUG)
     else:

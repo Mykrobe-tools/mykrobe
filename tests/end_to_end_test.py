@@ -1,6 +1,5 @@
 import json
 import os
-import pytest
 import subprocess
 
 from mykrobe.parser import parser
