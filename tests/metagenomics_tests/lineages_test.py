@@ -1,8 +1,6 @@
 import copy
 import json
-import pytest
 
-import anytree
 from anytree.exporter import JsonExporter
 
 from mykrobe.metagenomics import LineagePredictor
@@ -13,6 +11,7 @@ def test_lineage_to_itself_plus_parents():
     assert f("a") == ["a"]
     assert f("a.1") == ["a", "a.1"]
     assert f("a.1.2") == ["a", "a.1", "a.1.2"]
+
 
 def test_constructor_makes_tree():
     # Note: deliberately miss out lineage1.1 to check that node
@@ -36,10 +35,16 @@ def test_constructor_makes_tree():
                 "name": "lineage1",
                 "children": [
                     {"name": "lineage1.2"},
-                    {"name": "lineage1.1", "children": [{"name": "lineage1.1.1"}],},
+                    {
+                        "name": "lineage1.1",
+                        "children": [{"name": "lineage1.1.1"}],
+                    },
                 ],
             },
-            {"name": "lineage2", "children": [{"name": "lineage2.1"}],},
+            {
+                "name": "lineage2",
+                "children": [{"name": "lineage2.1"}],
+            },
         ],
     }
     assert got_tree == expect_tree
@@ -48,11 +53,20 @@ def test_constructor_makes_tree():
 def test_score_each_lineage_node():
     lineage_calls = {
         "lineage1": {
-            "var1": {"genotype": [0, 0], "info": {"filter": [], "conf": 500},},
-            "var1a": {"genotype": [1, 1], "info": {"filter": [], "conf": 1000},},
+            "var1": {
+                "genotype": [0, 0],
+                "info": {"filter": [], "conf": 500},
+            },
+            "var1a": {
+                "genotype": [1, 1],
+                "info": {"filter": [], "conf": 1000},
+            },
         },
         "lineage1.1": {
-            "var1.1": {"genotype": [1, 1], "info": {"filter": [], "conf": 20},},
+            "var1.1": {
+                "genotype": [1, 1],
+                "info": {"filter": [], "conf": 20},
+            },
         },
     }
     variant_to_lineage = {
@@ -79,18 +93,38 @@ def test_get_paths_and_scores():
 
     lineage_calls = {
         "lineage1": {
-            "var1": {"genotype": [0, 0], "info": {"filter": [], "conf": 500},},
-            "var1a": {"genotype": [1, 1], "info": {"filter": [], "conf": 1000},},
+            "var1": {
+                "genotype": [0, 0],
+                "info": {"filter": [], "conf": 500},
+            },
+            "var1a": {
+                "genotype": [1, 1],
+                "info": {"filter": [], "conf": 1000},
+            },
         },
         "lineage1.1": {
-            "var1.1": {"genotype": [1, 1], "info": {"filter": [], "conf": 1000},},
+            "var1.1": {
+                "genotype": [1, 1],
+                "info": {"filter": [], "conf": 1000},
+            },
         },
         "lineage1.1.1": {
-            "var1.1.1": {"genotype": [1, 1], "info": {"filter": [], "conf": 100},},
+            "var1.1.1": {
+                "genotype": [1, 1],
+                "info": {"filter": [], "conf": 100},
+            },
         },
-        "lineage2": {"var2": {"genotype": [1, 1], "info": {"filter": [], "conf": 1},},},
+        "lineage2": {
+            "var2": {
+                "genotype": [1, 1],
+                "info": {"filter": [], "conf": 1},
+            },
+        },
         "lineage2.1": {
-            "var2": {"genotype": [0, 0], "info": {"filter": [], "conf": 100},},
+            "var2": {
+                "genotype": [0, 0],
+                "info": {"filter": [], "conf": 100},
+            },
         },
     }
 
@@ -128,9 +162,16 @@ def test_call_lineage_using_conf_scores():
     var2_1_call = {"genotype": [1, 1], "info": {"filter": [], "conf": 500}}
 
     lineage_calls = {
-        "lineage1": {"var1": var1_call, "var1a": var1a_call,},
-        "lineage1.1": {"var1.1": var1_1_call,},
-        "lineage1.1.1": {"var1.1.1": var1_1_1_call,},
+        "lineage1": {
+            "var1": var1_call,
+            "var1a": var1a_call,
+        },
+        "lineage1.1": {
+            "var1.1": var1_1_call,
+        },
+        "lineage1.1.1": {
+            "var1.1.1": var1_1_1_call,
+        },
     }
 
     expect = {
@@ -151,8 +192,13 @@ def test_call_lineage_using_conf_scores():
 
 def test_genotype_each_lineage_node():
     lineage_calls = {
-        "lineage1": {"var1": {"genotype": [0, 0]}, "var1a": {"genotype": [1, 1]},},
-        "lineage1.1": {"var1.1": {"genotype": [0, 1]},},
+        "lineage1": {
+            "var1": {"genotype": [0, 0]},
+            "var1a": {"genotype": [1, 1]},
+        },
+        "lineage1.1": {
+            "var1.1": {"genotype": [0, 1]},
+        },
     }
     variant_to_lineage = {
         "var1": {"name": "lineage1", "use_ref_allele": True},
@@ -177,24 +223,35 @@ def test_get_good_paths_using_genotype_calls():
     }
 
     lineage_calls = {
-        "lineage1": {"var1": {"genotype": [0, 0],}, "var1a": {"genotype": [1, 1]},},
-        "lineage1.1": {"var1.1": {"genotype": [1, 1]},},
-        "lineage1.1.1": {"var1.1.1": {"genotype": [1, 1]},},
-        "lineage2": {"var2": {"genotype": [1, 1]},},
-        "lineage2.1": {"var2": {"genotype": [0, 0]},},
+        "lineage1": {
+            "var1": {
+                "genotype": [0, 0],
+            },
+            "var1a": {"genotype": [1, 1]},
+        },
+        "lineage1.1": {
+            "var1.1": {"genotype": [1, 1]},
+        },
+        "lineage1.1.1": {
+            "var1.1.1": {"genotype": [1, 1]},
+        },
+        "lineage2": {
+            "var2": {"genotype": [1, 1]},
+        },
+        "lineage2.1": {
+            "var2": {"genotype": [0, 0]},
+        },
     }
 
     lin_pred = LineagePredictor(variant_to_lineage)
     got = lin_pred._get_good_paths_using_genotype_calls(lineage_calls)
     expect = {
-        "lineage1.1.1":
-        {
+        "lineage1.1.1": {
             "genotypes": {"lineage1": 1, "lineage1.1": 1, "lineage1.1.1": 1},
             "good_nodes": 3,
             "tree_depth": 3,
         },
-        "lineage2":
-        {
+        "lineage2": {
             "genotypes": {"lineage2": 1},
             "good_nodes": 1,
             "tree_depth": 1,
@@ -208,7 +265,11 @@ def test_call_lineage():
         "var1": {"name": "lineage1", "use_ref_allele": False},
         "var1a": {"name": "lineage1", "use_ref_allele": False},
         "var1.1": {"name": "lineage1.1", "use_ref_allele": False},
-        "var1.1.1": {"name": "lineage1.1.1", "use_ref_allele": False, "report_name": "l1-1-1"},
+        "var1.1.1": {
+            "name": "lineage1.1.1",
+            "use_ref_allele": False,
+            "report_name": "l1-1-1",
+        },
         "var2": {"name": "lineage2", "use_ref_allele": False},
         "var2.1": {"name": "lineage2.1", "use_ref_allele": False},
     }
@@ -223,9 +284,16 @@ def test_call_lineage():
     var2_1_call = {"genotype": [1, 1]}
 
     lineage_calls = {
-        "lineage1": {"var1": var1_call, "var1a": var1a_call,},
-        "lineage1.1": {"var1.1": var1_1_call,},
-        "lineage1.1.1": {"var1.1.1": var1_1_1_call,},
+        "lineage1": {
+            "var1": var1_call,
+            "var1a": var1a_call,
+        },
+        "lineage1.1": {
+            "var1.1": var1_1_call,
+        },
+        "lineage1.1.1": {
+            "var1.1.1": var1_1_1_call,
+        },
     }
 
     expect_lineage_calls = copy.deepcopy(lineage_calls)
@@ -241,7 +309,7 @@ def test_call_lineage():
                 "good_nodes": 3,
                 "tree_depth": 3,
             },
-        }
+        },
     }
     assert lin_pred.call_lineage(lineage_calls) == expect
 
@@ -253,7 +321,7 @@ def test_call_lineage():
         "lineage2.1": {"var2.1": var2_1_call},
     }
     expect["calls_summary"]["lineage2.1"] = {
-        "genotypes": {'lineage2': 1, 'lineage2.1': 1},
+        "genotypes": {"lineage2": 1, "lineage2.1": 1},
         "good_nodes": 2,
         "tree_depth": 2,
     }

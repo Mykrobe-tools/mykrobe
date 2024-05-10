@@ -33,7 +33,7 @@ def test_species_dir():
                     "hierarchy": None,
                 },
             },
-        }
+        },
     }
     with open(os.path.join(temp_dir, "manifest.json"), "w") as f:
         json.dump(manifest_data, f, indent=2, sort_keys=True)
@@ -84,7 +84,6 @@ def test_species_dir():
     with open(amr_json, "w") as f:
         pass
     assert sdir.sanity_check()
-
 
     manifest_data["panels"]["panel2"] = {
         "description": "description of panel2",

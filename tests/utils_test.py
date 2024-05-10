@@ -55,7 +55,7 @@ def test_fix_amino_acid_X_variants_keys():
         "katG_S315C-GCT2155167TTA": "baz",
         "katG_S315X-GCT2155167CTA": "baz",  # katG is on reverse strand so stop TAG is CTA
         "embB_M306I-ATG4247429ATA": "value",
-        "embB_M306X-ATG4247429ATA": "value", # duplicate of previous, should remove
+        "embB_M306X-ATG4247429ATA": "value",  # duplicate of previous, should remove
     }
 
     utils.fix_amino_acid_X_variants_keys(test_dict)

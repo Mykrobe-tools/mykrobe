@@ -9,7 +9,8 @@ import pytest
 
 def test_percentage_coverage():
     assert percent_coverage_from_expected_coverage(
-        100) > percent_coverage_from_expected_coverage(10)
+        100
+    ) > percent_coverage_from_expected_coverage(10)
     assert percent_coverage_from_expected_coverage(100) == 1
     assert percent_coverage_from_expected_coverage(1) < 1
 
@@ -21,46 +22,28 @@ def test_log_factorial():
 
 
 def test_log_lik_depth():
-    assert exp(
-        log_lik_depth(
-            expected_depth=10,
-            depth=10)) > exp(
-        log_lik_depth(
-            expected_depth=10,
-            depth=1))
-    assert exp(
-        log_lik_depth(
-            expected_depth=10,
-            depth=10)) > exp(
-        log_lik_depth(
-            expected_depth=10,
-            depth=8))
-    assert exp(
-        log_lik_depth(
-            expected_depth=10,
-            depth=10)) == exp(
-        log_lik_depth(
-            expected_depth=10,
-            depth=9))
-    assert exp(
-        log_lik_depth(
-            expected_depth=10,
-            depth=10)) > exp(
-        log_lik_depth(
-            expected_depth=10,
-            depth=11))
-    assert log_lik_depth(
-        expected_depth=100,
-        depth=50) < log_lik_depth(
-        expected_depth=10,
-        depth=9)
-    with pytest.raises(ValueError) as cm:
+    assert exp(log_lik_depth(expected_depth=10, depth=10)) > exp(
+        log_lik_depth(expected_depth=10, depth=1)
+    )
+    assert exp(log_lik_depth(expected_depth=10, depth=10)) > exp(
+        log_lik_depth(expected_depth=10, depth=8)
+    )
+    assert exp(log_lik_depth(expected_depth=10, depth=10)) == exp(
+        log_lik_depth(expected_depth=10, depth=9)
+    )
+    assert exp(log_lik_depth(expected_depth=10, depth=10)) > exp(
+        log_lik_depth(expected_depth=10, depth=11)
+    )
+    assert log_lik_depth(expected_depth=100, depth=50) < log_lik_depth(
+        expected_depth=10, depth=9
+    )
+    with pytest.raises(ValueError):
         log_lik_depth(expected_depth=0, depth=0)
-    with pytest.raises(ValueError) as cm:
+    with pytest.raises(ValueError):
         log_lik_depth(expected_depth=-1, depth=9)
-    with pytest.raises(ValueError) as cm:
+    with pytest.raises(ValueError):
         log_lik_depth(expected_depth=12, depth=-1)
-    with pytest.raises(ValueError) as cm:
+    with pytest.raises(ValueError):
         log_lik_depth(expected_depth=0, depth=1)
     assert log_lik_depth(expected_depth=1, depth=0) == -1
 
