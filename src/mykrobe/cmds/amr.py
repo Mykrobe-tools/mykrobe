@@ -153,6 +153,7 @@ def ref_data_from_args(args):
             "var_to_res_json": args.custom_variant_to_resistance_json,
             "hierarchy_json": None,
             "lineage_json": args.custom_lineage_json,
+            "ncbi_names_json": None,
             "kmer": args.kmer,
             "version": "custom",
             "species_phylo_group": None,
