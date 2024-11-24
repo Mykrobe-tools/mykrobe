@@ -29,7 +29,8 @@ mykrobe predict --sample my_sample_name \
   --format json \
   --seq reads.fq.gz
 ```
-
+(It is possible to output most of the results as CSV, but some information is lost (does not fit easily
+in tabular/csv format)
 
 Test reads can be obtained by running:
 
