@@ -1,6 +1,8 @@
-from pkg_resources import get_distribution
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version
+
 
 try:
-    __version__ = "v" + get_distribution("mykrobe").version
-except:
+    __version__ = f"v{version('mykrobe')}"
+except PackageNotFoundError:
     __version__ = "local"
