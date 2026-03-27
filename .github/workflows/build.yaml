@@ -108,7 +108,7 @@ jobs:
 
   mac_build:
     name: Build mac os command line
-    runs-on: macos-11
+    runs-on: macos-15-intel
     steps:
     - name: Check out code for the build
       uses: actions/checkout@v3
