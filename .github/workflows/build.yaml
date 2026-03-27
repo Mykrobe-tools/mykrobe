@@ -49,7 +49,6 @@ jobs:
           rsync
           runc \
           squashfs-tools \
-          squashfs-tools-ng \
           uidmap \
           uuid-dev \
           wget \
