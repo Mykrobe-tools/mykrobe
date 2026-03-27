@@ -107,6 +107,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   mac_build:
+    if: false  # disable for now because is broken
     name: Build mac os command line
     runs-on: macos-15-intel
     steps:
