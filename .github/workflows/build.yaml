@@ -66,7 +66,7 @@ jobs:
         cd $GOPATH/src/github.com/sylabs
         wget https://github.com/sylabs/singularity/releases/download/v${SINGULARITY_VERSION}/singularity-ce-${SINGULARITY_VERSION}.tar.gz
         tar -xzf singularity-ce-${SINGULARITY_VERSION}.tar.gz
-        cd singularity-ce
+        cd singularity-ce-${SINGULARITY_VERSION}
         ./mconfig -v -p /usr/local
         make -j `nproc 2>/dev/null || echo 1` -C ./builddir all
         sudo make -C ./builddir install
