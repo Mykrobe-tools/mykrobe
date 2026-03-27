@@ -126,3 +126,11 @@ def test_data_dir():
     expect_manifest["species1"]["latest"] = copy.copy(manifest_data["species1"])
     assert ddir.manifest == expect_manifest
     shutil.rmtree(temp_dir)
+
+
+def test_resolve_download_url_for_figshare():
+    old = "https://figshare.com/ndownloader/files/42494211"
+    new = "https://ndownloader.figshare.com/files/42494211"
+    assert DataDir._resolve_download_url(old) == new
+    assert DataDir._resolve_download_url(new) == new
+    assert DataDir._resolve_download_url("https://example.com/file.tar.gz") == "https://example.com/file.tar.gz"

@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import re
+from urllib.parse import urlparse
 import requests
 import shutil
 import tarfile
@@ -14,6 +15,14 @@ logger = logging.getLogger(__name__)
 
 
 class DataDir:
+    @staticmethod
+    def _resolve_download_url(url):
+        parsed = urlparse(url)
+        if parsed.netloc == "figshare.com" and parsed.path.startswith("/ndownloader/files/"):
+            file_id = parsed.path.rsplit("/", 1)[-1]
+            return f"https://ndownloader.figshare.com/files/{file_id}"
+        return url
+
     def __init__(self, root_dir):
         self.root_dir = os.path.abspath(root_dir)
         self.manifest_json = os.path.join(self.root_dir, "manifest.json")
@@ -134,8 +143,10 @@ class DataDir:
             logger.info(f"Installing species from file {tarball_name}")
             to_extract = tarball_name
         else:
-            logger.info(f"Downloading file {tarball_name}")
-            request = requests.get(tarball_name, allow_redirects=True)
+            download_url = DataDir._resolve_download_url(tarball_name)
+            logger.info(f"Downloading file {download_url}")
+            request = requests.get(download_url, allow_redirects=True)
+            request.raise_for_status()
             to_extract = os.path.join(tmp_dir, "tmp.add_species.tar.gz")
             with open(to_extract, 'wb') as t:
                 t.write(request.content)
