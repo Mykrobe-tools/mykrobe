@@ -47,7 +47,7 @@ jobs:
           libsubid-dev \
           libtool \
           pkg-config \
-          rsync
+          rsync \
           runc \
           squashfs-tools \
           uidmap \
