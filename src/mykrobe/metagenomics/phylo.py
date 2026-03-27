@@ -27,6 +27,7 @@ TAXON_THRESHOLDS = {
     "Shigella_sonnei": 90,
     "Salmonella_enterica": 90,
     "Salmonella_Typhi": 90,
+    "Shigella_flexneri": 90,
 }
 
 
